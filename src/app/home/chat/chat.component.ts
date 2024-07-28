@@ -46,5 +46,7 @@ export class ChatComponent {
   }
 
 
-
+  getCurrentObjectId(){
+    return localStorage.getItem('objectId');
+  }
 }

@@ -1,31 +1,65 @@
 <div class="h-full flex flex-col pt-3 px-3 bg-[#F6EFEE]">
-  <div class="flex flex-col mb-3 basis-[94%] bg-white rounded-md">
+  <div class="flex flex-col mb-3 basis-[94%] bg-white rounded-md overflow-y-scroll">
     <p
       *ngIf="messages.length === 0"
       class="w-full text-center bg-gray-500 text-white"
     >
       No messages here
     </p>
-    <div class="flex px-5" *ngFor="let message of messages; index as i">
-      <div *ngIf="i === 0 || messages[i].senderId !== messages[i-1].senderId">
-        <img src="./assets/re.png" class="h-11 w-11 rounded-full" />
+
+    <div
+      class="flex px-5"
+      *ngFor="let message of messages; index as i"
+      [ngClass]="
+        message.senderId === getCurrentObjectId()
+          ? 'justify-end flex-row-reverse'
+          : 'justify-start flex-row'
+      "
+    >
+      <div class="w-11">
+        <img
+          *ngIf="i === 0 || messages[i].senderId !== messages[i - 1].senderId"
+          src="./assets/re.png"
+          class="h-11 w-11 rounded-full"
+        />
       </div>
-      <div class="flex flex-col px-3">
-        <div class="flex text-xl">
-          <p *ngIf="i === 0 || messages[i].senderId !== messages[i-1].senderId ">
+      <div class="flex flex-col w-full">
+        <div
+          class="flex text-xl w-full"
+          [ngClass]="
+            message.senderId === getCurrentObjectId()
+              ? 'justify-end pr-2'
+              : 'justify-start pl-2'
+          "
+        >
+          <p
+            *ngIf="i === 0 || messages[i].senderId !== messages[i - 1].senderId"
+          >
             {{
               message.senderId === senderUser?.objectId
                 ? senderUser?.firstName
                 : receiverUser?.firstName
             }}
-          {{message.senderId === senderUser?.objectId
-            ? senderUser?.lastName
-            : receiverUser?.lastName}}
+            {{
+              message.senderId === senderUser?.objectId
+                ? senderUser?.lastName
+                : receiverUser?.lastName
+            }}
           </p>
           <p class="ml-2 font-light hidden">04:33 AM</p>
         </div>
-        <p class="text-lg" 
-        [ngClass]="i !== 0 && messages[i].senderId === messages[i-1].senderId ? 'pl-11' : ''">{{ message.messageText }}</p>
+        <div
+          class="flex"
+          [ngClass]="
+            message.senderId === getCurrentObjectId()
+              ? 'justify-end pr-2'
+              : 'justify-start pl-2'
+          "
+        >
+          <p class="text-lg font-light">
+            {{ message.messageText }}
+          </p>
+        </div>
       </div>
     </div>
   </div>

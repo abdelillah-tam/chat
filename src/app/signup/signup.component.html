@@ -1,0 +1,83 @@
+<div class="h-full w-full bg-white">
+  <div
+    class="h-1/2 flex flex-col justify-evenly items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+  >
+    <div class="flex justify-center items-center w-full">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        fill="#16a34a"
+        height="72px"
+        width="72px"
+        version="1.1"
+        id="Capa_1"
+        viewBox="0 0 60 60"
+        xml:space="preserve"
+      >
+        <path
+          d="M30,1.5c-16.542,0-30,12.112-30,27c0,5.205,1.647,10.246,4.768,14.604c-0.591,6.537-2.175,11.39-4.475,13.689  c-0.304,0.304-0.38,0.769-0.188,1.153C0.276,58.289,0.625,58.5,1,58.5c0.046,0,0.093-0.003,0.14-0.01  c0.405-0.057,9.813-1.412,16.617-5.338C21.622,54.711,25.738,55.5,30,55.5c16.542,0,30-12.112,30-27S46.542,1.5,30,1.5z"
+        />
+      </svg>
+      <p class="text-3xl ml-2">Chat</p>
+    </div>
+
+    <p class="text-3xl">Create an account</p>
+
+    <form
+      class="flex flex-col"
+      [formGroup]="signUpForm"
+      (ngSubmit)="onSubmit()"
+    >
+      <div class="flex">
+        <input
+          class="text-xl font-light h-9 px-2 mr-1 border border-gray-300 outline-none rounded-md focus:border-blue-600"
+          placeholder="First Name"
+          formControlName="firstName"
+        />
+        <input
+          class="text-xl font-light h-9 px-2 ml-1 border border-gray-300 outline-none rounded-md focus:border-blue-600"
+          placeholder="Last Name"
+          formControlName="lastName"
+          
+        />
+      </div>
+
+      <select
+        class="text-xl font-light mt-4 px-2 outline-none focus:border-blue-600 border-gray-300 border rounded-md h-9"
+        formControlName="sex"
+      >
+        <option>Male</option>
+        <option>Female</option>
+      </select>
+
+      <input
+        class="text-xl font-light h-9 mt-4 px-2 border border-gray-300 outline-none rounded-md focus:border-blue-600"
+        placeholder="Email"
+        type="email"
+        formControlName="email"
+      />
+
+      <input
+        class="text-xl font-light h-9 mt-4 px-2 border border-gray-300 outline-none rounded-md focus:border-blue-600"
+        placeholder="Password"
+        type="password"
+        formControlName="password"
+      />
+
+      <button
+        class="bg-green-600 mt-8 text-white h-9 text-xl font-light rounded-md"
+      >
+        Signup
+      </button>
+      <div class="flex mt-1">
+        <p>Alreay have an account?</p>
+        <a
+          class="ml-1 text-blue-600 underline"
+          routerLink="/login"
+          routerLinkActive="active"
+          >Login</a
+        >
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,14 +1,14 @@
-<div class="h-full bg-[#EEF2F1] px-5 pt-3">
+<div class="h-full px-5 pt-3 bg-[#EEF2F1]">
   <div class="w-full">
     <input
-      class="basis-[95%] w-full text-xl font-light px-2 border border-gray-300 outline-none rounded-md focus:border-blue-600"
+      class="basis-[95%] w-full px-2 text-xl font-light border outline-none rounded-md border-gray-300 focus:border-blue-600"
       placeholder="Search"
       [(ngModel)]="searchInput"
       (ngModelChange)="findUsers()"
     />
   </div>
   <div
-    class="flex flex-col-reverse basis-[94%] rounded-md p-5 mt-5 bg-green-600 cursor-pointer"
+    class="basis-[94%] flex flex-col-reverse p-5 mt-5 rounded-md bg-green-600 cursor-pointer"
     *ngFor="let user of users"
     (click)="openChatWindow(user.objectId)"
   >
@@ -16,12 +16,10 @@
       <div>
         <img src="./assets/re.png" class="h-11 w-11 rounded-full" />
       </div>
-      <div class="flex flex-col pl-3 w-full text-white" >
-        <div class="flex text-xl w-full justify-between items-center">
+      <div class="w-full flex flex-col justify-center pl-3 text-white">
+        <div class="w-full flex items-center text-xl">
           <p>{{ user.firstName }} {{ user.lastName }}</p>
-          <p class="font-light text-base">04:33 AM</p>
         </div>
-        <p class="text-md">Hey guys check this out</p>
       </div>
     </div>
   </div>

@@ -13,6 +13,7 @@ export class MessagingService {
 
   private db = getDatabase();
 
+
   constructor() { }
 
   openChatWindow(receiverObjectId: string) {
@@ -26,20 +27,21 @@ export class MessagingService {
 
   sendMessage(message: Message) {
 
-    const timestamp = Date.now();
 
-    const receiverMessageListRef = ref(this.db, 'chats/' + message.senderId + '/' + message.receiverId + '/' + timestamp);
-    const senderMessageListRef = ref(this.db, 'chats/' + message.receiverId + '/' + message.senderId + '/' + timestamp);
+    const receiverMessageListRef = ref(this.db, 'chats/' + message.senderId + '/' + message.receiverId + '/' + message.timestamp);
+    const senderMessageListRef = ref(this.db, 'chats/' + message.receiverId + '/' + message.senderId + '/' + message.timestamp);
 
     set(receiverMessageListRef, {
       'messageText': message.messageText,
       'senderId': message.senderId,
-      'receiverId': message.receiverId
+      'receiverId': message.receiverId,
+      'timestamp': message.timestamp
     });
     set(senderMessageListRef, {
       'messageText': message.messageText,
       'senderId': message.senderId,
-      'receiverId': message.receiverId
+      'receiverId': message.receiverId,
+      'timestamp': message.timestamp
     });
   }
 
@@ -49,10 +51,10 @@ export class MessagingService {
     let msgs: any[] = [];
 
     onValue(reference, (snapshot) => {
+      msgs = [];
       snapshot.forEach((child) => {
         msgs.push(child.val());
       });
-
       onMessagesDownloaded(msgs);
     });
   }

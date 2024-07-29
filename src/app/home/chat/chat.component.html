@@ -5,7 +5,9 @@
   >
     No messages here
   </p>
-  <div class="flex flex-col mb-3 basis-[94%] bg-white rounded-md overflow-y-auto">
+  <div
+    class="basis-[94%] flex flex-col mb-3 py-3 bg-white rounded-md overflow-y-auto"
+  >
     <div
       class="flex px-5"
       *ngFor="let message of messages; index as i"
@@ -22,9 +24,9 @@
           class="h-11 w-11 rounded-full"
         />
       </div>
-      <div class="flex flex-col w-full">
+      <div class="w-full flex flex-col">
         <div
-          class="flex text-xl w-full"
+          class="w-full flex text-xl"
           [ngClass]="
             message.senderId === getCurrentObjectId()
               ? 'justify-end pr-2'
@@ -45,18 +47,20 @@
                 : receiverUser?.lastName
             }}
           </p>
-          <p class="ml-2 font-light hidden">04:33 AM</p>
         </div>
         <div
-          class="flex"
+          class="flex items-center"
           [ngClass]="
             message.senderId === getCurrentObjectId()
-              ? 'justify-end pr-2'
-              : 'justify-start pl-2'
+              ? 'pr-2 flex-row-reverse'
+              : 'flex-row pl-2'
           "
         >
           <p class="text-lg font-light">
             {{ message.messageText }}
+          </p>
+          <p class="ml-2 font-light text-xs px-2">
+            {{ message.timestamp | date : "hh:mm aa" }}
           </p>
         </div>
       </div>
@@ -64,7 +68,7 @@
   </div>
   <div class="basis-[6%] flex mb-3">
     <input
-      class="basis-[95%] w-full h-full text-xl font-light px-2 border border-gray-300 outline-none rounded-md focus:border-blue-600"
+      class="basis-[95%] w-full h-full px-2 text-xl border-gray-300 outline-none rounded-md focus:border-blue-600 font-lightborder"
       placeholder="Type a message"
       [(ngModel)]="text"
     />
@@ -80,6 +84,7 @@
         viewBox="0 0 495.003 495.003"
         xml:space="preserve"
         (click)="sendMessage()"
+        class="cursor-pointer"
       >
         <g id="XMLID_51_">
           <path

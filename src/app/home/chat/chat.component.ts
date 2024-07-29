@@ -20,13 +20,13 @@ export class ChatComponent {
   senderUser: User | undefined;
   receiverUser: User | undefined;
 
-  text = "";
+  text = '';
 
   constructor(private messagingService: MessagingService, private authService: AuthService) {
     this.messagingService.listenForMessages((messages) => {
       this.messages = messages;
     });
-    
+
     this.authService.getFullName(localStorage.getItem('objectId')!, (user) => {
       this.senderUser = user;
     });
@@ -40,13 +40,15 @@ export class ChatComponent {
   sendMessage() {
     const message = new Message(this.text,
       localStorage.getItem('objectId')!,
-      this.messagingService.receiverObjectId);
+      this.messagingService.receiverObjectId, Date.now().toString());
+
+    this.text = '';
 
     this.messagingService.sendMessage(message);
   }
 
 
-  getCurrentObjectId(){
+  getCurrentObjectId() {
     return localStorage.getItem('objectId');
   }
 }

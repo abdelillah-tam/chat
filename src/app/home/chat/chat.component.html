@@ -1,12 +1,11 @@
-<div class="h-full flex flex-col pt-3 px-3 bg-[#F6EFEE]">
-  <div class="flex flex-col mb-3 basis-[94%] bg-white rounded-md overflow-y-scroll">
-    <p
-      *ngIf="messages.length === 0"
-      class="w-full text-center bg-gray-500 text-white"
-    >
-      No messages here
-    </p>
-
+<div class="h-full w-full flex flex-col pt-3 px-3 bg-[#F6EFEE]">
+  <p
+    *ngIf="messages.length === 0"
+    class="w-full text-center bg-gray-500 text-white"
+  >
+    No messages here
+  </p>
+  <div class="flex flex-col mb-3 basis-[94%] bg-white rounded-md overflow-y-auto">
     <div
       class="flex px-5"
       *ngFor="let message of messages; index as i"

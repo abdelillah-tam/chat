@@ -17,11 +17,11 @@
           : 'justify-start flex-row'
       "
     >
-      <div class="w-11">
+      <div class="h-11 w-11 rounded-full">
         <img
           *ngIf="i === 0 || messages[i].senderId !== messages[i - 1].senderId"
-          src="./assets/re.png"
-          class="h-11 w-11 rounded-full"
+          src="./assets/user.jpg"
+          class="rounded-full"
         />
       </div>
       <div class="w-full flex flex-col">
@@ -71,6 +71,7 @@
       class="basis-[95%] w-full h-full px-2 text-xl border-gray-300 outline-none border rounded-md focus:border-blue-600 font-lightborder"
       placeholder="Type a message"
       [(ngModel)]="text"
+      (keydown.enter)="sendMessage()"
     />
     <div class="basis-[5%] p-2">
       <svg

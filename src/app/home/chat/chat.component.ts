@@ -46,6 +46,7 @@ export class ChatComponent {
 
 
   sendMessage() {
+    if(this.text !== ''){
     const message = new Message(this.text,
       localStorage.getItem('objectId')!,
       this.messagingService.receiverObjectId, Date.now().toString());
@@ -53,6 +54,7 @@ export class ChatComponent {
     this.text = '';
 
     this.messagingService.sendMessage(message);
+    }
   }
 
 

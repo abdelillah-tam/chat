@@ -5,30 +5,45 @@ import { ChatComponent } from "./chat/chat.component";
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MessagingService } from '../services/messaging.service';
+import { AuthService } from '../services/auth.service';
+import { User } from '../model/user';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule,ContactInformationComponent, UsersComponent, ChatComponent],
+  imports: [CommonModule, ContactInformationComponent, UsersComponent, ChatComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
-export class HomeComponent implements OnInit{
+export class HomeComponent implements OnInit {
 
   opened: boolean = false;
-  constructor(private router: Router, private messagingService: MessagingService){}
+  constructor(private router: Router,
+    private messagingService: MessagingService,
+    private authService: AuthService) {
+      this.getFullName();
+     }
 
+    currentUser: User | undefined;
 
   ngOnInit(): void {
     if (localStorage.getItem('email') === null ||
-            localStorage.getItem('userToken') === null ||
-            localStorage.getItem('objectId') === null) {
-            this.router.navigate(['/login']);
-          }
+      localStorage.getItem('userToken') === null ||
+      localStorage.getItem('objectId') === null) {
+      this.router.navigate(['/login']);
+    }
 
     this.messagingService.openChat.subscribe((result) => {
       this.opened = result;
-    }) 
+    })
   }
 
+
+  getFullName() {
+    this
+      .authService
+      .getFullName(localStorage.getItem('objectId')!, (user) => {
+        this.currentUser = user;
+      });
+  }
 }

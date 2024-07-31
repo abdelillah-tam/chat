@@ -47,7 +47,7 @@ export class MessagingService {
 
   listenForMessages(onMessagesDownloaded : (messages: any[]) => void) {
     const reference = ref(this.db, 'chats/' + localStorage.getItem('objectId')! + '/' + this.receiverObjectId);
-    console.log('listen called');
+    
     let msgs: any[] = [];
 
     onValue(reference, (snapshot) => {
@@ -56,6 +56,7 @@ export class MessagingService {
         msgs.push(child.val());
       });
       onMessagesDownloaded(msgs);
+      console.log('listen called');
     });
   }
 

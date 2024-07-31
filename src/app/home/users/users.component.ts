@@ -30,7 +30,25 @@ export class UsersComponent {
     });
   }
 
-  openChatWindow(objectId: string){
+  openChatWindow(objectId: string, index: number){
+    this.messagingService.closeChatWindow();
     this.messagingService.openChatWindow(objectId);
+    let usersList = document.querySelectorAll('.users-list');
+    usersList.forEach((value, key) => {
+      let name = value.querySelector('.name-class');
+
+      if(key !== index){
+        value.classList.remove('bg-green-600');
+        name?.classList.remove('text-white');
+        name?.classList.add('text-gray-700');
+        
+      }else{
+        value.classList.add('bg-green-600');
+        value.classList.add('text-gray-600');
+        name?.classList.add('text-white');
+        name?.classList.remove('text-gray-700');
+      }
+    })
+    //usersList[index].classList.add('bg-green-600');
   }
 }

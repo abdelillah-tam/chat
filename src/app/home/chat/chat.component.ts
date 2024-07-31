@@ -23,9 +23,16 @@ export class ChatComponent {
   text = '';
 
   constructor(private messagingService: MessagingService, private authService: AuthService) {
-    this.messagingService.listenForMessages((messages) => {
-      this.messages = messages;
+
+    this.messagingService.openChat.subscribe((value) => {
+      if(value){
+        console.log(value);
+        this.messagingService.listenForMessages((messages) => {
+          this.messages = messages;
+        });
+      }
     });
+    
 
     this.authService.getFullName(localStorage.getItem('objectId')!, (user) => {
       this.senderUser = user;

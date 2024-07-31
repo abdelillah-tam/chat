@@ -8,15 +8,15 @@
     />
   </div>
   <div
-    class="basis-[94%] flex flex-col-reverse p-5 mt-5 rounded-md bg-green-600 cursor-pointer"
-    *ngFor="let user of users"
-    (click)="openChatWindow(user.objectId)"
+    class="users-list basis-[94%] flex flex-col-reverse p-5 mt-5 rounded-md  cursor-pointer"
+    *ngFor="let user of users; index as i"
+    (click)="openChatWindow(user.objectId, i)"
   >
     <div class="flex">
       <div>
         <img src="./assets/re.png" class="h-11 w-11 rounded-full" />
       </div>
-      <div class="w-full flex flex-col justify-center pl-3 text-white">
+      <div class="name-class w-full flex flex-col justify-center pl-3 text-gray-700">
         <div class="w-full flex items-center text-xl">
           <p>{{ user.firstName }} {{ user.lastName }}</p>
         </div>

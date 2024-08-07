@@ -30,8 +30,18 @@
     </div>
   </div>
   <div
-    class="w-2/6 h-1/2 flex flex-col justify-center ml-auto mr-auto absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+    class="w-2/6 h-1/2 flex flex-col justify-evenly ml-auto mr-auto absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
   >
+    <button class="h-9 border rounded-md flex items-center justify-center py-2" (click)="login()">
+      <img src="./assets/google-icon.png" class="w-7 h-7" />&#160;Sign in using
+      Google
+    </button>
+
+    <div class="flex justify-between items-center">
+      <mat-divider class="w-[45%]"></mat-divider>
+      <p>Or</p>
+      <mat-divider class="w-[45%]"></mat-divider>
+    </div>
     <form
       class="h-3/6 flex flex-col justify-between"
       [formGroup]="loginGroup"

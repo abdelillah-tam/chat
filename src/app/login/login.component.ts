@@ -1,19 +1,31 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { CommonModule } from '@angular/common';
+import { MatDividerModule } from "@angular/material/divider";
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, ReactiveFormsModule, CommonModule],
+  imports: [RouterLink, RouterLinkActive, ReactiveFormsModule, CommonModule, MatDividerModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
 
-  constructor(private authService: AuthService, private router: Router) { }
+  constructor(private authService: AuthService, private router: Router) {
+    // @ts-ignore
+    google.accounts.id.initialize({
+      client_id: '205706621989-pken44sei0ti29vd95ukk3o2ja4e4gh1.apps.googleusercontent.com',
+      callback: this.handleCredential.bind(this)
+    });
+  }
+
+  ngOnInit(): void {
+
+
+  }
 
 
   loginGroup = new FormGroup(
@@ -42,5 +54,12 @@ export class LoginComponent {
     }
   }
 
+  login() {
+    // @ts-ignore
+    google.accounts.id.prompt();
+  }
 
+  handleCredential(credential: { credential: string }) {
+    this.authService.loginWithProvider(credential);
+  }
 }

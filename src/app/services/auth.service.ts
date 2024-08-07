@@ -44,6 +44,27 @@ export class AuthService {
       });
   }
 
+  loginWithProvider(credential: { credential: string }) {
+    this.http.post('https://brainyclub-eu.backendless.app/api/users/oauth/googleplus/login', {
+      'accessToken': credential.credential
+    },
+      {
+        headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+      }).subscribe((result) => {
+        console.log(result);
+
+      });
+
+  }
+
+  logout() {
+    this.http.get('https://brainyclub-eu.backendless.app/api/users/logout', {
+      headers: new HttpHeaders({
+        'user-token': localStorage.getItem('userToken')!
+      })
+    });
+  }
+
   findUsers(name: string, userToken: string, onFind: (users: Array<User>) => void) {
     this.http.get<Array<User>>(`https://brainyclub-eu.backendless.app/api/data/Users?where=firstName%20%3D%20'${name}'`,
       {

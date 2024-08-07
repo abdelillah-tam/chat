@@ -1,5 +1,5 @@
 <div class="h-screen w-full flex flex-col">
-  <header class="h-[10%] flex items-center justify-between px-7 bg-white ">
+  <header class="h-[10%] flex items-center justify-between px-7 bg-white">
     <div class="flex items-center">
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -18,16 +18,32 @@
       </svg>
       <p class="text-3xl ml-2">Chat</p>
     </div>
-    <div class="flex items-center">
-        <div class="h-9 w-9">
-          <img src="./assets/user.jpg" />
-        </div>
-        <p class="cursor-pointer">{{ currentUser?.firstName }} {{ currentUser?.lastName }}</p>
+    <div class="w-44 flex items-center relative" (click)="openPanel()">
+      <div class="h-9 w-9">
+        <img src="./assets/user.jpg" />
+      </div>
+      <p class="cursor-pointer">
+        {{ currentUser?.firstName }} {{ currentUser?.lastName }}
+      </p>
     </div>
   </header>
 
-  <div class="h-[90%] flex flex-1">
+  <div class="h-[90%] flex flex-1 relative">
+    <ul
+      class="w-44 flex flex-col bg-white absolute right-0 mx-7"
+      *ngIf="openedPanel"
+    >
+      <li class="flex my-3 items-center" (click)="logout()">
+        <div class="h-9 w-9 p-1 pl-2 content-center">
+          <img src="./assets/logout.png" />
+        </div>
+        <p class="cursor-pointer">Logout</p>
+      </li>
+    </ul>
     <app-users [ngClass]="opened ? 'basis-1/3' : 'basis-full'"></app-users>
-    <app-chat *ngIf="opened" [ngClass]="opened ? 'basis-2/3' :'basis-0'"></app-chat>
+    <app-chat
+      *ngIf="opened"
+      [ngClass]="opened ? 'basis-2/3' : 'basis-0'"
+    ></app-chat>
   </div>
 </div>

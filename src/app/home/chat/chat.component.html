@@ -8,7 +8,7 @@
   <div
     class="basis-[94%] flex flex-col mb-3 py-3 bg-white rounded-md overflow-y-auto"
   >
-    <div
+    <ul
       class="flex px-5"
       *ngFor="let message of messages; index as i"
       [ngClass]="
@@ -17,14 +17,14 @@
           : 'justify-start flex-row'
       "
     >
-      <div class="w-11 rounded-full">
+      <li class="w-11 rounded-full">
         <img
           *ngIf="i === 0 || messages[i].senderId !== messages[i - 1].senderId"
           src="./assets/user.jpg"
           class="rounded-full"
         />
-      </div>
-      <div class="w-full flex flex-col">
+      </li>
+      <li class="w-full flex flex-col">
         <div
           class="w-full flex text-xl"
           [ngClass]="
@@ -63,8 +63,8 @@
             {{ message.timestamp | date : "hh:mm aa" }}
           </p>
         </div>
-      </div>
-    </div>
+      </li>
+    </ul>
   </div>
   <div class="basis-[6%] flex mb-3">
     <input

@@ -18,13 +18,16 @@ import { User } from '../model/user';
 export class HomeComponent implements OnInit {
 
   opened: boolean = false;
+
+  openedPanel: boolean = false;
+
   constructor(private router: Router,
     private messagingService: MessagingService,
     private authService: AuthService) {
-      this.getFullName();
-     }
+    this.getFullName();
+  }
 
-    currentUser: User | undefined;
+  currentUser: User | undefined;
 
   ngOnInit(): void {
     if (localStorage.getItem('email') === null ||
@@ -45,5 +48,17 @@ export class HomeComponent implements OnInit {
       .getFullName(localStorage.getItem('objectId')!, (user) => {
         this.currentUser = user;
       });
+  }
+  
+  openPanel(){
+    this.openedPanel = !this.openedPanel;
+  }
+  
+  logout(){
+    this.authService.logout();
+    localStorage.removeItem('email');
+    localStorage.removeItem('userToken');
+    localStorage.removeItem('objectId');
+    this.router.navigate(['/login']);
   }
 }

@@ -4,29 +4,31 @@ export class User {
     email: string;
     sex: string;
     objectId: string;
+    provider: string;
 
-    constructor(firstName: string, lastName: string, email: string, sex: string, objectId: string) {
+    constructor(firstName: string, lastName: string, email: string, sex: string, objectId: string, provider: string) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.sex = sex;
         this.objectId = objectId;
+        this.provider = provider;
     }
 
-    getFirstName(){
+    getFirstName() {
         return this.firstName;
     }
 
-    getLastName(){
+    getLastName() {
         return this.lastName;
     }
 
-    getEmail(){
+    getEmail() {
         return this.email;
     }
 
-    getSex(){
+    getSex() {
         return this.sex;
     }
-    
+
 }

@@ -56,6 +56,7 @@
         type="email"
         formControlName="email"
       />
+      <p class="text-red-600" *ngIf="!isEmailValid">Enter a valid email !</p>
 
       <input
         class="text-xl font-light h-9 mt-4 px-2 border border-gray-300 outline-none rounded-md focus:border-blue-600"
@@ -63,6 +64,7 @@
         type="password"
         formControlName="password"
       />
+      <p class="text-red-600" *ngIf="!isPasswordValid">Password must be at least 8 characters !</p>
 
       <button
         class="bg-green-600 mt-8 text-white h-9 text-xl font-light rounded-md"

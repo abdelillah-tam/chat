@@ -32,7 +32,10 @@
   <div
     class="w-2/6 h-1/2 flex flex-col justify-evenly ml-auto mr-auto absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
   >
-    <button class="h-9 border rounded-md flex items-center justify-center py-2" (click)="login()">
+    <button
+      class="h-9 border rounded-md flex items-center justify-center py-2"
+      (click)="login()"
+    >
       <img src="./assets/google-icon.png" class="w-7 h-7" />&#160;Sign in using
       Google
     </button>
@@ -54,6 +57,9 @@
           placeholder="Email"
           formControlName="email"
         />
+        <p class="text-red-600" *ngIf="!isEmailValid">
+          Enter a valid email !
+        </p>
       </div>
       <div class="flex flex-col">
         <label class="text-xl font-bold">Password</label>
@@ -63,6 +69,9 @@
           placeholder="Password"
           formControlName="password"
         />
+        <p class="text-red-600" *ngIf="!isPasswordValid">
+          Password must be at least 8 characters !
+        </p>
       </div>
 
       <button class="bg-green-600 text-white h-9 text-xl font-light rounded-md">

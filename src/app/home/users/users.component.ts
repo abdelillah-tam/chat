@@ -25,7 +25,7 @@ export class UsersComponent {
 
   findUsers(){
     let userToken = localStorage.getItem('userToken');
-    this.authService.findUsers(this.searchInput, userToken!, (users: Array<User>) => {
+    this.authService.findUsersByName(this.searchInput, userToken!, (users: Array<User>) => {
       this.users = users;
     });
   }

@@ -25,6 +25,8 @@ export class LoginComponent implements OnInit {
     });
   }
 
+  isPasswordVisible = false;
+
   isEmailValid = true;
   isPasswordValid = true;
 
@@ -82,6 +84,10 @@ export class LoginComponent implements OnInit {
         )
       }
     })
+  }
+
+  makePasswordVisible(){
+    this.isPasswordVisible = !this.isPasswordVisible;
   }
 
   private saveDataLocally(email: string, userToken: string, objectId: string) {

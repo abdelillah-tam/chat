@@ -1,0 +1,16 @@
+@media only screen and (max-width: 500px) {
+  .header {
+    flex-direction: column;
+  }
+
+  .login-div {
+    width: 90%;
+  }
+
+  .create-account {
+    margin-top: 2em;
+    .create-account-text {
+      display: none;
+    }
+  }
+}

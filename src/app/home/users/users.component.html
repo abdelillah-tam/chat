@@ -2,11 +2,12 @@
   <div class="w-full">
     <input
       class="basis-[95%] w-full px-2 text-xl font-light border outline-none rounded-md border-gray-300 focus:border-blue-600"
-      placeholder="Search"
+      placeholder="Search for a user"
       [(ngModel)]="searchInput"
       (ngModelChange)="findUsers()"
     />
   </div>
+  
   <div
     class="users-list basis-[94%] flex flex-col-reverse p-5 mt-5 rounded-md  cursor-pointer"
     *ngFor="let user of users; index as i"

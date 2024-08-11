@@ -46,23 +46,6 @@ export class AuthService {
       });
   }
 
-  loginWithProvider(credential: { credential: string }) {
-
-    this.http.post('https://brainyclub-eu.backendless.app/api/users/oauth/googleplus/login', {
-      'accessToken': credential.credential,
-      'fieldsMapping': JSON.parse(JSON.stringify({
-        email: 'email',
-        name: 'name'
-      }))
-    },
-      {
-        headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-      }).subscribe((result) => {
-
-      });
-
-  }
-
   logout() {
     this.http.get('https://brainyclub-eu.backendless.app/api/users/logout', {
       headers: new HttpHeaders({

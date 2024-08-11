@@ -1,5 +1,5 @@
-<div class="h-full w-full bg-white">
-  <div class="flex justify-between items-center p-6">
+<div class="h-full w-full select-none bg-white">
+  <div class="header flex justify-between items-center p-6">
     <div class="flex items-center">
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -18,8 +18,8 @@
       </svg>
       <p class="text-3xl ml-2">Chat</p>
     </div>
-    <div class="flex items-center">
-      <p class="mr-2">New to Chat?</p>
+    <div class="create-account flex items-center">
+      <p class="create-account-text mr-2">New to Chat?</p>
       <button
         class="border border-gray-300 rounded-md px-2 py-1"
         routerLink="/signup"
@@ -30,7 +30,7 @@
     </div>
   </div>
   <div
-    class="w-2/6 h-1/2 flex flex-col justify-evenly ml-auto mr-auto absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+    class="login-div w-96 h-1/2 flex flex-col justify-evenly ml-auto mr-auto absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
   >
     <button
       class="h-9 border rounded-md flex items-center justify-center py-2"
@@ -42,7 +42,7 @@
 
     <div class="flex justify-between items-center">
       <mat-divider class="w-[45%]"></mat-divider>
-      <p>Or</p>
+      <p class="select-none">Or</p>
       <mat-divider class="w-[45%]"></mat-divider>
     </div>
     <form

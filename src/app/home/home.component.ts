@@ -34,8 +34,13 @@ export class HomeComponent implements OnInit {
       localStorage.getItem('userToken') === null ||
       localStorage.getItem('objectId') === null) {
       this.router.navigate(['/login']);
+    } else {
+      this.authService.verifyIfTokenValid(localStorage.getItem('userToken')!, (value) => {
+        if(!value){
+          this.router.navigate(['/login']);
+        }
+      })
     }
-
     this.messagingService.openChat.subscribe((result) => {
       this.opened = result;
     })
@@ -49,12 +54,12 @@ export class HomeComponent implements OnInit {
         this.currentUser = user;
       });
   }
-  
-  openPanel(){
+
+  openPanel() {
     this.openedPanel = !this.openedPanel;
   }
-  
-  logout(){
+
+  logout() {
     this.authService.logout();
     localStorage.removeItem('email');
     localStorage.removeItem('userToken');

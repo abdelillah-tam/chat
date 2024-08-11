@@ -46,6 +46,15 @@ export class AuthService {
       });
   }
 
+  verifyIfTokenValid(userToken: string, onSuccess : (value: boolean) => void){
+    this
+    .http
+    .get<boolean>(`https://brainyclub-eu.backendless.app/api/users/isvalidusertoken/${userToken}`)
+    .subscribe((result)=>{
+      onSuccess(result);
+    })
+  }
+
   logout() {
     this.http.get('https://brainyclub-eu.backendless.app/api/users/logout', {
       headers: new HttpHeaders({

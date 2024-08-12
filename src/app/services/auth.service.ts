@@ -46,13 +46,13 @@ export class AuthService {
       });
   }
 
-  verifyIfTokenValid(userToken: string, onSuccess : (value: boolean) => void){
+  verifyIfTokenValid(userToken: string, onSuccess: (value: boolean) => void) {
     this
-    .http
-    .get<boolean>(`https://brainyclub-eu.backendless.app/api/users/isvalidusertoken/${userToken}`)
-    .subscribe((result)=>{
-      onSuccess(result);
-    })
+      .http
+      .get<boolean>(`https://brainyclub-eu.backendless.app/api/users/isvalidusertoken/${userToken}`)
+      .subscribe((result) => {
+        onSuccess(result);
+      })
   }
 
   logout() {
@@ -76,7 +76,20 @@ export class AuthService {
     });
   }
 
-  findUserByEmail(email: string, onFind: (user: User | undefined) => void){
+  findUsersByObjectId(objectId: string, onFind: (users: User) => void){
+    this.http.get<User>(`https://brainyclub-eu.backendless.app/api/data/Users/${objectId}`,
+      {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+          'user-token': localStorage.getItem('userToken')!
+        }),
+      }
+    ).subscribe((result) => {
+      onFind(result);
+    });
+  }
+
+  findUserByEmail(email: string, onFind: (user: User | undefined) => void) {
     this.http.get<Array<User>>(`https://eu-api.backendless.com/EC90E79D-4443-4858-8D5E-02E90D0C63B1/58C3266A-8C33-4D5C-854B-66704F41CFB6/data/Users?where=email%3D'${email}'&property=%60provider%60&property=%60email%60&property=%60firstName%60&property=%60lastName%60`,
       {
         headers: new HttpHeaders({
@@ -97,6 +110,32 @@ export class AuthService {
       }
     ).subscribe((result) => {
       onGet(result);
+    });
+  }
+
+  updateInfos(
+    objectId: string,
+    firstName: string | undefined,
+    lastName: string | undefined,
+    email: string | undefined,
+    password: string | undefined,
+    onSuccess: ((user: User) => void) ) {
+
+    this.http.put<User>(`https://brainyclub-eu.backendless.app/api/data/users/${objectId}`,
+      {
+        'firstName': firstName,
+        'lastName': lastName,
+        'email': email,
+        'password': password
+      },
+      {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+          'user-token': localStorage.getItem('userToken')!
+        }),
+      }
+    ).subscribe((result) => {
+      onSuccess(result);
     });
   }
 }

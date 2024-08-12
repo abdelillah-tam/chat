@@ -1,6 +1,7 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { getDatabase, ref, onValue, set, push, onChildAdded, get, child, query, orderByChild } from "firebase/database";
 import { Message } from '../model/message';
+import { User } from '../model/user';
 
 @Injectable({
   providedIn: 'root'
@@ -9,12 +10,11 @@ export class MessagingService {
 
   openChat = new EventEmitter<boolean>();
 
+  usersYouTalkedWith = new EventEmitter<string[]>();
+
   receiverObjectId = '';
 
   private db = getDatabase();
-
-
-  constructor() { }
 
   openChatWindow(receiverObjectId: string) {
     this.receiverObjectId = receiverObjectId;
@@ -56,9 +56,20 @@ export class MessagingService {
         msgs.push(child.val());
       });
       onMessagesDownloaded(msgs);
-      console.log('listen called');
     });
   }
 
+  getUsers(){
+    const reference = ref(this.db, 'chats/' + localStorage.getItem('objectId')!);
+    get(reference).then((result) => {
+      let users : string[] = [];
+      result.forEach((child) => {
+        users.push(child.key);
+      });
+
+      this.usersYouTalkedWith.emit(users);
+      
+    })
+  }
   
 }

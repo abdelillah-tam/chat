@@ -7,19 +7,26 @@ import { CommonModule } from '@angular/common';
 import { MessagingService } from '../services/messaging.service';
 import { AuthService } from '../services/auth.service';
 import { User } from '../model/user';
+import { SettingsComponent } from './settings/settings.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, ContactInformationComponent, UsersComponent, ChatComponent],
+  imports: [CommonModule, ContactInformationComponent, UsersComponent, ChatComponent, SettingsComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
 export class HomeComponent implements OnInit {
 
-  opened: boolean = false;
+  
+
+  openedChat: boolean = false;
+
+  openedSettings: boolean = false;
 
   openedPanel: boolean = false;
+
+  openedUsersPanelInMobile = false;
 
   constructor(private router: Router,
     private messagingService: MessagingService,
@@ -30,19 +37,20 @@ export class HomeComponent implements OnInit {
   currentUser: User | undefined;
 
   ngOnInit(): void {
+  
     if (localStorage.getItem('email') === null ||
       localStorage.getItem('userToken') === null ||
       localStorage.getItem('objectId') === null) {
       this.router.navigate(['/login']);
     } else {
       this.authService.verifyIfTokenValid(localStorage.getItem('userToken')!, (value) => {
-        if(!value){
+        if (!value) {
           this.router.navigate(['/login']);
         }
       })
     }
     this.messagingService.openChat.subscribe((result) => {
-      this.opened = result;
+      this.openedChat = result;
     })
   }
 
@@ -59,11 +67,25 @@ export class HomeComponent implements OnInit {
     this.openedPanel = !this.openedPanel;
   }
 
+  openSettings() {
+    this.openedPanel = false;
+    this.openedChat = false;
+    this.openedSettings = true;
+  }
+
+  closeSettings(){
+    this.openedSettings = false;
+  }
+
   logout() {
     this.authService.logout();
     localStorage.removeItem('email');
     localStorage.removeItem('userToken');
     localStorage.removeItem('objectId');
     this.router.navigate(['/login']);
+  }
+
+  showMenu(){
+    this.openedUsersPanelInMobile = !this.openedUsersPanelInMobile;
   }
 }

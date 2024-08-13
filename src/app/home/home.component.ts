@@ -8,17 +8,29 @@ import { MessagingService } from '../services/messaging.service';
 import { AuthService } from '../services/auth.service';
 import { User } from '../model/user';
 import { SettingsComponent } from './settings/settings.component';
+import { trigger, state, style, animate, transition } from '@angular/animations'
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [CommonModule, ContactInformationComponent, UsersComponent, ChatComponent, SettingsComponent],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.scss'
+  styleUrl: './home.component.scss',
+  animations: [
+    trigger('openUsersPanel', [
+      state('opened', style({
+        left: '0px'
+      })),
+      state('closed', style({
+        left: '-100%'
+      })),
+      transition('opened <=> closed', [animate('0.5s')])
+    ])
+  ]
 })
 export class HomeComponent implements OnInit {
 
-  
+
 
   openedChat: boolean = false;
 
@@ -37,7 +49,7 @@ export class HomeComponent implements OnInit {
   currentUser: User | undefined;
 
   ngOnInit(): void {
-  
+
     if (localStorage.getItem('email') === null ||
       localStorage.getItem('userToken') === null ||
       localStorage.getItem('objectId') === null) {
@@ -73,7 +85,7 @@ export class HomeComponent implements OnInit {
     this.openedSettings = true;
   }
 
-  closeSettings(){
+  closeSettings() {
     this.openedSettings = false;
   }
 
@@ -85,7 +97,7 @@ export class HomeComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
-  showMenu(){
+  showMenu() {
     this.openedUsersPanelInMobile = !this.openedUsersPanelInMobile;
   }
 }

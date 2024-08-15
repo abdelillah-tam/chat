@@ -1,4 +1,4 @@
-<div class="h-full w-full select-none bg-white">
+<div [@appear] class="h-full w-full select-none bg-white">
   <div class="header flex justify-between items-center p-6">
     <div class="flex items-center">
       <svg
@@ -45,10 +45,7 @@
       <p class="select-none">Or</p>
       <mat-divider class="w-[45%]"></mat-divider>
     </div>
-    <form
-      class="h-3/6 flex flex-col justify-between"
-      [formGroup]="loginGroup"
-    >
+    <form class="h-3/6 flex flex-col justify-between" [formGroup]="loginGroup">
       <div class="flex flex-col">
         <label class="text-xl font-bold">Email</label>
         <input
@@ -63,13 +60,14 @@
         <div class="relative">
           <input
             class="w-full text-xl font-light h-9 px-2 border border-gray-300 outline-none rounded-md focus:border-blue-600"
-            [type]="isPasswordVisible ? 'text' :'password'"
+            [type]="isPasswordVisible ? 'text' : 'password'"
             placeholder="Password"
             formControlName="password"
             id="dd"
           />
-          <button class="absolute h-full -right-0 -top-0 mr-2"
-          (click)="makePasswordVisible()"
+          <button
+            class="absolute h-full -right-0 -top-0 mr-2"
+            (click)="makePasswordVisible()"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -108,9 +106,13 @@
         </p>
       </div>
 
-      <button class="bg-green-600 text-white h-9 text-xl font-light rounded-md" (click)="onSubmitLogin()">
+      <button
+        class="bg-green-600 text-white h-9 text-xl font-light rounded-md"
+        (click)="onSubmitLogin()"
+      >
         Login
       </button>
+      <!--class="bg-green-600 text-white h-9 text-xl font-light rounded-md"-->
     </form>
   </div>
 </div>

@@ -6,17 +6,25 @@ import { CommonModule } from '@angular/common';
 import { MatDividerModule } from "@angular/material/divider";
 import * as jose from 'jose';
 import { User } from '../model/user';
+import { animate, state, style, transition, trigger } from '@angular/animations';
+
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [RouterLink, RouterLinkActive, ReactiveFormsModule, CommonModule, MatDividerModule],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+  styleUrl: './login.component.scss',
+  animations: [
+    trigger('appear', [
+      transition(':enter', [style({ opacity: 0 }), animate('500ms')])
+    ])
+  ]
 })
 export class LoginComponent implements OnInit {
 
   constructor(private authService: AuthService, private router: Router) { }
 
+  changed = 0;
   ngOnInit(): void {
     // @ts-ignore
     google.accounts.id.initialize({
@@ -31,7 +39,7 @@ export class LoginComponent implements OnInit {
   isPasswordValid = true;
 
   loginGroup = new FormGroup({
-    email: new FormControl('', [Validators.required,Validators.email]),
+    email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [Validators.required, Validators.minLength(8)])
   });
 
@@ -44,7 +52,7 @@ export class LoginComponent implements OnInit {
         this.loginGroup.value.email!,
         this.loginGroup.value.password!,
         (email, userToken, objectId) => this.saveDataLocally(email, userToken, objectId));
-    }else{
+    } else {
       this.isEmailValid = this.loginGroup.controls.email.valid;
       this.isPasswordValid = this.loginGroup.controls.password.valid;
     }
@@ -86,7 +94,7 @@ export class LoginComponent implements OnInit {
     })
   }
 
-  makePasswordVisible(){
+  makePasswordVisible() {
     this.isPasswordVisible = !this.isPasswordVisible;
   }
 
@@ -99,6 +107,14 @@ export class LoginComponent implements OnInit {
       localStorage.getItem('userToken') !== null &&
       localStorage.getItem('objectId') !== null) {
       this.router.navigate(['/home']);
+    }
+  }
+
+  change() {
+    if (this.changed < 2) {
+      this.changed += 1;
+    } else {
+      this.changed = 0;
     }
   }
 }

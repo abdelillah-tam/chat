@@ -1,4 +1,4 @@
-<div class="home h-screen w-full flex flex-col select-none">
+<div @appear class="home h-screen w-full flex flex-col select-none">
   <header
     class="h-[10%] flex items-center justify-between px-7 mb:px-3 bg-white"
   >
@@ -43,8 +43,9 @@
 
   <div class="h-[90%] flex flex-1 relative">
     <ul
-      class="w-24 flex flex-col bg-white border-b border-r border-l absolute right-0 mx-7 mb:mx-3"
       *ngIf="openedPanel"
+      @appear
+      class="w-24 flex flex-col bg-white border-b border-r border-l absolute right-0 mx-7 mb:mx-3"
     >
       <li class="flex my-3 items-center" (click)="openSettings()">
         <div class="h-9 w-9 p-1 pl-2 content-center">
@@ -60,22 +61,23 @@
       </li>
     </ul>
     <app-users
+      *ngIf="!openedSettings"
+      @appear
       [@openUsersPanel]="openedUsersPanelInMobile ? 'opened' : 'closed'"
       class="mb:absolute mb:h-full"
-      [ngClass]="[
-        openedChat ? 'basis-1/3' : 'basis-full'
-      ]"
-      *ngIf="!openedSettings"
+      [ngClass]="[openedChat ? 'basis-1/3' : 'basis-full']"
     ></app-users>
 
     <app-chat
-      class="mb:basis-full"
       *ngIf="openedChat"
+      @appear
+      class="mb:basis-full"
       [ngClass]="openedChat ? 'basis-2/3' : 'basis-0'"
     ></app-chat>
 
     <app-settings
       *ngIf="openedSettings"
+      @appear
       [ngClass]="openedSettings ? 'basis-full' : 'basis-0'"
       (hiddenSettings)="closeSettings()"
     ></app-settings>

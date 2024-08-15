@@ -25,6 +25,10 @@ import { trigger, state, style, animate, transition } from '@angular/animations'
         left: '-100%'
       })),
       transition('opened <=> closed', [animate('0.5s')])
+    ]),
+    trigger('appear', [
+      transition(':enter', [style({ opacity: 0 }), animate('500ms', style({ opacity: 1 }))]),
+      transition(':leave', [style({ opacity: 1 }), animate('50ms', style({ opacity: 0 }))])
     ])
   ]
 })

@@ -2,13 +2,14 @@ import { Component, OnInit, output } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { User } from '../../model/user';
+import { animate, transition, trigger } from '@angular/animations';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
   imports: [ReactiveFormsModule],
   templateUrl: './settings.component.html',
-  styleUrl: './settings.component.scss'
+  styleUrl: './settings.component.scss',
 })
 export class SettingsComponent implements OnInit {
 
@@ -26,11 +27,11 @@ export class SettingsComponent implements OnInit {
       this.infoGroup.controls.lastName.setValue(this.currentUser!.lastName);
       this.infoGroup.controls.email.setValue(this.currentUser!.email);
 
-      if(this.currentUser!.provider === 'google'){
+      if (this.currentUser!.provider === 'google') {
         this.infoGroup.controls.email.disable();
         this.infoGroup.controls.password.disable();
       }
-      
+
     })
   }
 
@@ -42,8 +43,8 @@ export class SettingsComponent implements OnInit {
     password: new FormControl('')
   });
 
-  updateInfos(){
-    if(this.infoGroup.valid && this.currentUser!.provider !== 'google'){
+  updateInfos() {
+    if (this.infoGroup.valid && this.currentUser!.provider !== 'google') {
       this.authService.updateInfos(
         localStorage.getItem('objectId')!,
         this.infoGroup.value.firstName!,
@@ -55,20 +56,20 @@ export class SettingsComponent implements OnInit {
         }
       )
 
-    
-    }else if(this.infoGroup.valid){
+
+    } else if (this.infoGroup.valid) {
       this.authService.updateInfos(
         localStorage.getItem('objectId')!,
         this.infoGroup.value.firstName!,
         this.infoGroup.value.lastName!,
         undefined,
         undefined,
-        (user) => {}
+        (user) => { }
       )
     }
   }
 
-  hideSettings(){
+  hideSettings() {
     this.hiddenSettings.emit(true);
   }
 }

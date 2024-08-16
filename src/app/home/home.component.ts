@@ -27,7 +27,7 @@ import { trigger, state, style, animate, transition, AnimationEvent, keyframes }
       transition('opened <=> closed', [animate('0.5s')])
     ]),
     trigger('appear', [
-      transition(':enter', [style({ opacity: 0 }), animate('10000ms', keyframes([
+      transition(':enter', [style({ opacity: 0 }), animate('300ms', keyframes([
         style({opacity: 0, offset: 0}),
         style({opacity: 0.8, offset: 0.2}),
         style({opacity: 1, offset: 1})

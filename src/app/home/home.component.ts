@@ -8,7 +8,7 @@ import { MessagingService } from '../services/messaging.service';
 import { AuthService } from '../services/auth.service';
 import { User } from '../model/user';
 import { SettingsComponent } from './settings/settings.component';
-import { trigger, state, style, animate, transition } from '@angular/animations'
+import { trigger, state, style, animate, transition, AnimationEvent } from '@angular/animations'
 
 @Component({
   selector: 'app-home',
@@ -27,14 +27,12 @@ import { trigger, state, style, animate, transition } from '@angular/animations'
       transition('opened <=> closed', [animate('0.5s')])
     ]),
     trigger('appear', [
-      transition(':enter', [style({ opacity: 0 }), animate('500ms', style({ opacity: 1 }))]),
+      transition(':enter', [style({ opacity: 0 }), animate('200ms', style({ opacity: 1 }))]),
       transition(':leave', [style({ opacity: 1 }), animate('50ms', style({ opacity: 0 }))])
     ])
   ]
 })
 export class HomeComponent implements OnInit {
-
-
 
   openedChat: boolean = false;
 

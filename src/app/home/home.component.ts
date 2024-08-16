@@ -8,7 +8,7 @@ import { MessagingService } from '../services/messaging.service';
 import { AuthService } from '../services/auth.service';
 import { User } from '../model/user';
 import { SettingsComponent } from './settings/settings.component';
-import { trigger, state, style, animate, transition, AnimationEvent } from '@angular/animations'
+import { trigger, state, style, animate, transition, AnimationEvent, keyframes } from '@angular/animations'
 
 @Component({
   selector: 'app-home',
@@ -27,9 +27,14 @@ import { trigger, state, style, animate, transition, AnimationEvent } from '@ang
       transition('opened <=> closed', [animate('0.5s')])
     ]),
     trigger('appear', [
-      transition(':enter', [style({ opacity: 0 }), animate('200ms', style({ opacity: 1 }))]),
+      transition(':enter', [style({ opacity: 0 }), animate('10000ms', keyframes([
+        style({opacity: 0, offset: 0}),
+        style({opacity: 0.8, offset: 0.2}),
+        style({opacity: 1, offset: 1})
+      ]))]),
       transition(':leave', [style({ opacity: 1 }), animate('50ms', style({ opacity: 0 }))])
-    ])
+    ]),
+
   ]
 })
 export class HomeComponent implements OnInit {

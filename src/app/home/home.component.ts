@@ -8,7 +8,7 @@ import { MessagingService } from '../services/messaging.service';
 import { AuthService } from '../services/auth.service';
 import { User } from '../model/user';
 import { SettingsComponent } from './settings/settings.component';
-import { trigger, state, style, animate, transition, AnimationEvent, keyframes } from '@angular/animations'
+import { trigger, state, style, animate, transition, AnimationEvent, keyframes, query, animateChild, stagger } from '@angular/animations'
 
 @Component({
   selector: 'app-home',
@@ -27,12 +27,13 @@ import { trigger, state, style, animate, transition, AnimationEvent, keyframes }
       transition('opened <=> closed', [animate('0.5s')])
     ]),
     trigger('appear', [
-      transition(':enter', [style({ opacity: 0 }), animate('300ms', keyframes([
-        style({opacity: 0, offset: 0}),
-        style({opacity: 0.8, offset: 0.2}),
-        style({opacity: 1, offset: 1})
-      ]))]),
-      transition(':leave', [style({ opacity: 1 }), animate('50ms', style({ opacity: 0 }))])
+      transition(':enter', [style({ opacity: 0 }), animate('500ms', keyframes([
+        style({ opacity: 0, offset: 0 }),
+        style({ opacity: 1, offset: 1 })
+      ]))
+      ]),
+
+      transition(':leave', [style({ opacity: 1 }), animate('50ms', style({ opacity: 0 }))]),
     ]),
 
   ]
@@ -46,6 +47,8 @@ export class HomeComponent implements OnInit {
   openedPanel: boolean = false;
 
   openedUsersPanelInMobile = false;
+
+  changed = false;
 
   constructor(private router: Router,
     private messagingService: MessagingService,
@@ -106,5 +109,9 @@ export class HomeComponent implements OnInit {
 
   showMenu() {
     this.openedUsersPanelInMobile = !this.openedUsersPanelInMobile;
+  }
+
+  change() {
+    this.changed = !this.changed;
   }
 }

@@ -15,9 +15,10 @@ import { animate, style, transition, trigger } from '@angular/animations';
   animations: [
     trigger('ani', [
       transition(':enter', [style({ opacity: 0 }), animate('500ms')]),
-      transition(':leave', [style({ opacity: 1 }), animate('5000ms')])
+      transition(':leave', [style({ opacity: 1 }), animate('5000ms')]),
     ]),
 
+   
   ]
 })
 export class SignupComponent {

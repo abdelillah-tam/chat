@@ -4,6 +4,7 @@ import { User } from '../../model/user';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { MessagingService } from '../../services/messaging.service';
+import { animate, animateChild, query, stagger, style, transition, trigger } from '@angular/animations';
 
 
 
@@ -12,7 +13,28 @@ import { MessagingService } from '../../services/messaging.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './users.component.html',
-  styleUrl: './users.component.scss'
+  styleUrl: './users.component.scss',
+  animations: [
+    trigger('opc', [
+      transition(':enter',[
+        style({opacity: 0}),
+        animate('10s', style({opacity: 1}))
+      ])
+      
+    ]),
+    trigger('animateListOfUsers', [
+      transition('* => *', [
+        query('li', stagger(300, animateChild()))
+      ])
+    ]),
+    trigger('aniOne', [
+      transition(':enter', [
+        style({ transform: 'translateX(-100%)' }),
+        animate('0.6s', style({ transform: 'translateX(0)' }))
+      ])
+    ]),
+    
+  ]
 })
 export class UsersComponent implements OnInit {
 
@@ -22,6 +44,9 @@ export class UsersComponent implements OnInit {
 
   users: Array<User> = [];
 
+  p: Array<User> = [new User('Abdelillah', 'Tamoussat', '', '', '', ''),
+  new User('Abdelillah', 'Tamoussat', '', '', '', ''),
+  new User('Abdelillah', 'Tamoussat', '', '', '', '')];
   ngOnInit(): void {
     this.messagingService.getUsers();
     this.messagingService.usersYouTalkedWith.subscribe((result) => {
@@ -31,11 +56,9 @@ export class UsersComponent implements OnInit {
           this.openChatWindow(this.users[0].objectId, 0);
         });
       });
-      
+
     });
-    
-      
-    
+
   }
 
   findUsers() {

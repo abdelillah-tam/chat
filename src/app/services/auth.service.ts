@@ -28,8 +28,8 @@ export class AuthService {
     });
   }
 
-  login(email: string, password: string, onLoggedIn: (email: string, userToken: string, objectId: string) => void) {
-    this.http.post<{
+  login(email: string, password: string) {
+    /*this.http.post<{
       email: string;
       'user-token': string;
       objectId: string
@@ -44,6 +44,22 @@ export class AuthService {
           onLoggedIn(result.email, result['user-token'], result.objectId);
         }
       });
+      
+       onLoggedIn: (email: string, userToken: string, objectId: string) => void
+
+      */
+
+      return this.http.post<{
+        email: string;
+        'user-token': string;
+        objectId: string
+      }>('https://brainyclub-eu.backendless.app/api/users/login', {
+        'login': email,
+        'password': password
+      },
+        {
+          headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+        });
   }
 
   verifyIfTokenValid(userToken: string, onSuccess: (value: boolean) => void) {

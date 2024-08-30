@@ -13,10 +13,10 @@ import { animate, style, transition, trigger } from '@angular/animations';
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.scss',
   animations: [
-    trigger('ani', [
+    /*trigger('ani', [
       transition(':enter', [style({ opacity: 0 }), animate('500ms')]),
       transition(':leave', [style({ opacity: 1 }), animate('5000ms')]),
-    ]),
+    ]),*/
 
    
   ]

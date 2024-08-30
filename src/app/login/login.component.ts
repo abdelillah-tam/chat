@@ -7,6 +7,10 @@ import { MatDividerModule } from "@angular/material/divider";
 import * as jose from 'jose';
 import { User } from '../model/user';
 import { animate, state, style, transition, trigger } from '@angular/animations';
+import { Store } from '@ngrx/store';
+import { login } from '../state/auth/auth.actions';
+import { AuthState } from '../state/auth/auth-state';
+import { selectState } from '../state/auth/auth.selectors';
 
 @Component({
   selector: 'app-login',
@@ -15,14 +19,14 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
   animations: [
-    trigger('appear', [
+    /*trigger('appear', [
       transition(':enter', [style({ opacity: 0 }), animate('500ms')])
-    ])
+    ])*/
   ]
 })
 export class LoginComponent implements OnInit {
 
-  constructor(private authService: AuthService, private router: Router) { }
+  constructor(private authService: AuthService, private router: Router, private store: Store<AuthState>) { }
 
   changed = 0;
   ngOnInit(): void {
@@ -30,6 +34,13 @@ export class LoginComponent implements OnInit {
     google.accounts.id.initialize({
       client_id: '205706621989-pken44sei0ti29vd95ukk3o2ja4e4gh1.apps.googleusercontent.com',
       callback: this.handleCredential.bind(this)
+    });
+
+    this.store.select(selectState).subscribe((state) => {
+      if (state.state === 'failed') { }
+      else if (state.state === 'success') {
+        this.saveDataLocally(state.email, state.userToken, state.objectId);
+      }
     });
   }
 
@@ -47,11 +58,11 @@ export class LoginComponent implements OnInit {
     if (this.loginGroup.valid) {
       this.isEmailValid = this.loginGroup.valid;
       this.isPasswordValid = this.loginGroup.valid;
-
-      this.authService.login(
-        this.loginGroup.value.email!,
-        this.loginGroup.value.password!,
-        (email, userToken, objectId) => this.saveDataLocally(email, userToken, objectId));
+      this.store.dispatch(login({
+        email: this.loginGroup.value.email!,
+        password: this.loginGroup.value.password!
+      }));
+      
     } else {
       this.isEmailValid = this.loginGroup.controls.email.valid;
       this.isPasswordValid = this.loginGroup.controls.password.valid;
@@ -72,10 +83,10 @@ export class LoginComponent implements OnInit {
         if (user.provider === 'backendless') {
           alert('Try to login using email !');
         } else if (user!.provider === 'google') {
-          this.authService.login(
+          /*this.authService.login(
             // @ts-ignore
             googleUser.email!, googleUser.sub!,
-            (email, userToken, objectId) => this.saveDataLocally(email, userToken, objectId))
+            (email, userToken, objectId) => this.saveDataLocally(email, userToken, objectId))*/
         }
       } else {
 
@@ -83,11 +94,11 @@ export class LoginComponent implements OnInit {
           // @ts-ignore 
           new User(googleUser.given_name, googleUser.family_name, googleUser.email, '', '', 'google'),
           googleUser.sub!, 'google', () => {
-            this.authService.login(
-              // @ts-ignore
-              googleUser!.email!,
-              googleUser.sub!,
-              (email, userToken, objectId) => this.saveDataLocally(email, userToken, objectId))
+            /* this.authService.login(
+               // @ts-ignore
+               googleUser!.email!,
+               googleUser.sub!,
+               (email, userToken, objectId) => this.saveDataLocally(email, userToken, objectId))*/
           }
         )
       }

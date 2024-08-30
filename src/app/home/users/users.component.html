@@ -9,10 +9,10 @@
   </div>
 
   <ul [@animateListOfUsers]="users.length" class="basis-[94%]">
+    @for(user of users; track user.email){
     <li
       class="users-list flex flex-col-reverse p-5 mt-5 rounded-md cursor-pointer"
-      *ngFor="let user of users; index as i"
-      (click)="openChatWindow(user.objectId, i)"
+      (click)="openChatWindow(user.objectId, $index)"
       @aniOne
     >
       <div class="flex">
@@ -28,5 +28,8 @@
         </div>
       </div>
     </li>
+    } @empty{
+      
+    }
   </ul>
 </div>

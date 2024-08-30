@@ -53,7 +53,10 @@
           placeholder="Email"
           formControlName="email"
         />
-        <p class="text-red-600" *ngIf="!isEmailValid">Enter a valid email !</p>
+        @if(!isEmailValid){
+          <p class="text-red-600">Enter a valid email !</p>
+        }
+        
       </div>
       <div class="flex flex-col">
         <label class="text-xl font-bold" for="dd">Password</label>
@@ -101,9 +104,12 @@
           </button>
         </div>
 
-        <p class="text-red-600" *ngIf="!isPasswordValid">
-          Password must be at least 8 characters !
-        </p>
+        @if(!isPasswordValid){
+          <p class="text-red-600">
+            Password must be at least 8 characters !
+          </p>
+        }
+        
       </div>
 
       <button

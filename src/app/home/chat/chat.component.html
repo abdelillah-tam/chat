@@ -1,16 +1,14 @@
 <div class="h-full w-full flex flex-col pt-3 px-3 bg-[#F6EFEE]">
-  <p
-    *ngIf="messages.length === 0"
-    class="w-full text-center bg-gray-500 text-white"
-  >
-    No messages here
-  </p>
+  @if(messages.length === 0){
+  <p class="w-full text-center bg-gray-500 text-white">No messages here</p>
+  }
+
   <div
     class="basis-[94%] flex flex-col mb-3 py-3 bg-white rounded-md overflow-y-auto"
   >
+    @for(message of messages; track message.timestamp){
     <ul
       class="flex px-5"
-      *ngFor="let message of messages; index as i"
       [ngClass]="
         message.senderId === getCurrentObjectId()
           ? 'justify-end flex-row-reverse'
@@ -18,11 +16,10 @@
       "
     >
       <li class="w-11 rounded-full">
-        <img
-          *ngIf="i === 0 || messages[i].senderId !== messages[i - 1].senderId"
-          src="./assets/user.jpg"
-          class="rounded-full"
-        />
+        @if($first || messages[$index].senderId !==
+        messages[$index-1].senderId){
+        <img src="./assets/user.jpg" class="rounded-full" />
+        }
       </li>
       <li class="w-full flex flex-col">
         <div
@@ -33,9 +30,9 @@
               : 'justify-start pl-2'
           "
         >
-          <p
-            *ngIf="i === 0 || messages[i].senderId !== messages[i - 1].senderId"
-          >
+          @if($first || messages[$index].senderId !== messages[$index -
+          1].senderId){
+          <p>
             {{
               message.senderId === senderUser?.objectId
                 ? senderUser?.firstName
@@ -47,6 +44,7 @@
                 : receiverUser?.lastName
             }}
           </p>
+          }
         </div>
         <div
           class="flex items-center select-text"
@@ -65,6 +63,7 @@
         </div>
       </li>
     </ul>
+    } @empty{ }
   </div>
   <div class="basis-[6%] flex mb-3">
     <input

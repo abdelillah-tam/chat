@@ -1,10 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MessagingService } from '../../services/messaging.service';
 import { FormsModule } from '@angular/forms';
 import { Message } from '../../model/message';
-import { AuthService } from '../../services/auth.service';
 import { User } from '../../model/user';
+import { Store } from '@ngrx/store';
+import { listenForMessagesAction, sendMessageAction } from '../../state/messaging/messaging.actions';
+import { selectChat, selectMessages } from '../../state/messaging/messaging.selectors';
+import { getUserByObjectIdAction } from '../../state/auth/auth.actions';
+import { selectCurrentLoggedInUser, selectUser } from '../../state/auth/auth.selectors';
 
 @Component({
   selector: 'app-chat',
@@ -13,7 +17,7 @@ import { User } from '../../model/user';
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss'
 })
-export class ChatComponent {
+export class ChatComponent implements OnInit {
 
   messages: Message[] = [];
 
@@ -22,38 +26,40 @@ export class ChatComponent {
 
   text = '';
 
-  constructor(private messagingService: MessagingService, private authService: AuthService) {
-    this.messagingService.listenForMessages((messages) => {
-      this.messages = messages;
+  constructor(private store: Store) {
+
+  }
+  ngOnInit(): void {
+    this.store.select(selectMessages).subscribe((result) => {
+      this.messages = result;
     });
-    this.messagingService.openChat.subscribe((value) => {
-      if(value){
-        this.messagingService.listenForMessages((messages) => {
-          this.messages = messages;
-        });
+
+    this.store.select(selectCurrentLoggedInUser).subscribe(result => {
+      this.senderUser = result;
+    })
+
+    this.store.select(selectUser).subscribe(result => {
+      this.receiverUser = result;
+    })
+
+    this.store.select(selectChat).subscribe(result => {
+      if (result.openChat) {
+        this.store.dispatch(listenForMessagesAction({ objectId: result.objectId }));
+        this.store.dispatch(getUserByObjectIdAction({ objectId: result.objectId }));
       }
-    });
-    
-
-    this.authService.getFullName(localStorage.getItem('objectId')!, (user) => {
-      this.senderUser = user;
-    });
-
-    this.authService.getFullName(this.messagingService.receiverObjectId, (user) => {
-      this.receiverUser = user;
-    });
+    })
   }
 
 
   sendMessage() {
-    if(this.text !== ''){
-    const message = new Message(this.text,
-      localStorage.getItem('objectId')!,
-      this.messagingService.receiverObjectId, Date.now().toString());
+    if (this.text !== '') {
+      const message = new Message(this.text,
+        localStorage.getItem('objectId')!,
+        this.receiverUser!.objectId, Date.now().toString());
 
-    this.text = '';
-
-    this.messagingService.sendMessage(message);
+      this.text = '';
+      console.log(message);
+      this.store.dispatch(sendMessageAction({ message: message }));
     }
   }
 

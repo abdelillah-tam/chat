@@ -5,6 +5,10 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { MessagingService } from '../../services/messaging.service';
 import { animate, animateChild, query, stagger, style, transition, trigger } from '@angular/animations';
+import { Store } from '@ngrx/store';
+import { openChatWindowAction } from '../../state/messaging/messaging.actions';
+import { emptyStateAction, getAllUsersInContactAction } from '../../state/auth/auth.actions';
+import { selectUsers } from '../../state/auth/auth.selectors';
 
 
 
@@ -13,68 +17,52 @@ import { animate, animateChild, query, stagger, style, transition, trigger } fro
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './users.component.html',
-  styleUrl: './users.component.scss',
-  animations: [
-    trigger('opc', [
-      transition(':enter',[
-        style({opacity: 0}),
-        animate('10s', style({opacity: 1}))
-      ])
-      
-    ]),
-    trigger('animateListOfUsers', [
-      transition('* => *', [
-        query('li', stagger(300, animateChild()))
-      ])
-    ]),
-    trigger('aniOne', [
-      transition(':enter', [
-        style({ transform: 'translateX(-100%)' }),
-        animate('0.6s', style({ transform: 'translateX(0)' }))
-      ])
-    ]),
-    
-  ]
+  styleUrl: './users.component.scss'
 })
 export class UsersComponent implements OnInit {
 
-  constructor(private authService: AuthService, private messagingService: MessagingService) { }
+  constructor(
+    private authService: AuthService,
+    private messagingService: MessagingService,
+    private store: Store) { }
 
   searchInput: string = '';
 
   users: Array<User> = [];
 
-  p: Array<User> = [new User('Abdelillah', 'Tamoussat', '', '', '', ''),
-  new User('Abdelillah', 'Tamoussat', '', '', '', ''),
-  new User('Abdelillah', 'Tamoussat', '', '', '', '')];
   ngOnInit(): void {
-    this.messagingService.getUsers();
-    this.messagingService.usersYouTalkedWith.subscribe((result) => {
-      result.forEach((objectId) => {
-        this.authService.findUsersByObjectId(objectId, (user) => {
-          this.users.push(user);
-          this.openChatWindow(this.users[0].objectId, 0);
-        });
-      });
 
-    });
+    this.store.select(selectUsers)
+      .subscribe(result => {
+        if (result !== undefined) {
+          this.users = result;
+          setTimeout(() => {
+            this.openChatWindow(this.users[0].objectId, 0);
+          }, 5);
+
+        }
+      })
+
+    this.messagingService.getUsers();
 
   }
 
   findUsers() {
     if (this.searchInput.length !== 0) {
-      let userToken = localStorage.getItem('userToken');
-      this.authService.findUsersByName(this.searchInput, userToken!, (users: Array<User>) => {
+      this.authService.findUsersByName(this.searchInput, (users: Array<User>) => {
         this.users = users;
       });
     } else {
-      this.messagingService.getUsers();
+      setTimeout(() => {
+        this.messagingService.getUsers();
+      }, 50);
+
     }
   }
 
   openChatWindow(objectId: string, index: number) {
-    this.messagingService.closeChatWindow();
-    this.messagingService.openChatWindow(objectId);
+    this.store.dispatch(emptyStateAction());
+    this.store.dispatch(openChatWindowAction({ objectId: objectId }));
     let usersList = document.querySelectorAll('.users-list');
     usersList.forEach((value, key) => {
       let name = value.querySelector('.name-class');

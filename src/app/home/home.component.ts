@@ -1,42 +1,22 @@
 import { Component, OnInit } from '@angular/core';
-import { ContactInformationComponent } from './chat/contact-information/contact-information.component';
 import { UsersComponent } from "./users/users.component";
 import { ChatComponent } from "./chat/chat.component";
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { MessagingService } from '../services/messaging.service';
 import { AuthService } from '../services/auth.service';
 import { User } from '../model/user';
 import { SettingsComponent } from './settings/settings.component';
-import { trigger, state, style, animate, transition, AnimationEvent, keyframes, query, animateChild, stagger } from '@angular/animations'
+import { Store } from '@ngrx/store';
+import { selectChat } from '../state/messaging/messaging.selectors';
+import { checkIfTokenIsValidAction, getCurrentLoggedInUser } from '../state/auth/auth.actions';
+import { selectCurrentLoggedInUser, selectTokenValidation } from '../state/auth/auth.selectors';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, ContactInformationComponent, UsersComponent, ChatComponent, SettingsComponent],
+  imports: [CommonModule, UsersComponent, ChatComponent, SettingsComponent],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.scss',
-  animations: [
-    trigger('openUsersPanel', [
-      state('opened', style({
-        left: '0px'
-      })),
-      state('closed', style({
-        left: '-100%'
-      })),
-      transition('opened <=> closed', [animate('0.5s')])
-    ]),
-    trigger('appear', [
-      transition(':enter', [style({ opacity: 0 }), animate('500ms', keyframes([
-        style({ opacity: 0, offset: 0 }),
-        style({ opacity: 1, offset: 1 })
-      ]))
-      ]),
-
-      transition(':leave', [style({ opacity: 1 }), animate('50ms', style({ opacity: 0 }))]),
-    ]),
-
-  ]
+  styleUrl: './home.component.scss'
 })
 export class HomeComponent implements OnInit {
 
@@ -51,8 +31,22 @@ export class HomeComponent implements OnInit {
   changed = false;
 
   constructor(private router: Router,
-    private messagingService: MessagingService,
-    private authService: AuthService) {
+    private authService: AuthService, private store: Store) {
+
+    if (localStorage.getItem('email') === null ||
+      localStorage.getItem('userToken') === null ||
+      localStorage.getItem('objectId') === null) {
+      this.router.navigate(['/login']);
+    } else {
+      this.store.dispatch(checkIfTokenIsValidAction({ token: localStorage.getItem('userToken')! }));
+
+      this.store.select(selectTokenValidation)
+        .subscribe((valid) => {
+          if (valid !== undefined && !valid) {
+            this.router.navigate(['/login']);
+          }
+        });
+    }
     this.getFullName();
   }
 
@@ -60,29 +54,19 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
 
-    if (localStorage.getItem('email') === null ||
-      localStorage.getItem('userToken') === null ||
-      localStorage.getItem('objectId') === null) {
-      this.router.navigate(['/login']);
-    } else {
-      this.authService.verifyIfTokenValid(localStorage.getItem('userToken')!, (value) => {
-        if (!value) {
-          this.router.navigate(['/login']);
-        }
-      })
-    }
-    this.messagingService.openChat.subscribe((result) => {
-      this.openedChat = result;
-    })
+    this.store.select(selectChat)
+      .subscribe(result => {
+        this.openedChat = result.openChat;
+      });
+
+    this.store.select(selectCurrentLoggedInUser).subscribe(result => {
+      this.currentUser = result;
+    });
   }
 
 
   getFullName() {
-    this
-      .authService
-      .getFullName(localStorage.getItem('objectId')!, (user) => {
-        this.currentUser = user;
-      });
+    this.store.dispatch(getCurrentLoggedInUser({ objectId: localStorage.getItem('objectId')! }));
   }
 
   openPanel() {
@@ -100,11 +84,12 @@ export class HomeComponent implements OnInit {
   }
 
   logout() {
+    localStorage.clear();
     this.authService.logout();
-    localStorage.removeItem('email');
-    localStorage.removeItem('userToken');
-    localStorage.removeItem('objectId');
-    this.router.navigate(['/login']);
+    if (localStorage.length === 0) {
+      this.router.navigate(['/login']);
+    }
+
   }
 
   showMenu() {

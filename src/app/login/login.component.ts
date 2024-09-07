@@ -8,7 +8,7 @@ import * as jose from 'jose';
 import { User } from '../model/user';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { Store } from '@ngrx/store';
-import { login } from '../state/auth/auth.actions';
+import { emptyStateAction, loginAction, signupAction } from '../state/auth/auth.actions';
 import { AuthState } from '../state/auth/auth-state';
 import { selectState } from '../state/auth/auth.selectors';
 
@@ -19,16 +19,19 @@ import { selectState } from '../state/auth/auth.selectors';
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
   animations: [
-    /*trigger('appear', [
+    trigger('appear', [
       transition(':enter', [style({ opacity: 0 }), animate('500ms')])
-    ])*/
+    ])
   ]
 })
 export class LoginComponent implements OnInit {
 
-  constructor(private authService: AuthService, private router: Router, private store: Store<AuthState>) { }
+  constructor(private authService: AuthService,
+    private router: Router,
+    private store: Store<AuthState>) { }
 
   changed = 0;
+
   ngOnInit(): void {
     // @ts-ignore
     google.accounts.id.initialize({
@@ -38,10 +41,13 @@ export class LoginComponent implements OnInit {
 
     this.store.select(selectState).subscribe((state) => {
       if (state.state === 'failed') { }
-      else if (state.state === 'success') {
-        this.saveDataLocally(state.email, state.userToken, state.objectId);
+      else if (state.state === 'success' && typeof state.userData !== undefined) {
+        let data = state.userData as { email: string; userToken: string; objectId: string };
+        this.saveDataLocally(data.email, data.userToken, data.objectId);
+        this.store.dispatch(emptyStateAction());
       }
     });
+
   }
 
   isPasswordVisible = false;
@@ -58,11 +64,11 @@ export class LoginComponent implements OnInit {
     if (this.loginGroup.valid) {
       this.isEmailValid = this.loginGroup.valid;
       this.isPasswordValid = this.loginGroup.valid;
-      this.store.dispatch(login({
+      this.store.dispatch(loginAction({
         email: this.loginGroup.value.email!,
         password: this.loginGroup.value.password!
       }));
-      
+
     } else {
       this.isEmailValid = this.loginGroup.controls.email.valid;
       this.isPasswordValid = this.loginGroup.controls.password.valid;
@@ -83,24 +89,17 @@ export class LoginComponent implements OnInit {
         if (user.provider === 'backendless') {
           alert('Try to login using email !');
         } else if (user!.provider === 'google') {
-          /*this.authService.login(
-            // @ts-ignore
-            googleUser.email!, googleUser.sub!,
-            (email, userToken, objectId) => this.saveDataLocally(email, userToken, objectId))*/
+          //@ts-ignore
+          this.store.dispatch(loginAction({ email: googleUser.email!, password: googleUser.sub! }));
         }
       } else {
-
-        this.authService.signUp(
+        this.store.dispatch(signupAction({
           // @ts-ignore 
-          new User(googleUser.given_name, googleUser.family_name, googleUser.email, '', '', 'google'),
-          googleUser.sub!, 'google', () => {
-            /* this.authService.login(
-               // @ts-ignore
-               googleUser!.email!,
-               googleUser.sub!,
-               (email, userToken, objectId) => this.saveDataLocally(email, userToken, objectId))*/
-          }
-        )
+          user: new User(googleUser.given_name, googleUser.family_name, googleUser.email, '', '', 'google'),
+          password: googleUser!.sub!,
+          provider: 'google'
+        }));
+
       }
     })
   }

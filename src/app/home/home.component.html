@@ -44,7 +44,6 @@
   <div class="h-[90%] flex flex-1 relative">
     @if(openedPanel){
       <ul
-      @appear
       class="w-24 flex flex-col bg-white border-b border-r border-l absolute right-0 mx-7 mb:mx-3"
     >
       <li class="flex my-3 items-center" (click)="openSettings()">
@@ -71,7 +70,6 @@
     
     @if(openedChat){
       <app-chat
-      @appear
       class="mb:basis-full"
       [ngClass]="openedChat ? 'basis-2/3' : 'basis-0'"
     ></app-chat>
@@ -79,7 +77,6 @@
    
     @if(openedSettings){
       <app-settings
-      @appear
       [ngClass]="openedSettings ? 'basis-full' : 'basis-0'"
       (hiddenSettings)="closeSettings()"
     ></app-settings>

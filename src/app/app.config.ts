@@ -9,14 +9,18 @@ import { provideState, provideStore } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
 import { authReducer } from './state/auth/auth.reducers';
 import { AuthEffects } from './state/auth/auth.effects';
+import { chatReducer, messagesReducer, sendMessageReducer } from './state/messaging/messaging.reducers';
+import { MessagingEffects } from './state/messaging/messaging.effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes), {
     provide: LocationStrategy, useClass: HashLocationStrategy
   },
   provideHttpClient(),
-  provideAnimationsAsync(),
   provideStore(),
-  provideState('auth', authReducer)
-    , provideEffects(AuthEffects)]
+  provideState('auth', authReducer),
+  provideState('sendMessage', sendMessageReducer),
+  provideState('messages', messagesReducer),
+  provideState('chat', chatReducer),
+  provideEffects(AuthEffects, MessagingEffects)]
 };

@@ -10,8 +10,8 @@ export class AuthService {
 
   }
 
-  signUp(user: User, password: string, provider: string, onSignedUp: () => void) {
-    this.http.post<User>('https://brainyclub-eu.backendless.app/api/users/register', {
+  signUp(user: User, password: string, provider: string) {
+    return this.http.post<User>('https://brainyclub-eu.backendless.app/api/users/register', {
       'email': user.getEmail(),
       'password': password,
       'firstName': user.getFirstName(),
@@ -20,16 +20,11 @@ export class AuthService {
       'provider': provider
     }, {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-    }).subscribe((result) => {
-      console.log(result);
-      if (result !== null) {
-        onSignedUp();
-      }
     });
   }
 
   login(email: string, password: string) {
-    /*this.http.post<{
+    return this.http.post<{
       email: string;
       'user-token': string;
       objectId: string
@@ -39,36 +34,13 @@ export class AuthService {
     },
       {
         headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-      }).subscribe((result) => {
-        if (result['user-token'] !== null) {
-          onLoggedIn(result.email, result['user-token'], result.objectId);
-        }
       });
-      
-       onLoggedIn: (email: string, userToken: string, objectId: string) => void
-
-      */
-
-      return this.http.post<{
-        email: string;
-        'user-token': string;
-        objectId: string
-      }>('https://brainyclub-eu.backendless.app/api/users/login', {
-        'login': email,
-        'password': password
-      },
-        {
-          headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-        });
   }
 
-  verifyIfTokenValid(userToken: string, onSuccess: (value: boolean) => void) {
-    this
+  verifyIfTokenValid(userToken: string) {
+    return this
       .http
-      .get<boolean>(`https://brainyclub-eu.backendless.app/api/users/isvalidusertoken/${userToken}`)
-      .subscribe((result) => {
-        onSuccess(result);
-      })
+      .get<boolean>(`https://brainyclub-eu.backendless.app/api/users/isvalidusertoken/${userToken}`);
   }
 
   logout() {
@@ -79,21 +51,8 @@ export class AuthService {
     });
   }
 
-  findUsersByName(name: string, userToken: string, onFind: (users: Array<User>) => void) {
+  findUsersByName(name: string, onFind: (users: Array<User>) => void) {
     this.http.get<Array<User>>(`https://brainyclub-eu.backendless.app/api/data/Users?where=firstName%20%3D%20'${name}'`,
-      {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-          'user-token': localStorage.getItem('userToken')!
-        }),
-      }
-    ).subscribe((result) => {
-      onFind(result);
-    });
-  }
-
-  findUsersByObjectId(objectId: string, onFind: (users: User) => void){
-    this.http.get<User>(`https://brainyclub-eu.backendless.app/api/data/Users/${objectId}`,
       {
         headers: new HttpHeaders({
           'Content-Type': 'application/json',
@@ -116,17 +75,29 @@ export class AuthService {
       onFind(result[0]);
     });
   }
-  getFullName(objectId: string, onGet: (user: User) => void) {
-    this.http.get<User>(`https://brainyclub-eu.backendless.app/api/data/Users/${objectId}?property=%60firstName%60&property=%60lastName%60`,
+  findUserByObjectId(objectId: string) {
+    return this.http.get<User>(`https://brainyclub-eu.backendless.app/api/data/Users/${objectId}`,
       {
         headers: new HttpHeaders({
           'Content-Type': 'application/json',
           'user-token': localStorage.getItem('userToken')!
         }),
       }
-    ).subscribe((result) => {
-      onGet(result);
-    });
+    );
+  }
+
+  findUsersByObjectId(objectsId: string[]) {
+    let items: string = '('
+    objectsId.forEach((item, index) => {
+      if (index !== (objectsId.length - 1)) {
+        items += `'` + item + `',`
+      } else {
+        items += `'` + item + `')`
+      }
+
+    })
+    return this.http
+      .get<User[]>(`https://eu-api.backendless.com/EC90E79D-4443-4858-8D5E-02E90D0C63B1/58C3266A-8C33-4D5C-854B-66704F41CFB6/data/Users?where=objectId%20IN%20${items}`)
   }
 
   updateInfos(
@@ -135,7 +106,7 @@ export class AuthService {
     lastName: string | undefined,
     email: string | undefined,
     password: string | undefined,
-    onSuccess: ((user: User) => void) ) {
+    onSuccess: ((user: User) => void)) {
 
     this.http.put<User>(`https://brainyclub-eu.backendless.app/api/data/users/${objectId}`,
       {

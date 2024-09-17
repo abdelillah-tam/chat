@@ -11,11 +11,18 @@ import { Store } from '@ngrx/store';
 import { emptyStateAction, loginAction, signupAction } from '../state/auth/auth.actions';
 import { AuthState } from '../state/auth/auth-state';
 import { selectState } from '../state/auth/auth.selectors';
+import { MAT_FORM_FIELD_DEFAULT_OPTIONS, MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule, MatLabel, MatInput } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, ReactiveFormsModule, CommonModule, MatDividerModule],
+  imports: [RouterLink, RouterLinkActive, ReactiveFormsModule, CommonModule, MatButtonModule, MatIconModule, MatDividerModule, MatFormFieldModule, MatInputModule, MatLabel, MatInput],
+  providers: [
+    {provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: {appearance: 'outline'}}
+  ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
   animations: [

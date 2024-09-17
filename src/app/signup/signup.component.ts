@@ -1,18 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { AuthService } from '../services/auth.service';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { User } from '../model/user';
 import { CommonModule } from '@angular/common';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Store } from '@ngrx/store';
-import { loginResultAction, signupAction } from '../state/auth/auth.actions';
-import { selectState } from '../state/auth/auth.selectors';
+import { signupAction } from '../state/auth/auth.actions';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button'
 
 @Component({
   selector: 'app-signup',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, ReactiveFormsModule, CommonModule],
+  imports: [RouterLink, RouterLinkActive, ReactiveFormsModule, CommonModule, MatFormFieldModule, MatSelectModule, MatInputModule, MatButtonModule],
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.scss',
   animations: [
@@ -29,9 +31,9 @@ export class SignupComponent implements OnInit {
 
   }
   ngOnInit(): void {
-    this.store.select(selectState).subscribe((result) => {
+    /*this.store.select(selectState).subscribe((result) => {
       this.router.navigate(['/home']);
-    });
+    });*/
   }
 
   show = true;

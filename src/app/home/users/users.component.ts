@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit } from '@angular/core';
 import { User } from '../../model/user';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
@@ -9,22 +9,24 @@ import { Store } from '@ngrx/store';
 import { openChatWindowAction } from '../../state/messaging/messaging.actions';
 import { emptyStateAction, getAllUsersInContactAction } from '../../state/auth/auth.actions';
 import { selectUsers } from '../../state/auth/auth.selectors';
-
+import { MatListModule } from '@angular/material/list';
 
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatListModule],
   templateUrl: './users.component.html',
   styleUrl: './users.component.scss'
 })
 export class UsersComponent implements OnInit {
 
   constructor(
+    private elementRef: ElementRef,
     private authService: AuthService,
     private messagingService: MessagingService,
-    private store: Store) { }
+    private store: Store) {
+     }
 
   searchInput: string = '';
 
@@ -63,7 +65,9 @@ export class UsersComponent implements OnInit {
   openChatWindow(objectId: string, index: number) {
     this.store.dispatch(emptyStateAction());
     this.store.dispatch(openChatWindowAction({ objectId: objectId }));
-    let usersList = document.querySelectorAll('.users-list');
+
+    let usersList = this.elementRef.nativeElement.querySelectorAll('.users-list');
+    // @ts-ignore
     usersList.forEach((value, key) => {
       let name = value.querySelector('.name-class');
 

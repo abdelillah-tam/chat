@@ -9,11 +9,14 @@ import { listenForMessagesAction, sendMessageAction } from '../../state/messagin
 import { selectChat, selectMessages } from '../../state/messaging/messaging.selectors';
 import { getUserByObjectIdAction } from '../../state/auth/auth.actions';
 import { selectCurrentLoggedInUser, selectUser } from '../../state/auth/auth.selectors';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatIconModule, MatFormFieldModule, MatInputModule],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss'
 })

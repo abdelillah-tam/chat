@@ -11,11 +11,13 @@ import { authReducer } from './state/auth/auth.reducers';
 import { AuthEffects } from './state/auth/auth.effects';
 import { chatReducer, messagesReducer, sendMessageReducer } from './state/messaging/messaging.reducers';
 import { MessagingEffects } from './state/messaging/messaging.effects';
+import { provideAnimations } from '@angular/platform-browser/animations';
 
 export const appConfig: ApplicationConfig = {
   providers: [provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes), {
     provide: LocationStrategy, useClass: HashLocationStrategy
   },
+  provideAnimationsAsync(),
   provideHttpClient(),
   provideStore(),
   provideState('auth', authReducer),

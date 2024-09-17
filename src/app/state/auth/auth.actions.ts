@@ -17,7 +17,7 @@ export const GETUSERBYOBJECTID = '[Chat Component] get user';
 
 export const GOTTENUSER = '[Auth API] gotten user';
 
-export const GETALLUSERSINCONTACT = '[Messaging Service] get all users in contact';
+export const GETALLUSERSINCONTACT = '[Auth API] get all users in contact';
 
 export const GOTTENUSERS = '[Auth API] gotten users';
 
@@ -26,6 +26,7 @@ export const CHECKTOKENIFVALID = '[HomeComponent] check if token is valid';
 export const TOKENCHECKRESULT = '[Auth API] result of token check';
 
 export const ERRORAPI = '[Auth API] error';
+
 
 export const signupAction = createAction(SIGNUPACTION, props<{ user: User; password: string; provider: string }>());
 

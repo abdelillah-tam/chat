@@ -1,26 +1,19 @@
 <div class="h-full px-5 pt-3 bg-[#EEF2F1]">
   <div class="w-full">
     <input
-      class="basis-[95%] w-full px-2 text-xl font-light border outline-none rounded-md border-gray-300 focus:border-blue-600"
-      placeholder="Search for a user"
-      [(ngModel)]="searchInput"
-      (ngModelChange)="findUsers()"
-    />
+      class="basis-[95%] w-full px-2 text-xl font-light border outline-none rounded-md border-gray-300  focus:border-blue-600"
+      placeholder="Search for a user" [(ngModel)]="searchInput" (ngModelChange)="findUsers()" />
   </div>
 
   <ul class="basis-[94%]">
     @for(user of users; track user.email){
-    <li
-      class="users-list flex flex-col-reverse p-5 mt-5 rounded-md cursor-pointer"
-      (click)="openChatWindow(user.objectId, $index)"
-    >
+    <li class="users-list flex flex-col-reverse p-5 mt-5 rounded-md cursor-pointer"
+      (click)="openChatWindow(user.objectId, $index)">
       <div class="flex">
         <div class="h-11 w-11 rounded-full">
           <img src="./assets/user.jpg" class="rounded-full" />
         </div>
-        <div
-          class="name-class w-full flex flex-col justify-center pl-3 text-gray-700"
-        >
+        <div class="name-class w-full flex flex-col justify-center pl-3 text-gray-700">
           <div class="w-full flex items-center text-xl">
             <p>{{ user.firstName }} {{ user.lastName }}</p>
           </div>

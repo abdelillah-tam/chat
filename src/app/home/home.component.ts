@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { UsersComponent } from "./users/users.component";
 import { ChatComponent } from "./chat/chat.component";
 import { Router } from '@angular/router';
@@ -10,21 +10,27 @@ import { Store } from '@ngrx/store';
 import { selectChat } from '../state/messaging/messaging.selectors';
 import { checkIfTokenIsValidAction, getCurrentLoggedInUser } from '../state/auth/auth.actions';
 import { selectCurrentLoggedInUser, selectTokenValidation } from '../state/auth/auth.selectors';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
+import { MatSidenavModule} from '@angular/material/sidenav';
+import { MatIconModule } from '@angular/material/icon';
+import { MatListModule} from '@angular/material/list';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, UsersComponent, ChatComponent, SettingsComponent],
+  imports: [CommonModule, UsersComponent, ChatComponent, SettingsComponent, MatListModule,MatToolbarModule, MatMenuModule, MatSidenavModule, MatIconModule],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.scss'
+  styleUrl: './home.component.scss',
+ 
 })
 export class HomeComponent implements OnInit {
+
+  openSide: boolean = false;
 
   openedChat: boolean = false;
 
   openedSettings: boolean = false;
-
-  openedPanel: boolean = false;
 
   openedUsersPanelInMobile = false;
 
@@ -69,14 +75,11 @@ export class HomeComponent implements OnInit {
     this.store.dispatch(getCurrentLoggedInUser({ objectId: localStorage.getItem('objectId')! }));
   }
 
-  openPanel() {
-    this.openedPanel = !this.openedPanel;
-  }
 
   openSettings() {
-    this.openedPanel = false;
     this.openedChat = false;
     this.openedSettings = true;
+    this.openSide = false;
   }
 
   closeSettings() {

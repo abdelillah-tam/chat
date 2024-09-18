@@ -22,6 +22,9 @@ import { MatListModule } from '@angular/material/list';
   imports: [CommonModule, UsersComponent, ChatComponent, SettingsComponent, MatListModule, MatToolbarModule, MatMenuModule, MatSidenavModule, MatIconModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
+  host: {
+    '(window:resize)': 'onResize($event)'
+  }
 })
 export class HomeComponent implements OnInit {
 
@@ -104,7 +107,6 @@ export class HomeComponent implements OnInit {
     this.changed = !this.changed;
   }
 
-  @HostListener('window:resize', ['$event'])
   onResize(event: Event) {
     // @ts-ignore
     if(event.target.innerWidth <= 600){

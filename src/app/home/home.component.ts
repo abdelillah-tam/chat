@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { UsersComponent } from "./users/users.component";
 import { ChatComponent } from "./chat/chat.component";
 import { Router } from '@angular/router';
@@ -12,17 +12,16 @@ import { checkIfTokenIsValidAction, getCurrentLoggedInUser } from '../state/auth
 import { selectCurrentLoggedInUser, selectTokenValidation } from '../state/auth/auth.selectors';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
-import { MatSidenavModule} from '@angular/material/sidenav';
+import { MatDrawerMode, MatSidenavModule } from '@angular/material/sidenav';
 import { MatIconModule } from '@angular/material/icon';
-import { MatListModule} from '@angular/material/list';
+import { MatListModule } from '@angular/material/list';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, UsersComponent, ChatComponent, SettingsComponent, MatListModule,MatToolbarModule, MatMenuModule, MatSidenavModule, MatIconModule],
+  imports: [CommonModule, UsersComponent, ChatComponent, SettingsComponent, MatListModule, MatToolbarModule, MatMenuModule, MatSidenavModule, MatIconModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
- 
 })
 export class HomeComponent implements OnInit {
 
@@ -35,6 +34,8 @@ export class HomeComponent implements OnInit {
   openedUsersPanelInMobile = false;
 
   changed = false;
+
+  mode: MatDrawerMode = 'side';
 
   constructor(private router: Router,
     private authService: AuthService, private store: Store) {
@@ -101,5 +102,15 @@ export class HomeComponent implements OnInit {
 
   change() {
     this.changed = !this.changed;
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event) {
+    // @ts-ignore
+    if(event.target.innerWidth <= 600){
+      this.mode = 'over';
+    }else{
+      this.mode = 'side';
+    }
   }
 }

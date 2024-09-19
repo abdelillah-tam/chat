@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnInit } from '@angular/core';
 import { User } from '../../model/user';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../services/auth.service';
 import { MessagingService } from '../../services/messaging.service';
 import { Store } from '@ngrx/store';
 import { openChatWindowAction } from '../../state/messaging/messaging.actions';
@@ -22,7 +21,6 @@ export class UsersComponent implements OnInit {
 
   constructor(
     private elementRef: ElementRef,
-    private authService: AuthService,
     private messagingService: MessagingService,
     private store: Store) {
   }

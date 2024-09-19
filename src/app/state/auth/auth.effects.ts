@@ -1,8 +1,8 @@
 import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { AuthService } from "../../services/auth.service";
-import { CHECKTOKENIFVALID, errorAction, GETALLUSERSINCONTACT, GETCURRENTLOGGEDINUSER, GETUSERBYOBJECTID, gottenCurrentLoggedInUserAction, GOTTENUSER, gottenUserAction, gottenUsersAction, loginAction, LOGINACTION, loginResultAction, resultOfTokenCheckingAction, SIGNUPACTION } from "./auth.actions";
-import { catchError, exhaustMap, firstValueFrom, map, of, pipe } from "rxjs";
+import { CHECKTOKENIFVALID, errorAction, FINDUSERS, GETALLUSERSINCONTACT, GETCURRENTLOGGEDINUSER, GETUSERBYOBJECTID, gottenCurrentLoggedInUserAction, GOTTENUSER, gottenUserAction, gottenUsersAction, loginAction, LOGINACTION, loginResultAction, resultOfTokenCheckingAction, SIGNUPACTION } from "./auth.actions";
+import { catchError, debounce, debounceTime, exhaustMap, firstValueFrom, map, of, pipe } from "rxjs";
 import { User } from "../../model/user";
 
 @Injectable()
@@ -15,6 +15,7 @@ export class AuthEffects {
     getCurrentLoggedInUser$;
     getUserByObjectId$;
     getAllUsers$;
+    findUsers$;
 
     constructor(private action$: Actions, private authService: AuthService) {
         this.login$ = createEffect(() => this.action$.pipe(
@@ -90,6 +91,20 @@ export class AuthEffects {
             exhaustMap((value: { objectsId: string[] }) => {
                 return this.authService
                     .findUsersByObjectId(value.objectsId)
+                    .pipe(
+                        map(data => {
+                            return gottenUsersAction({ users: data });
+                        }),
+                        catchError(() => of(errorAction()))
+                    )
+            })
+        ));
+
+        this.findUsers$ = createEffect(() => this.action$.pipe(
+            debounceTime(500),
+            ofType(FINDUSERS),
+            exhaustMap((value: { name: string }) => {
+                return this.authService.findUsersByName(value.name)
                     .pipe(
                         map(data => {
                             return gottenUsersAction({ users: data });

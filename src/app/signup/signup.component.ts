@@ -30,6 +30,15 @@ export class SignupComponent implements OnInit {
   constructor(private router: Router, private store: Store) {
 
   }
+
+  signUpForm = new FormGroup({
+    firstName: new FormControl('', [Validators.required]),
+    lastName: new FormControl('', [Validators.required]),
+    sex: new FormControl('', [Validators.required]),
+    email: new FormControl('', [Validators.required, Validators.email]),
+    password: new FormControl('', [Validators.required, Validators.minLength(8)]),
+    confirmPassword: new FormControl('', [Validators.required, Validators.minLength(8)])
+  });
   ngOnInit(): void {
     /*this.store.select(selectState).subscribe((result) => {
       this.router.navigate(['/home']);
@@ -40,30 +49,27 @@ export class SignupComponent implements OnInit {
 
   isEmailValid = true;
   isPasswordValid = true;
-
-  signUpForm = new FormGroup({
-    firstName: new FormControl(''),
-    lastName: new FormControl(''),
-    sex: new FormControl('Sex'),
-    email: new FormControl('', [Validators.required, Validators.email]),
-    password: new FormControl('', [Validators.required, Validators.minLength(8)])
-  });
+  isConfirmPasswordValid = true;
 
 
   onSubmit() {
     if (this.signUpForm.valid) {
-      this.store.dispatch(signupAction({
-        user: new User(
-          this.signUpForm.value.firstName!,
-          this.signUpForm.value.lastName!,
-          this.signUpForm.value.email!,
-          this.signUpForm.value.sex!,
-          '',
-          ''
-        ),
-        password: this.signUpForm.value.password!,
-        provider: 'backendless'
-      }))
+      if (this.signUpForm.value.password! === this.signUpForm.value.confirmPassword!) {
+        this.store.dispatch(signupAction({
+          user: new User(
+            this.signUpForm.value.firstName!,
+            this.signUpForm.value.lastName!,
+            this.signUpForm.value.email!,
+            this.signUpForm.value.sex!,
+            '',
+            ''
+          ),
+          password: this.signUpForm.value.password!,
+          provider: 'backendless'
+        }))
+      } else {
+        this.isConfirmPasswordValid = false;
+      }
     } else {
       this.isEmailValid = this.signUpForm.controls.email.valid;
       this.isPasswordValid = this.signUpForm.controls.password.valid;

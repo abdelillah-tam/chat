@@ -4,10 +4,9 @@ import { User } from '../../model/user';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { MessagingService } from '../../services/messaging.service';
-import { animate, animateChild, query, stagger, style, transition, trigger } from '@angular/animations';
 import { Store } from '@ngrx/store';
 import { openChatWindowAction } from '../../state/messaging/messaging.actions';
-import { emptyStateAction, getAllUsersInContactAction } from '../../state/auth/auth.actions';
+import { emptyStateAction, findUsersAction, getAllUsersInContactAction } from '../../state/auth/auth.actions';
 import { selectUsers } from '../../state/auth/auth.selectors';
 import { MatListModule } from '@angular/material/list';
 
@@ -26,7 +25,7 @@ export class UsersComponent implements OnInit {
     private authService: AuthService,
     private messagingService: MessagingService,
     private store: Store) {
-     }
+  }
 
   searchInput: string = '';
 
@@ -40,7 +39,7 @@ export class UsersComponent implements OnInit {
           this.users = result;
           setTimeout(() => {
             this.openChatWindow(this.users[0].objectId, 0);
-          }, 5);
+          }, 1000);
 
         }
       })
@@ -51,9 +50,7 @@ export class UsersComponent implements OnInit {
 
   findUsers() {
     if (this.searchInput.length !== 0) {
-      this.authService.findUsersByName(this.searchInput, (users: Array<User>) => {
-        this.users = users;
-      });
+      this.store.dispatch(findUsersAction({ name: this.searchInput }));
     } else {
       setTimeout(() => {
         this.messagingService.getUsers();
@@ -72,12 +69,12 @@ export class UsersComponent implements OnInit {
       let name = value.querySelector('.name-class');
 
       if (key !== index) {
-        value.classList.remove('bg-green-600');
+        value.classList.remove('green-background');
         name?.classList.remove('text-white');
         name?.classList.add('text-gray-700');
 
       } else {
-        value.classList.add('bg-green-600');
+        value.classList.add('green-background');
         value.classList.add('text-gray-600');
         name?.classList.add('text-white');
         name?.classList.remove('text-gray-700');

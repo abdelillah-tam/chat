@@ -1,6 +1,6 @@
 <div class="h-full w-full select-none bg-white" [@ani]>
   <div
-    class="signup-div h-[70%] flex flex-col justify-evenly items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+    class="signup-div h-5/6 flex flex-col justify-evenly items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
     <div class="flex justify-center items-center w-full">
       <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#16a34a" height="72px"
         width="72px" version="1.1" id="Capa_1" viewBox="0 0 60 60" xml:space="preserve">
@@ -41,7 +41,7 @@
         <mat-label>Email</mat-label>
         <input matInput type="email" formControlName="email" />
         @if(!isEmailValid){
-        <mat-hint>Enter a valid email !</mat-hint>
+        <mat-error>Enter a valid email !</mat-error>
         }
       </mat-form-field>
 
@@ -50,11 +50,17 @@
         <mat-label>Password</mat-label>
         <input matInput type="password" formControlName="password" />
         @if(!isPasswordValid){
-        <mat-hint>Password must be at least 8 characters !</mat-hint>
+        <mat-error>Password must be at least 8 characters !</mat-error>
         }
       </mat-form-field>
 
-
+      <mat-form-field class="mt-4" appearance="outline">
+        <mat-label>Confirm Password</mat-label>
+        <input matInput type="password" formControlName="confirmPassword" />
+        @if(!isConfirmPasswordValid){
+        <mat-error>Not equals to password, confirm again</mat-error>
+        }
+      </mat-form-field>
 
       <button mat-flat-button class=" mt-8 text-white text-xl font-light rounded-md"
         [style.--mdc-filled-button-container-shape]="'0.375rem'" [style.--mdc-filled-button-label-text-size]="'1.2rem'">

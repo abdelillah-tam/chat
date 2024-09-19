@@ -51,17 +51,15 @@ export class AuthService {
     });
   }
 
-  findUsersByName(name: string, onFind: (users: Array<User>) => void) {
-    this.http.get<Array<User>>(`https://brainyclub-eu.backendless.app/api/data/Users?where=firstName%20%3D%20'${name}'`,
+  findUsersByName(name: string) {
+    return this.http.get<Array<User>>(`https://brainyclub-eu.backendless.app/api/data/Users?where=firstName%20%3D%20'${name}'`,
       {
         headers: new HttpHeaders({
           'Content-Type': 'application/json',
           'user-token': localStorage.getItem('userToken')!
         }),
       }
-    ).subscribe((result) => {
-      onFind(result);
-    });
+    );
   }
 
   findUserByEmail(email: string, onFind: (user: User | undefined) => void) {

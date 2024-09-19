@@ -21,9 +21,11 @@ export const GETALLUSERSINCONTACT = '[Auth API] get all users in contact';
 
 export const GOTTENUSERS = '[Auth API] gotten users';
 
-export const CHECKTOKENIFVALID = '[HomeComponent] check if token is valid';
+export const CHECKTOKENIFVALID = '[Home Component] check if token is valid';
 
 export const TOKENCHECKRESULT = '[Auth API] result of token check';
+
+export const FINDUSERS = '[Users Component] find users';
 
 export const ERRORAPI = '[Auth API] error';
 
@@ -55,3 +57,5 @@ export const gottenUsersAction = createAction(GOTTENUSERS, props<{ users: User[]
 export const checkIfTokenIsValidAction = createAction(CHECKTOKENIFVALID, props<{ token: string }>());
 
 export const resultOfTokenCheckingAction = createAction(TOKENCHECKRESULT, props<{ valid: boolean }>());
+
+export const findUsersAction = createAction(FINDUSERS, props<{ name: string }>())

@@ -21,7 +21,7 @@ import { MatButtonModule } from '@angular/material/button';
   standalone: true,
   imports: [RouterLink, RouterLinkActive, ReactiveFormsModule, CommonModule, MatButtonModule, MatIconModule, MatDividerModule, MatFormFieldModule, MatInputModule, MatLabel, MatInput],
   providers: [
-    {provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: {appearance: 'outline'}}
+    { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: 'outline' } }
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
@@ -35,20 +35,17 @@ export class LoginComponent implements OnInit {
 
   constructor(private authService: AuthService,
     private router: Router,
-    private store: Store<AuthState>) { }
+    private store: Store<AuthState>) {
+    if (sessionStorage.getItem('credential') !== null) {
+      this.handleCredential(sessionStorage.getItem('credential')!);
+      sessionStorage.removeItem('credential');
+    }
+
+  }
 
   changed = 0;
 
   ngOnInit(): void {
-    // @ts-ignore
-    google.accounts.id.initialize({
-      client_id: '205706621989-pken44sei0ti29vd95ukk3o2ja4e4gh1.apps.googleusercontent.com',
-      callback: this.handleCredential.bind(this)
-    });
-
-    // @ts-ignore
-    google.accounts.id.prompt();
-
     this.store.select(selectState).subscribe((state) => {
       if (state.state === 'failed') { }
       else if (state.state === 'success' && typeof state.userData !== undefined) {
@@ -85,13 +82,8 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  login() {
-    // @ts-ignore
-    google.accounts.id.prompt();
-  }
-
-  handleCredential(result: { credential: string }) {
-    let googleUser = jose.decodeJwt(result.credential);
+  handleCredential(credential: string) {
+    let googleUser = jose.decodeJwt(credential);
 
     // @ts-ignore
     this.authService.findUserByEmail(googleUser.email, (user) => {

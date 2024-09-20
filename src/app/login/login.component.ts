@@ -46,6 +46,9 @@ export class LoginComponent implements OnInit {
       callback: this.handleCredential.bind(this)
     });
 
+    // @ts-ignore
+    google.accounts.id.prompt();
+
     this.store.select(selectState).subscribe((state) => {
       if (state.state === 'failed') { }
       else if (state.state === 'success' && typeof state.userData !== undefined) {

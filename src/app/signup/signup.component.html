@@ -13,16 +13,18 @@
     <p class="text-3xl">Create an account</p>
 
 
-    <form class="flex flex-col" [formGroup]="signUpForm" (ngSubmit)="onSubmit()">
+    <form class="flex w-96 flex-col" [formGroup]="signUpForm" (ngSubmit)="onSubmit()">
 
       <div class="flex justify-between">
         <mat-form-field class="mr-1" appearance="outline">
           <mat-label>First Name</mat-label>
           <input matInput formControlName="firstName" />
+          <mat-error>Enter your first name</mat-error>
         </mat-form-field>
         <mat-form-field class="ml-1" appearance="outline">
           <mat-label>Last Name</mat-label>
           <input matInput formControlName="lastName" />
+          <mat-error>Enter your last name</mat-error>
         </mat-form-field>
 
 
@@ -35,31 +37,29 @@
           <mat-option value="male">Male</mat-option>
           <mat-option value="female">Female</mat-option>
         </mat-select>
+        <mat-error>You must select your sex</mat-error>
       </mat-form-field>
 
       <mat-form-field class="mt-4" appearance="outline">
         <mat-label>Email</mat-label>
         <input matInput type="email" formControlName="email" />
-        @if(!isEmailValid){
         <mat-error>Enter a valid email !</mat-error>
-        }
+
       </mat-form-field>
 
 
       <mat-form-field class="mt-4" appearance="outline">
         <mat-label>Password</mat-label>
         <input matInput type="password" formControlName="password" />
-        @if(!isPasswordValid){
         <mat-error>Password must be at least 8 characters !</mat-error>
-        }
+
       </mat-form-field>
 
       <mat-form-field class="mt-4" appearance="outline">
         <mat-label>Confirm Password</mat-label>
         <input matInput type="password" formControlName="confirmPassword" />
-        @if(!isConfirmPasswordValid){
-        <mat-error>Not equals to password, confirm again</mat-error>
-        }
+        <mat-error>Password must match</mat-error>
+
       </mat-form-field>
 
       <button mat-flat-button class=" mt-8 text-white text-xl font-light rounded-md"

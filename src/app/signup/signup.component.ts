@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { User } from '../model/user';
 import { CommonModule } from '@angular/common';
 import { animate, style, transition, trigger } from '@angular/animations';
@@ -27,7 +27,7 @@ import { MatButtonModule } from '@angular/material/button'
 })
 export class SignupComponent implements OnInit {
 
-  constructor(private router: Router, private store: Store) {
+  constructor(private store: Store) {
 
   }
 
@@ -37,42 +37,49 @@ export class SignupComponent implements OnInit {
     sex: new FormControl('', [Validators.required]),
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [Validators.required, Validators.minLength(8)]),
-    confirmPassword: new FormControl('', [Validators.required, Validators.minLength(8)])
+    confirmPassword: new FormControl('', [Validators.required])
   });
   ngOnInit(): void {
     /*this.store.select(selectState).subscribe((result) => {
       this.router.navigate(['/home']);
     });*/
+
+    this.signUpForm.addValidators([this.comparePasswordValidator('password', 'confirmPassword')]);
   }
 
   show = true;
 
-  isEmailValid = true;
-  isPasswordValid = true;
-  isConfirmPasswordValid = true;
-
 
   onSubmit() {
     if (this.signUpForm.valid) {
-      if (this.signUpForm.value.password! === this.signUpForm.value.confirmPassword!) {
-        this.store.dispatch(signupAction({
-          user: new User(
-            this.signUpForm.value.firstName!,
-            this.signUpForm.value.lastName!,
-            this.signUpForm.value.email!,
-            this.signUpForm.value.sex!,
-            '',
-            ''
-          ),
-          password: this.signUpForm.value.password!,
-          provider: 'backendless'
-        }))
+      this.store.dispatch(signupAction({
+        user: new User(
+          this.signUpForm.value.firstName!,
+          this.signUpForm.value.lastName!,
+          this.signUpForm.value.email!,
+          this.signUpForm.value.sex!,
+          '',
+          ''
+        ),
+        password: this.signUpForm.value.password!,
+        provider: 'backendless'
+      }))
+
+    }
+  }
+  comparePasswordValidator(controlName: string, matchingControlName: string): ValidatorFn {
+    return (abstractControl: AbstractControl) => {
+      const control = abstractControl.get(controlName);
+      const matchingControl = abstractControl.get(matchingControlName);
+
+      if (control!.value !== matchingControl!.value) {
+        const error = { confirmedValidator: 'Password do not match' };
+        matchingControl!.setErrors(error);
+        return error;
       } else {
-        this.isConfirmPasswordValid = false;
+        matchingControl!.setErrors(null);
+        return null
       }
-    } else {
-      this.isEmailValid = this.signUpForm.controls.email.valid;
-      this.isPasswordValid = this.signUpForm.controls.password.valid;
     }
   }
 

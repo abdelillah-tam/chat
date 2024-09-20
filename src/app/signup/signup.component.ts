@@ -40,9 +40,6 @@ export class SignupComponent implements OnInit {
     confirmPassword: new FormControl('', [Validators.required])
   });
   ngOnInit(): void {
-    /*this.store.select(selectState).subscribe((result) => {
-      this.router.navigate(['/home']);
-    });*/
 
     this.signUpForm.addValidators([this.comparePasswordValidator('password', 'confirmPassword')]);
   }

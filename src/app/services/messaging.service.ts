@@ -7,9 +7,6 @@ import { Store } from '@ngrx/store';
 import { receiveMessageAction } from '../state/messaging/messaging.actions';
 import { getAllUsersInContactAction } from '../state/auth/auth.actions';
 
-@Injectable({
-  providedIn: 'root'
-})
 export class MessagingService {
 
 

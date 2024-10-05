@@ -1,7 +1,7 @@
 import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { UsersComponent } from "./users/users.component";
-import { ChatComponent } from "./chat/chat.component";
-import { Router } from '@angular/router';
+import { ChatComponent } from "./users/chat/chat.component";
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../services/auth.service';
 import { User } from '../model/user';
@@ -19,7 +19,7 @@ import { MatListModule } from '@angular/material/list';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, UsersComponent, ChatComponent, SettingsComponent, MatListModule, MatToolbarModule, MatMenuModule, MatSidenavModule, MatIconModule],
+  imports: [RouterOutlet, RouterLink, CommonModule, UsersComponent, ChatComponent, SettingsComponent, MatListModule, MatToolbarModule, MatMenuModule, MatSidenavModule, MatIconModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
   host: {
@@ -29,8 +29,6 @@ import { MatListModule } from '@angular/material/list';
 export class HomeComponent implements OnInit {
 
   openSide: boolean = false;
-
-  openedChat: boolean = false;
 
   openedSettings: boolean = false;
 
@@ -66,7 +64,10 @@ export class HomeComponent implements OnInit {
 
     this.store.select(selectChat)
       .subscribe(result => {
-        this.openedChat = result.openChat;
+        //this.openedChat = result.openChat;
+        if (result) {
+          this.router.navigate(['chat']);
+        }
       });
 
     this.store.select(selectCurrentLoggedInUser).subscribe(result => {
@@ -81,14 +82,10 @@ export class HomeComponent implements OnInit {
 
 
   openSettings() {
-    this.openedChat = false;
     this.openedSettings = true;
-    this.openSide = false;
+    this.router.navigate(['settings']);
   }
 
-  closeSettings() {
-    this.openedSettings = false;
-  }
 
   logout() {
     localStorage.clear();
@@ -109,9 +106,9 @@ export class HomeComponent implements OnInit {
 
   onResize(event: Event) {
     // @ts-ignore
-    if(event.target.innerWidth <= 600){
+    if (event.target.innerWidth <= 600) {
       this.mode = 'over';
-    }else{
+    } else {
       this.mode = 'side';
     }
   }

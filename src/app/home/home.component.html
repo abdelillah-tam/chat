@@ -30,7 +30,7 @@
   <mat-sidenav-container class="h-full">
     <mat-sidenav [opened]="openSide" mode="over" [mode]="mode">
       <mat-nav-list>
-        <button mat-list-item (click)="openSettings()">
+        <button routerLink="settings" mat-list-item>
           <mat-icon matListItemIcon>settings</mat-icon>
           <p matListItemTitle>Settings</p>
         </button>
@@ -43,21 +43,11 @@
 
     <mat-sidenav-content>
 
-      <div class="h-full flex mb:flex-col flex-1 relative">
+      <div class="h-full  flex mb:flex-col flex-1 relative">
 
-        @if(!openedSettings){
-        <app-users [ngClass]="openedChat ? 'basis-1/3 mb:basis-1/5' :'basis-full mb:basis-full'"></app-users>
-        }
-
-        @if (openedChat) {
-        <app-chat [ngClass]="openedChat ? 'basis-2/3 mb:basis-4/5' : 'basis-0 mb:basis-0'"></app-chat>
-        }
-
-        @if(openedSettings){
-        <app-settings [ngClass]="openedSettings ? 'basis-full' : 'basis-0'"
-          (hiddenSettings)="closeSettings()"></app-settings>
-        }
-
+        <div class="h-full w-full">
+          <router-outlet />
+        </div>
       </div>
     </mat-sidenav-content>
 

@@ -8,12 +8,14 @@ import { openChatWindowAction } from '../../state/messaging/messaging.actions';
 import { emptyStateAction, findUsersAction, getAllUsersInContactAction } from '../../state/auth/auth.actions';
 import { selectUsers } from '../../state/auth/auth.selectors';
 import { MatListModule } from '@angular/material/list';
+import { RouterLink } from '@angular/router';
+import { ChatComponent } from "./chat/chat.component";
 
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatListModule],
+  imports: [RouterLink, CommonModule, FormsModule, MatListModule, ChatComponent],
   templateUrl: './users.component.html',
   styleUrl: './users.component.scss'
 })

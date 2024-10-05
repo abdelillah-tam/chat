@@ -6,6 +6,7 @@ import { animate, transition, trigger } from '@angular/animations';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-settings',
@@ -18,9 +19,7 @@ export class SettingsComponent implements OnInit {
 
   currentUser: User | undefined;
 
-  hiddenSettings = output<boolean>();
-
-  constructor(private authService: AuthService) {
+  constructor(private authService: AuthService, private router: Router) {
 
   }
   ngOnInit(): void {
@@ -73,6 +72,6 @@ export class SettingsComponent implements OnInit {
   }
 
   hideSettings() {
-    this.hiddenSettings.emit(true);
+    this.router.navigate(['/home']);
   }
 }

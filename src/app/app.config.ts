@@ -3,15 +3,17 @@ import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 import { HashLocationStrategy, LocationStrategy } from '@angular/common';
-import { provideHttpClient } from '@angular/common/http';
+import { HttpClient, provideHttpClient } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { provideState, provideStore } from '@ngrx/store';
+import { provideState, provideStore, Store } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
 import { authReducer } from './state/auth/auth.reducers';
 import { AuthEffects } from './state/auth/auth.effects';
 import { chatReducer, messagesReducer, sendMessageReducer } from './state/messaging/messaging.reducers';
 import { MessagingEffects } from './state/messaging/messaging.effects';
 import { provideAnimations } from '@angular/platform-browser/animations';
+import { AuthService } from './services/auth.service';
+import { MessagingService } from './services/messaging.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes), {
@@ -24,5 +26,16 @@ export const appConfig: ApplicationConfig = {
   provideState('sendMessage', sendMessageReducer),
   provideState('messages', messagesReducer),
   provideState('chat', chatReducer),
-  provideEffects(AuthEffects, MessagingEffects)]
+  provideEffects(AuthEffects, MessagingEffects),
+  {
+    provide: AuthService,
+    useFactory: (httpClient: HttpClient) => new AuthService(httpClient),
+    deps: [HttpClient]
+  },
+  {
+    provide: MessagingService,
+    useFactory: (store: Store) => new MessagingService(store),
+    deps: [Store]
+  }
+  ]
 };

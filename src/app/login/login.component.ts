@@ -15,6 +15,8 @@ import { MAT_FORM_FIELD_DEFAULT_OPTIONS, MatFormFieldModule } from '@angular/mat
 import { MatInputModule, MatLabel, MatInput } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { GoogleUser } from '../model/google-user.interface';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -32,6 +34,8 @@ import { MatButtonModule } from '@angular/material/button';
   ]
 })
 export class LoginComponent implements OnInit {
+
+  public googleToken = environment['google-token'];
 
   constructor(private authService: AuthService,
     private router: Router,
@@ -83,20 +87,17 @@ export class LoginComponent implements OnInit {
   }
 
   handleCredential(credential: string) {
-    let googleUser = jose.decodeJwt(credential);
+    let googleUser = jose.decodeJwt<GoogleUser>(credential);
 
-    // @ts-ignore
     this.authService.findUserByEmail(googleUser.email, (user) => {
       if (typeof user !== "undefined") {
         if (user.provider === 'backendless') {
           alert('Try to login using email !');
         } else if (user!.provider === 'google') {
-          //@ts-ignore
           this.store.dispatch(loginAction({ email: googleUser.email!, password: googleUser.sub! }));
         }
       } else {
         this.store.dispatch(signupAction({
-          // @ts-ignore 
           user: new User(googleUser.given_name, googleUser.family_name, googleUser.email, '', '', 'google'),
           password: googleUser!.sub!,
           provider: 'google'

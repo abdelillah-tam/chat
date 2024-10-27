@@ -19,7 +19,19 @@ import { MatListModule } from '@angular/material/list';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, CommonModule, UsersComponent, ChatComponent, SettingsComponent, MatListModule, MatToolbarModule, MatMenuModule, MatSidenavModule, MatIconModule],
+  imports: [
+    RouterOutlet,
+    RouterLink,
+    CommonModule,
+    UsersComponent,
+    ChatComponent,
+    SettingsComponent,
+    MatListModule,
+    MatToolbarModule,
+    MatMenuModule,
+    MatSidenavModule,
+    MatIconModule
+  ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
   host: {
@@ -39,7 +51,8 @@ export class HomeComponent implements OnInit {
   mode: MatDrawerMode = 'side';
 
   constructor(private router: Router,
-    private authService: AuthService, private store: Store) {
+    private authService: AuthService,
+    private store: Store) {
 
     if (localStorage.getItem('email') === null ||
       localStorage.getItem('userToken') === null ||

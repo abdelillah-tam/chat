@@ -64,6 +64,7 @@ export class UsersComponent implements OnInit {
     this.store.dispatch(openChatWindowAction({ objectId: objectId }));
 
     let usersList = this.elementRef.nativeElement.querySelectorAll('.users-list');
+
     // @ts-ignore
     usersList.forEach((value, key) => {
       let name = value.querySelector('.name-class');

@@ -18,8 +18,8 @@
   <div
     class="login-div w-[384px] h-1/2 flex flex-col justify-evenly ml-auto mr-auto absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
     <div>
-      <div id="g_id_onload" data-client_id="205706621989-pken44sei0ti29vd95ukk3o2ja4e4gh1.apps.googleusercontent.com"
-        data-context="signin" data-ux_mode="popup" data-callback="deal" data-auto_prompt="false">
+      <div id="g_id_onload" [attr.data-client_id]="googleToken + '.apps.googleusercontent.com'" data-context="signin"
+        data-ux_mode="popup" data-callback="deal" data-auto_prompt="false">
       </div>
 
       <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="filled_blue"

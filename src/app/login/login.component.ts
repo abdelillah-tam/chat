@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import { MatDividerModule } from "@angular/material/divider";
 import * as jose from 'jose';
 import { User } from '../model/user';
-import { animate, state, style, transition, trigger } from '@angular/animations';
+import { animate, style, transition, trigger } from '@angular/animations';
 import { Store } from '@ngrx/store';
 import { emptyStateAction, loginAction, signupAction } from '../state/auth/auth.actions';
 import { AuthState } from '../state/auth/auth-state';
@@ -35,7 +35,7 @@ import { environment } from '../../environments/environment';
 })
 export class LoginComponent implements OnInit {
 
-  public googleToken = environment['google-token'];
+  public googleToken = environment.GOOGLE_TOKEN;
 
   constructor(private authService: AuthService,
     private router: Router,

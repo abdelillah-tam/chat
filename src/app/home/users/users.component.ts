@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { MessagingService } from '../../services/messaging.service';
 import { Store } from '@ngrx/store';
 import { openChatWindowAction } from '../../state/messaging/messaging.actions';
-import { emptyStateAction, findUsersAction, getAllUsersInContactAction } from '../../state/auth/auth.actions';
+import { emptyStateAction, findUsersAction } from '../../state/auth/auth.actions';
 import { selectUsers } from '../../state/auth/auth.selectors';
 import { MatListModule } from '@angular/material/list';
 import { RouterLink } from '@angular/router';

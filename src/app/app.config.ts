@@ -9,33 +9,43 @@ import { provideState, provideStore, Store } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
 import { authReducer } from './state/auth/auth.reducers';
 import { AuthEffects } from './state/auth/auth.effects';
-import { chatReducer, messagesReducer, sendMessageReducer } from './state/messaging/messaging.reducers';
+import {
+  chatReducer,
+  imageMsgUrlReducer,
+  messagesReducer,
+  sendMessageReducer,
+} from './state/messaging/messaging.reducers';
 import { MessagingEffects } from './state/messaging/messaging.effects';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { AuthService } from './services/auth.service';
 import { MessagingService } from './services/messaging.service';
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes), {
-    provide: LocationStrategy, useClass: HashLocationStrategy
-  },
-  provideAnimationsAsync(),
-  provideHttpClient(),
-  provideStore(),
-  provideState('auth', authReducer),
-  provideState('sendMessage', sendMessageReducer),
-  provideState('messages', messagesReducer),
-  provideState('chat', chatReducer),
-  provideEffects(AuthEffects, MessagingEffects),
-  {
-    provide: AuthService,
-    useFactory: (httpClient: HttpClient) => new AuthService(httpClient),
-    deps: [HttpClient]
-  },
-  {
-    provide: MessagingService,
-    useFactory: (store: Store) => new MessagingService(store),
-    deps: [Store]
-  }
-  ]
+  providers: [
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes),
+    {
+      provide: LocationStrategy,
+      useClass: HashLocationStrategy,
+    },
+    provideAnimationsAsync(),
+    provideHttpClient(),
+    provideStore(),
+    provideState('auth', authReducer),
+    provideState('sendMessage', sendMessageReducer),
+    provideState('messages', messagesReducer),
+    provideState('chat', chatReducer),
+    provideState('imageMsgUrl', imageMsgUrlReducer),
+    provideEffects(AuthEffects, MessagingEffects),
+    {
+      provide: AuthService,
+      useFactory: (httpClient: HttpClient) => new AuthService(httpClient),
+      deps: [HttpClient],
+    },
+    {
+      provide: MessagingService,
+      useFactory: (store: Store) => new MessagingService(store),
+      deps: [Store],
+    },
+  ],
 };

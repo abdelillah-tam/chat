@@ -2,9 +2,8 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { SignupComponent } from './signup/signup.component';
 import { HomeComponent } from './home/home.component';
-import { SettingsComponent } from './home/settings/settings.component';
-import { ChatComponent } from './home/users/chat/chat.component';
 import { UsersComponent } from './home/users/users.component';
+import { SettingsComponent } from './settings/settings.component';
 
 export const routes: Routes = [
     {
@@ -12,10 +11,6 @@ export const routes: Routes = [
         path: 'home',
         component: HomeComponent,
         children: [
-            {
-                path: 'settings',
-                component: SettingsComponent
-            },
             {
                 path: 'chat',
                 component: UsersComponent,
@@ -27,6 +22,10 @@ export const routes: Routes = [
                 pathMatch: 'full'
             }
         ]
+    },
+    {
+        path: 'settings',
+        component: SettingsComponent
     },
     {
         title: 'Login',

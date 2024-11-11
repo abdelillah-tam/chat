@@ -5,13 +5,14 @@ import { initializeApp } from "firebase/app";
 import { getDatabase, ref, set} from "firebase/database"
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBaRYK1qyGrBi17GTypMzXGc5-vhC3HfBc",
-  authDomain: "chat-e5d4f.firebaseapp.com",
-  projectId: "chat-e5d4f",
-  storageBucket: "chat-e5d4f.appspot.com",
-  messagingSenderId: "841961552150",
-  appId: "1:841961552150:web:d2639c5f872acf76e73837",
-  databaseURL: "https://chat-e5d4f-default-rtdb.europe-west1.firebasedatabase.app"
+  apiKey: "AIzaSyBy_ShNxJDybd_kvZ4wqdxJ1iVC2R9wIhg",
+  authDomain: "feedmedia-572e2.firebaseapp.com",
+  databaseURL: "https://feedmedia-572e2-default-rtdb.firebaseio.com",
+  projectId: "feedmedia-572e2",
+  storageBucket: "feedmedia-572e2.appspot.com",
+  messagingSenderId: "789596897667",
+  appId: "1:789596897667:web:fe8593743ffc090a0d76b6",
+  measurementId: "G-64Q5CTX4JS"
 };
 
 initializeApp(firebaseConfig);

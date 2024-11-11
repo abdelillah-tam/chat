@@ -48,7 +48,9 @@ $chat-theme: mat.define-theme((color: (theme-type: light,
   font-family: 'Zain', 'sans-serif';
 }
 
-
+.mat-drawer{
+  --mat-sidenav-container-background-color: #fff;
+}
 
 html,
 body {

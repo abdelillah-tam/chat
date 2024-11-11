@@ -1,13 +1,8 @@
-export class Message {
-    messageText: string;
-    senderId: string;
-    receiverId: string;
-    timestamp: string;
-
-    constructor(messageText: string, senderId: string, receiverId: string, timestamp: string) {
-        this.messageText = messageText;
-        this.senderId = senderId;
-        this.receiverId = receiverId;
-        this.timestamp = timestamp;
-    }
+export interface Message {
+  messageText: string;
+  senderId: string;
+  receiverId: string;
+  timestamp: string;
+  type: 'image' | 'text' | 'image and text';
+  imageUrl: string;
 }

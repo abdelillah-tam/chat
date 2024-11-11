@@ -1,12 +1,11 @@
-import { Component, OnInit, output } from '@angular/core';
-import { AuthService } from '../../services/auth.service';
+import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { User } from '../../model/user';
-import { animate, transition, trigger } from '@angular/animations';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
+import { User } from '../model/user';
 
 @Component({
   selector: 'app-settings',

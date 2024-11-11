@@ -13,7 +13,7 @@
   </mat-sidenav>
 
   <mat-sidenav-content>
-    @if (isLoginOrSignupRoute) {
+    @if (!isLoginOrSignupRoute) {
     <header>
       <mat-toolbar
         class="relative z-10 flex items-center justify-between px-7 mb:px-3 bg-white mat-elevation-z1"

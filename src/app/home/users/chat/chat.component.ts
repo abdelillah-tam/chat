@@ -23,7 +23,6 @@ import {
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { lastValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-chat',
@@ -109,6 +108,7 @@ export class ChatComponent implements OnInit {
       this.file = null;
       this.imageUrl = '';
     } else if (this.text !== '' && this.file === null) {
+      
       this.message = {
         messageText: this.text,
         senderId: localStorage.getItem('objectId')!,

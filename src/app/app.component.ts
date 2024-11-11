@@ -9,6 +9,7 @@ import { getCurrentLoggedInUser } from './state/auth/auth.actions';
 import { selectCurrentLoggedInUser } from './state/auth/auth.selectors';
 import { User } from './model/user';
 import { AuthService } from './services/auth.service';
+import { getCurrentUser } from './model/get-current-user';
 
 @Component({
   selector: 'app-root',
@@ -46,7 +47,7 @@ export class AppComponent implements OnInit {
   isLoginOrSignupRoute: boolean = false;
 
   ngOnInit(): void {
-    this.getCurrentUser();
+    getCurrentUser(this.store);
 
     this.store.select(selectCurrentLoggedInUser).subscribe((result) => {
       this.currentUser = result;
@@ -64,11 +65,7 @@ export class AppComponent implements OnInit {
 
   }
 
-  getCurrentUser() {
-    this.store.dispatch(
-      getCurrentLoggedInUser({ objectId: localStorage.getItem('objectId')! })
-    );
-  }
+ 
 
   onResize(event: Event) {
     // @ts-ignore
@@ -84,6 +81,7 @@ export class AppComponent implements OnInit {
     this.authService.logout();
     if (localStorage.length === 0) {
       this.router.navigate(['/login']);
+      this.openSide = false;
     }
   }
 }

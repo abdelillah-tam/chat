@@ -4,17 +4,14 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../services/auth.service';
 import { Store } from '@ngrx/store';
 import { selectChat } from '../state/messaging/messaging.selectors';
-import {
-  checkIfTokenIsValidAction,
-} from '../state/auth/auth.actions';
-import {
-  selectTokenValidation,
-} from '../state/auth/auth.selectors';
+import { checkIfTokenIsValidAction } from '../state/auth/auth.actions';
+import { selectTokenValidation } from '../state/auth/auth.selectors';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
+import { getCurrentUser } from '../model/get-current-user';
 
 @Component({
   selector: 'app-home',
@@ -31,15 +28,9 @@ import { MatListModule } from '@angular/material/list';
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
-  
 })
 export class HomeComponent implements OnInit {
-  
-
-  constructor(
-    private router: Router,
-    private store: Store
-  ) {
+  constructor(private router: Router, private store: Store) {
     if (
       localStorage.getItem('email') === null ||
       localStorage.getItem('userToken') === null ||
@@ -60,12 +51,11 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    getCurrentUser(this.store);
     this.store.select(selectChat).subscribe((result) => {
       if (result) {
-        this.router.navigate(['chat']);
+        this.router.navigate(['/chat']);
       }
     });
   }
-
-  
 }

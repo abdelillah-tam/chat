@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { NavigationEnd, NavigationStart, Route, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDrawerMode, MatSidenavModule } from '@angular/material/sidenav';
@@ -43,12 +43,25 @@ export class AppComponent implements OnInit {
 
   mode: MatDrawerMode = 'side';
 
+  isLoginOrSignupRoute: boolean = false;
+
   ngOnInit(): void {
     this.getCurrentUser();
 
     this.store.select(selectCurrentLoggedInUser).subscribe((result) => {
       this.currentUser = result;
     });
+
+    this.router.events.subscribe(val => {
+      if (val instanceof NavigationStart) {
+        if(val.url === '/login' || val.url === '/signup'){
+          this.isLoginOrSignupRoute = true;
+        }else{
+          this.isLoginOrSignupRoute = false;
+        }
+      }
+    })
+
   }
 
   getCurrentUser() {

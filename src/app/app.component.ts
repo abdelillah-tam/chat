@@ -47,7 +47,6 @@ export class AppComponent implements OnInit {
   isLoginOrSignupRoute: boolean = false;
 
   ngOnInit(): void {
-    getCurrentUser(this.store);
 
     this.store.select(selectCurrentLoggedInUser).subscribe((result) => {
       this.currentUser = result;

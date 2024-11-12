@@ -1,4 +1,18 @@
 .green-background {
-    --tw-bg-opacity: 1;
-    background-color: rgb(22 163 74 / var(--tw-bg-opacity))
+  --tw-bg-opacity: 1;
+  background-color: rgb(22 163 74 / var(--tw-bg-opacity));
+}
+
+.active-user {
+  @apply bg-chateau-green-500;
+
+  .username {
+    @apply text-white;
+  }
+}
+
+.user {
+  .username {
+    @apply text-gray-700;
+  }
 }

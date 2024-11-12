@@ -15,16 +15,15 @@
     <ul class="basis-[94%] w-full flex flex-col mb:flex-row mb:overflow-x-auto">
       @for(user of users; track user.email){
       <li
-        class="users-list flex flex-col-reverse p-5 mt-5 rounded-md cursor-pointer"
+        [ngClass]="selectedUserIndex === $index ? 'active-user' : 'user'"
+        class="flex flex-col-reverse p-5 mt-5 rounded-md cursor-pointer"
         (click)="openChatWindow(user.objectId, $index)"
       >
         <div class="flex items-center">
           <div class="h-11 w-11 rounded-full">
             <img src="./assets/user.jpg" class="rounded-full" />
           </div>
-          <div
-            class="name-class min-w-48 flex flex-col items-center pl-3 text-gray-700"
-          >
+          <div class="username min-w-48 flex flex-col items-center pl-3">
             <p class="text-xl">{{ user.firstName }} {{ user.lastName }}</p>
           </div>
         </div>

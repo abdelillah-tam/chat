@@ -6,41 +6,31 @@ import { UsersComponent } from './home/users/users.component';
 import { SettingsComponent } from './settings/settings.component';
 
 export const routes: Routes = [
-    {
-        title: 'Home',
-        path: 'home',
-        component: HomeComponent,
-        children: [
-            {
-                path: 'chat',
-                component: UsersComponent,
-
-            },
-            {
-                path: '',
-                redirectTo: 'chat',
-                pathMatch: 'full'
-            }
-        ]
-    },
-    {
-        path: 'settings',
-        component: SettingsComponent
-    },
-    {
-        title: 'Login',
-        path: 'login',
-        component: LoginComponent,
-        data: { animation: 'Login' }
-    },
-    {
-        title: 'Signup',
-        path: 'signup', component: SignupComponent,
-        data: { animation: 'Signup' }
-    },
-    {
+  {
+    title: 'Home',
+    path: '',
+    component: HomeComponent,
+    children: [
+      {
         path: '',
-        redirectTo: '/home',
-        pathMatch: 'full'
-    }
+        component: UsersComponent,
+      },
+    ],
+  },
+  {
+    path: 'settings',
+    component: SettingsComponent,
+  },
+  {
+    title: 'Login',
+    path: 'login',
+    component: LoginComponent,
+    data: { animation: 'Login' },
+  },
+  {
+    title: 'Signup',
+    path: 'signup',
+    component: SignupComponent,
+    data: { animation: 'Signup' },
+  },
 ];

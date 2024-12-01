@@ -1,30 +1,47 @@
-<mat-sidenav-container class="h-full">
-  <mat-sidenav [opened]="openSide" mode="over" [mode]="mode">
+<mat-sidenav-container class="h-full w-full">
+  <mat-sidenav [opened]="openSide" mode="over">
+    <div class="p-4 flex justify-center items-center mb:w-full">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        fill="#16a34a"
+        height="48px"
+        width="48px"
+        version="1.1"
+        id="Capa_1"
+        viewBox="0 0 60 60"
+        xml:space="preserve"
+        class="ml-4"
+      >
+        <path
+          d="M30,1.5c-16.542,0-30,12.112-30,27c0,5.205,1.647,10.246,4.768,14.604c-0.591,6.537-2.175,11.39-4.475,13.689  c-0.304,0.304-0.38,0.769-0.188,1.153C0.276,58.289,0.625,58.5,1,58.5c0.046,0,0.093-0.003,0.14-0.01  c0.405-0.057,9.813-1.412,16.617-5.338C21.622,54.711,25.738,55.5,30,55.5c16.542,0,30-12.112,30-27S46.542,1.5,30,1.5z"
+        />
+      </svg>
+      <p class="text-3xl ml-2 text-gray-950">Chat</p>
+    </div>
     <mat-nav-list>
       <button routerLink="/settings" routerLinkActive="active" mat-list-item>
-        <mat-icon matListItemIcon>settings</mat-icon>
+        <mat-icon matListItemIcon class="material-symbols-outlined"
+          >settings</mat-icon
+        >
         <p matListItemTitle>Settings</p>
       </button>
       <button mat-list-item (click)="logout()">
-        <mat-icon matListItemIcon>logout</mat-icon>
+        <mat-icon matListItemIcon class="material-symbols-outlined"
+          >logout</mat-icon
+        >
         <p matListItemTitle (click)="(1 + 1)">Logout</p>
       </button>
     </mat-nav-list>
   </mat-sidenav>
 
   <mat-sidenav-content>
-    @if (!isLoginOrSignupRoute) {
-    <header>
-      <mat-toolbar
-        class="relative z-10 flex items-center justify-between px-7 mb:px-3 bg-white mat-elevation-z1"
-        [style.--mat-toolbar-container-background-color]="'#ffffff'"
-        [style.--mat-toolbar-standard-height]="'80px'"
+    <div class="flex h-full w-full">
+      @if (!isLoginOrSignupRoute) {
+      <aside
+        class="h-full basis-1/12 mb:hidden flex flex-col justify-around items-center bg-light-gray px-2"
       >
-        <div class="h-full flex items-center">
-          <button (click)="openSide = !openSide" class="flex items-center">
-            <mat-icon>menu</mat-icon>
-          </button>
-
+        <div class="flex items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -41,21 +58,56 @@
               d="M30,1.5c-16.542,0-30,12.112-30,27c0,5.205,1.647,10.246,4.768,14.604c-0.591,6.537-2.175,11.39-4.475,13.689  c-0.304,0.304-0.38,0.769-0.188,1.153C0.276,58.289,0.625,58.5,1,58.5c0.046,0,0.093-0.003,0.14-0.01  c0.405-0.057,9.813-1.412,16.617-5.338C21.622,54.711,25.738,55.5,30,55.5c16.542,0,30-12.112,30-27S46.542,1.5,30,1.5z"
             />
           </svg>
-          <p class="text-3xl ml-2">Chat</p>
+          <p class="text-3xl ml-2 text-gray-950">Chat</p>
         </div>
 
-        <button class="w-44 flex justify-end items-center relative">
-          <div class="h-9 w-9">
-            <img class="w-full h-full" src="./assets/user.jpg" />
+        <a
+          class="flex justify-center items-center w-16 h-16 cursor-pointer"
+          [ngClass]="selectedSection === 0 ? 'selected-section' : ''"
+          (click)="select(0)"
+        >
+          <div
+            class="icon-div h-[90%] w-[90%] bg-light-gray flex justify-center items-center rounded-[1.25rem]"
+          >
+            <mat-icon
+              class="material-symbols-outlined text-3xl text-gray-950 text-center"
+              fontIcon="chat"
+            ></mat-icon>
           </div>
-          <p class="cursor-pointer text-lg">
-            {{ currentUser?.firstName }} {{ currentUser?.lastName }}
-          </p>
-        </button>
-      </mat-toolbar>
-    </header>
-    }
+        </a>
 
-    <router-outlet />
+        <a
+          class="flex justify-center items-center w-16 h-16 cursor-pointer"
+          [ngClass]="selectedSection === 1 ? 'selected-section' : ''"
+          (click)="select(1)"
+        >
+          <div
+            class="icon-div h-[90%] w-[90%] bg-light-gray flex justify-center items-center rounded-[1.25rem]"
+          >
+            <mat-icon
+              class="material-symbols-outlined text-3xl text-gray-950 text-center"
+              fontIcon="settings"
+            ></mat-icon>
+          </div>
+        </a>
+        <a
+          class="icon-div flex justify-center items-center w-16 h-16 cursor-pointer"
+          (click)="logout()"
+        >
+          <div
+            class="icon-div h-[90%] w-[90%] bg-light-gray flex justify-center items-center rounded-[1.25rem]"
+          >
+            <mat-icon
+              class="material-symbols-outlined text-3xl text-gray-950 text-center"
+              fontIcon="logout"
+            ></mat-icon>
+          </div>
+        </a>
+      </aside>
+      }
+      <div class="basis-11/12 mb:basis-full">
+        <router-outlet />
+      </div>
+    </div>
   </mat-sidenav-content>
 </mat-sidenav-container>

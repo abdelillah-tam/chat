@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Message } from '../../../model/message';
 import { User } from '../../../model/user';
@@ -11,7 +11,6 @@ import {
   uploadImageMsgAction,
 } from '../../../state/messaging/messaging.actions';
 import {
-  selectChat,
   selectImageMsgUrl,
   selectMessages,
 } from '../../../state/messaging/messaging.selectors';
@@ -23,6 +22,7 @@ import {
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
   selector: 'app-chat',
@@ -33,6 +33,8 @@ import { MatInputModule } from '@angular/material/input';
     MatIconModule,
     MatFormFieldModule,
     MatInputModule,
+    RouterLink,
+    RouterLinkActive
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
@@ -52,7 +54,7 @@ export class ChatComponent implements OnInit {
 
   imageUrl: string = '';
 
-  constructor(private store: Store) {}
+  constructor(private store: Store, private router: Router) {}
   ngOnInit(): void {
     this.store.select(selectMessages).subscribe((result) => {
       this.messages = result;
@@ -66,21 +68,10 @@ export class ChatComponent implements OnInit {
       this.receiverUser = result;
     });
 
-    this.store.select(selectChat).subscribe((result) => {
-      if (result.openChat) {
-        this.store.dispatch(
-          listenForMessagesAction({ objectId: result.objectId })
-        );
-        this.store.dispatch(
-          getUserByObjectIdAction({ objectId: result.objectId })
-        );
-      }
-    });
-
-    this.store.select(selectImageMsgUrl).subscribe(result => {
-      if(result.length > 0){
+    this.store.select(selectImageMsgUrl).subscribe((result) => {
+      if (result.length > 0) {
         this.message!.imageUrl = result;
-        this.store.dispatch(sendMessageAction({message: this.message!}));
+        this.store.dispatch(sendMessageAction({ message: this.message! }));
         this.store.dispatch(emptyImageMsgAction());
       }
     });
@@ -108,7 +99,6 @@ export class ChatComponent implements OnInit {
       this.file = null;
       this.imageUrl = '';
     } else if (this.text !== '' && this.file === null) {
-      
       this.message = {
         messageText: this.text,
         senderId: localStorage.getItem('objectId')!,
@@ -118,9 +108,7 @@ export class ChatComponent implements OnInit {
         imageUrl: '',
       };
 
-      this.store.dispatch(
-        sendMessageAction({ message: this.message })
-      );
+      this.store.dispatch(sendMessageAction({ message: this.message }));
       this.text = '';
     } else if (this.text === '' && this.file !== null) {
       this.message = {
@@ -133,7 +121,10 @@ export class ChatComponent implements OnInit {
       };
 
       this.store.dispatch(
-        uploadImageMsgAction({ file: this.file!, sender: this.message.senderId })
+        uploadImageMsgAction({
+          file: this.file!,
+          sender: this.message.senderId,
+        })
       );
       this.text = '';
       this.file = null;
@@ -161,5 +152,15 @@ export class ChatComponent implements OnInit {
   removeImage() {
     this.file = null;
     this.imageUrl = '';
+  }
+
+  @Input()
+  set objectId(objectId: string) {
+    this.store.dispatch(listenForMessagesAction({ objectId: objectId }));
+    this.store.dispatch(getUserByObjectIdAction({ objectId: objectId }));
+  }
+
+  closeChat(){
+    this.router.navigate(['/']);
   }
 }

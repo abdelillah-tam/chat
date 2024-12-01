@@ -1,31 +1,56 @@
-<aside class="flex mb:flex-col h-[calc(100%-80px)] w-full">
+<aside class="flex w-full h-full">
   <div
-    class="h-full w-full px-5 pt-3 bg-[#EEF2F1] mb:basis-1/5"
-    [ngClass]="users.length === 0 ? 'basis-full' : 'basis-1/3'"
+    class="h-full pt-3 bg-light-gray mb:basis-full"
+    [ngClass]="
+      closedChat
+        ? 'basis-full mb:w-full'
+        : 'basis-1/3 mb:hidden'
+    "
   >
-    <div class="w-full">
-      <input
-        class="basis-[95%] w-full px-2 text-xl font-light border outline-none rounded-md border-gray-300 focus:border-blue-600"
-        placeholder="Search for a user"
-        [(ngModel)]="searchInput"
-        (ngModelChange)="findUsers()"
-      />
+    <div class="w-full flex justify-center px-2">
+      <button
+        class="basis-[10%] mb:flex items-center justify-evenly hidden cursor-pointer"
+        (click)="openSidenav()"
+      >
+        <mat-icon fontIcon="menu" class="material-symbols-outlined"></mat-icon>
+      </button>
+      <div class="basis-[90%] bg-white rounded-xl">
+        <mat-form-field
+          class="w-full"
+          appearance="outline"
+          subscriptSizing="dynamic"
+        >
+          <mat-label>Search for a user</mat-label>
+          <input
+            matInput
+            [(ngModel)]="searchInput"
+            (ngModelChange)="findUsers()"
+          />
+        </mat-form-field>
+      </div>
     </div>
-
-    <ul class="basis-[94%] w-full flex flex-col mb:flex-row mb:overflow-x-auto">
+    <ul class="basis-full w-full flex flex-col">
       @for(user of users; track user.email){
       <li
-        class="users-list flex flex-col-reverse p-5 mt-5 rounded-md cursor-pointer"
+        class="flex p-5 mt-5 cursor-pointer"
+        [ngClass]="$index === selectedUser ? 'selected-user' : ''"
         (click)="openChatWindow(user.objectId, $index)"
       >
         <div class="flex items-center">
-          <div class="h-11 w-11 rounded-full">
-            <img src="./assets/user.jpg" class="rounded-full" />
+          <div class="h-12 w-12 rounded-xl">
+            <img
+              [src]="
+                user.profileImageLink
+                  ? user.profileImageLink
+                  : './assets/user.png'
+              "
+              class="rounded-xl"
+            />
           </div>
-          <div
-            class="name-class min-w-48 flex flex-col items-center pl-3 text-gray-700"
-          >
-            <p class="text-xl">{{ user.firstName }} {{ user.lastName }}</p>
+          <div class="user-name flex flex-col items-center pl-3">
+            <p class="text-xl text-gray-950">
+              {{ user.firstName }} {{ user.lastName }}
+            </p>
           </div>
         </div>
       </li>
@@ -36,6 +61,8 @@
     </ul>
   </div>
   @if (users.length > 0) {
-  <app-chat class="basis-2/3 mb:basis-4/5"></app-chat>
+  <div [ngClass]="closedChat ? 'basis-0' : 'basis-2/3 mb:basis-full mb:w-full'">
+    <router-outlet />
+  </div>
   }
 </aside>

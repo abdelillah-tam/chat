@@ -1,9 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { Component } from '@angular/core';
+import {
+  NavigationEnd,
+  Router,
+  RouterLink,
+  RouterOutlet,
+} from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../services/auth.service';
 import { Store } from '@ngrx/store';
-import { selectChat } from '../state/messaging/messaging.selectors';
 import { checkIfTokenIsValidAction } from '../state/auth/auth.actions';
 import { selectTokenValidation } from '../state/auth/auth.selectors';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -11,7 +14,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
-import { getCurrentUser } from '../model/get-current-user';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -29,12 +32,12 @@ import { getCurrentUser } from '../model/get-current-user';
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent {
   constructor(private router: Router, private store: Store) {
     if (
-      localStorage.getItem('email') === null ||
-      localStorage.getItem('userToken') === null ||
-      localStorage.getItem('objectId') === null
+      !localStorage.getItem('email') ||
+      !localStorage.getItem('userToken') ||
+      !localStorage.getItem('objectId')
     ) {
       this.router.navigate(['/login']);
     } else {
@@ -48,14 +51,11 @@ export class HomeComponent implements OnInit {
         }
       });
     }
-  }
 
-  ngOnInit(): void {
-    getCurrentUser(this.store);
-    this.store.select(selectChat).subscribe((result) => {
-      if (result) {
-        this.router.navigate(['/chat']);
-      }
-    });
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe((result) => {
+        console.log(result);
+      });
   }
 }

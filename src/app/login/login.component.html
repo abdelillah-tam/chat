@@ -1,30 +1,57 @@
-<div class="h-full w-full select-none bg-white">
-  <div class="header flex justify-between items-center p-6">
+<div class="h-full w-screen select-none bg-white">
+  <header class="header flex justify-between items-center p-6">
     <div class="flex items-center">
-      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#16a34a" height="72px"
-        width="72px" version="1.1" id="Capa_1" viewBox="0 0 60 60" xml:space="preserve">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        fill="#16a34a"
+        height="72px"
+        width="72px"
+        version="1.1"
+        id="Capa_1"
+        viewBox="0 0 60 60"
+        xml:space="preserve"
+      >
         <path
-          d="M30,1.5c-16.542,0-30,12.112-30,27c0,5.205,1.647,10.246,4.768,14.604c-0.591,6.537-2.175,11.39-4.475,13.689  c-0.304,0.304-0.38,0.769-0.188,1.153C0.276,58.289,0.625,58.5,1,58.5c0.046,0,0.093-0.003,0.14-0.01  c0.405-0.057,9.813-1.412,16.617-5.338C21.622,54.711,25.738,55.5,30,55.5c16.542,0,30-12.112,30-27S46.542,1.5,30,1.5z" />
+          d="M30,1.5c-16.542,0-30,12.112-30,27c0,5.205,1.647,10.246,4.768,14.604c-0.591,6.537-2.175,11.39-4.475,13.689  c-0.304,0.304-0.38,0.769-0.188,1.153C0.276,58.289,0.625,58.5,1,58.5c0.046,0,0.093-0.003,0.14-0.01  c0.405-0.057,9.813-1.412,16.617-5.338C21.622,54.711,25.738,55.5,30,55.5c16.542,0,30-12.112,30-27S46.542,1.5,30,1.5z"
+        />
       </svg>
       <p class="text-3xl ml-2">Chat</p>
     </div>
     <div class="create-account flex items-center">
       <p class="create-account-text mr-2">New to Chat?</p>
-      <button class="border border-gray-300 rounded-md px-2 py-1" routerLink="/signup" routerLinkActive="active">
+      <button
+        class="border border-gray-300 rounded-md px-2 py-1"
+        routerLink="/signup"
+        routerLinkActive="active"
+      >
         Create an account
       </button>
     </div>
-  </div>
+  </header>
   <div
-    class="login-div w-[384px] h-1/2 flex flex-col justify-evenly ml-auto mr-auto absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+    class="login-div w-[384px] h-1/2 flex flex-col justify-evenly ml-auto mr-auto absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+  >
     <div>
-      <div id="g_id_onload" [attr.data-client_id]="googleToken + '.apps.googleusercontent.com'" data-context="signin"
-        data-ux_mode="popup" data-callback="deal" data-auto_prompt="false">
-      </div>
+      <div
+        id="g_id_onload"
+        [attr.data-client_id]="googleToken + '.apps.googleusercontent.com'"
+        data-context="signin"
+        data-ux_mode="popup"
+        data-callback="deal"
+        data-auto_prompt="false"
+      ></div>
 
-      <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="filled_blue"
-        data-text="signin_with" data-size="large" data-logo_alignment="left" data-width="384">
-      </div>
+      <div
+        class="g_id_signin"
+        data-type="standard"
+        data-shape="rectangular"
+        data-theme="filled_blue"
+        data-text="signin_with"
+        data-size="large"
+        data-logo_alignment="left"
+        data-width="384"
+      ></div>
     </div>
 
     <div class="flex justify-between items-center">
@@ -35,37 +62,56 @@
     <form class="h-3/6 flex flex-col justify-between" [formGroup]="loginGroup">
       <mat-form-field class="flex flex-col">
         <mat-label>Email</mat-label>
-        <input matInput
+        <input
+          matInput
           class="text-xl font-light h-9 px-2 border border-gray-300 outline-none rounded-md focus:border-blue-600"
-          formControlName="email" />
+          formControlName="email"
+        />
 
         <mat-error>Enter a valid email !</mat-error>
-
-
       </mat-form-field>
 
       <mat-form-field>
         <mat-label>Password</mat-label>
         <div class="relative">
-          <input matInput
+          <input
+            matInput
             class="w-full text-xl font-light h-9 px-2 border border-gray-300 outline-none rounded-md focus:border-blue-600"
-            [type]="isPasswordVisible ? 'text' : 'password'" placeholder="Password" formControlName="password"
-            id="dd" />
-          <button class="absolute h-full -right-0 -top-0 mr-2" (click)="makePasswordVisible()">
-            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000"
-              version="1.1" id="Capa_1" width="25px" height="25px" viewBox="0 0 442.04 442.04" xml:space="preserve">
+            [type]="isPasswordVisible ? 'text' : 'password'"
+            placeholder="Password"
+            formControlName="password"
+            id="dd"
+          />
+          <button
+            class="absolute h-full -right-0 -top-0 mr-2"
+            (click)="makePasswordVisible()"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+              fill="#000000"
+              version="1.1"
+              id="Capa_1"
+              width="25px"
+              height="25px"
+              viewBox="0 0 442.04 442.04"
+              xml:space="preserve"
+            >
               <g>
                 <g>
                   <path
-                    d="M221.02,341.304c-49.708,0-103.206-19.44-154.71-56.22C27.808,257.59,4.044,230.351,3.051,229.203    c-4.068-4.697-4.068-11.669,0-16.367c0.993-1.146,24.756-28.387,63.259-55.881c51.505-36.777,105.003-56.219,154.71-56.219    c49.708,0,103.207,19.441,154.71,56.219c38.502,27.494,62.266,54.734,63.259,55.881c4.068,4.697,4.068,11.669,0,16.367    c-0.993,1.146-24.756,28.387-63.259,55.881C324.227,321.863,270.729,341.304,221.02,341.304z M29.638,221.021    c9.61,9.799,27.747,27.03,51.694,44.071c32.83,23.361,83.714,51.212,139.688,51.212s106.859-27.851,139.688-51.212    c23.944-17.038,42.082-34.271,51.694-44.071c-9.609-9.799-27.747-27.03-51.694-44.071    c-32.829-23.362-83.714-51.212-139.688-51.212s-106.858,27.85-139.688,51.212C57.388,193.988,39.25,211.219,29.638,221.021z" />
+                    d="M221.02,341.304c-49.708,0-103.206-19.44-154.71-56.22C27.808,257.59,4.044,230.351,3.051,229.203    c-4.068-4.697-4.068-11.669,0-16.367c0.993-1.146,24.756-28.387,63.259-55.881c51.505-36.777,105.003-56.219,154.71-56.219    c49.708,0,103.207,19.441,154.71,56.219c38.502,27.494,62.266,54.734,63.259,55.881c4.068,4.697,4.068,11.669,0,16.367    c-0.993,1.146-24.756,28.387-63.259,55.881C324.227,321.863,270.729,341.304,221.02,341.304z M29.638,221.021    c9.61,9.799,27.747,27.03,51.694,44.071c32.83,23.361,83.714,51.212,139.688,51.212s106.859-27.851,139.688-51.212    c23.944-17.038,42.082-34.271,51.694-44.071c-9.609-9.799-27.747-27.03-51.694-44.071    c-32.829-23.362-83.714-51.212-139.688-51.212s-106.858,27.85-139.688,51.212C57.388,193.988,39.25,211.219,29.638,221.021z"
+                  />
                 </g>
                 <g>
                   <path
-                    d="M221.02,298.521c-42.734,0-77.5-34.767-77.5-77.5c0-42.733,34.766-77.5,77.5-77.5c18.794,0,36.924,6.814,51.048,19.188    c5.193,4.549,5.715,12.446,1.166,17.639c-4.549,5.193-12.447,5.714-17.639,1.166c-9.564-8.379-21.844-12.993-34.576-12.993    c-28.949,0-52.5,23.552-52.5,52.5s23.551,52.5,52.5,52.5c28.95,0,52.5-23.552,52.5-52.5c0-6.903,5.597-12.5,12.5-12.5    s12.5,5.597,12.5,12.5C298.521,263.754,263.754,298.521,221.02,298.521z" />
+                    d="M221.02,298.521c-42.734,0-77.5-34.767-77.5-77.5c0-42.733,34.766-77.5,77.5-77.5c18.794,0,36.924,6.814,51.048,19.188    c5.193,4.549,5.715,12.446,1.166,17.639c-4.549,5.193-12.447,5.714-17.639,1.166c-9.564-8.379-21.844-12.993-34.576-12.993    c-28.949,0-52.5,23.552-52.5,52.5s23.551,52.5,52.5,52.5c28.95,0,52.5-23.552,52.5-52.5c0-6.903,5.597-12.5,12.5-12.5    s12.5,5.597,12.5,12.5C298.521,263.754,263.754,298.521,221.02,298.521z"
+                  />
                 </g>
                 <g>
                   <path
-                    d="M221.02,246.021c-13.785,0-25-11.215-25-25s11.215-25,25-25c13.786,0,25,11.215,25,25S234.806,246.021,221.02,246.021z" />
+                    d="M221.02,246.021c-13.785,0-25-11.215-25-25s11.215-25,25-25c13.786,0,25,11.215,25,25S234.806,246.021,221.02,246.021z"
+                  />
                 </g>
               </g>
             </svg>
@@ -73,19 +119,18 @@
         </div>
 
         @if(!isPasswordValid){
-        <mat-hint>
-          Password must be at least 8 characters !
-        </mat-hint>
+        <mat-hint> Password must be at least 8 characters ! </mat-hint>
         }
-
       </mat-form-field>
 
-      <button mat-flat-button [style.--mdc-filled-button-container-shape]="'0.375rem'"
-        [style.--mdc-filled-button-label-text-size]="'1.2rem'" (click)="onSubmitLogin()">
+      <button
+        mat-flat-button
+        [style.--mdc-filled-button-container-shape]="'0.375rem'"
+        [style.--mdc-filled-button-label-text-size]="'1.2rem'"
+        (click)="onSubmitLogin()"
+      >
         Login
       </button>
     </form>
-
-
   </div>
 </div>

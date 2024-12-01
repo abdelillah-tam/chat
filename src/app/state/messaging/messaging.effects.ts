@@ -4,7 +4,6 @@ import { MessagingService } from '../../services/messaging.service';
 import {
   imageMsgUrlAction,
   LISTEN,
-  RECEIVEDMESSAGES,
   SENDMESSAGE,
   UPLOAD_IMG_MSG,
 } from './messaging.actions';
@@ -21,38 +20,36 @@ export class MessagingEffects {
     private actions$: Actions,
     private messagingService: MessagingService
   ) {
-    this.sendMessage$ = createEffect(() =>
-      this.actions$.pipe(
-        ofType(SENDMESSAGE),
-        map((value: { message: Message }) => {
-          this.messagingService.sendMessage(value.message);
-          return { type: '' };
-        })
-      )
+    this.sendMessage$ = createEffect(
+      () =>
+        this.actions$.pipe(
+          ofType(SENDMESSAGE),
+          map((value: { message: Message }) =>
+            this.messagingService.sendMessage(value.message)
+          )
+        ),
+      { dispatch: false }
     );
 
-    this.listenForMessages$ = createEffect(() =>
-      this.actions$.pipe(
-        ofType(LISTEN),
-        map((value: { objectId: string }) => {
-          this.messagingService.listenForMessages(value.objectId);
-          return { type: '' };
-        })
-      )
+    this.listenForMessages$ = createEffect(
+      () =>
+        this.actions$.pipe(
+          ofType(LISTEN),
+          map((value: { objectId: string }) =>
+            this.messagingService.listenForMessages(value.objectId)
+          )
+        ),
+      { dispatch: false }
     );
 
     this.uploadImgMsg$ = createEffect(() =>
       this.actions$.pipe(
         ofType(UPLOAD_IMG_MSG),
-        exhaustMap((value: { file: File; sender: string }) => {
-          return from(
+        exhaustMap((value: { file: File; sender: string }) =>
+          from(
             this.messagingService.uploadImageMsg(value.file, value.sender)
-          ).pipe(
-            map((result) => {
-              return imageMsgUrlAction({ imageUrl: result });
-            })
-          );
-        })
+          ).pipe(map((result) => imageMsgUrlAction({ imageUrl: result })))
+        )
       )
     );
   }

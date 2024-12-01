@@ -1,51 +1,81 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { User } from '../../model/user';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { MessagingService } from '../../services/messaging.service';
 import { Store } from '@ngrx/store';
-import { openChatWindowAction } from '../../state/messaging/messaging.actions';
-import { emptyStateAction, findUsersAction } from '../../state/auth/auth.actions';
+import { findUsersAction } from '../../state/auth/auth.actions';
 import { selectUsers } from '../../state/auth/auth.selectors';
-import { MatListModule } from '@angular/material/list';
-import { RouterLink } from '@angular/router';
-import { ChatComponent } from "./chat/chat.component";
-
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs';
+import { MatIconModule } from '@angular/material/icon';
+import {
+  openSidenavAction,
+} from '../../state/app/app.actions';
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [RouterLink, CommonModule, FormsModule, MatListModule, ChatComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    RouterOutlet,
+    ReactiveFormsModule,
+    MatIconModule,
+  ],
   templateUrl: './users.component.html',
-  styleUrl: './users.component.scss'
+  styleUrl: './users.component.scss',
 })
 export class UsersComponent implements OnInit {
-
-  constructor(
-    private elementRef: ElementRef,
-    private messagingService: MessagingService,
-    private store: Store) {
-  }
-
   searchInput: string = '';
 
   users: Array<User> = [];
 
+  selectedUser: number = -1;
+
+  closedChat: boolean = true;
+
+  closedSidenav = true;
+
+  constructor(
+    private messagingService: MessagingService,
+    private store: Store,
+    private router: Router
+  ) {}
+
   ngOnInit(): void {
-
-    this.store.select(selectUsers)
-      .subscribe(result => {
-        if (result !== undefined) {
-          this.users = result;
-          setTimeout(() => {
-            this.openChatWindow(this.users[0].objectId, 0);
-          }, 1000);
-
-        }
-      })
+    this.store.select(selectUsers).subscribe((result) => {
+      if (result && result.length) {
+        this.users = result;
+        let currentUser = this.router.url.slice(6);
+        this.selectedUser = this.users.findIndex((user) => {
+          return user.objectId === currentUser;
+        });
+      }
+    });
 
     this.messagingService.getUsers();
 
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe((result) => {
+        if (result.url.startsWith('/chat')) {
+          this.closedChat = false;
+        } else {
+          this.closedChat = true;
+        }
+      });
+
+    if (this.router.url === '/') {
+      this.closedChat = true;
+      this.selectedUser = -1;
+    } else if (this.router.url.startsWith('/chat')) {
+      this.closedChat = false;
+    }
   }
 
   findUsers() {
@@ -55,31 +85,15 @@ export class UsersComponent implements OnInit {
       setTimeout(() => {
         this.messagingService.getUsers();
       }, 50);
-
     }
   }
 
   openChatWindow(objectId: string, index: number) {
-    this.store.dispatch(emptyStateAction());
-    this.store.dispatch(openChatWindowAction({ objectId: objectId }));
+    this.selectedUser = index;
+    this.router.navigate([`chat/${objectId}`]);
+  }
 
-    let usersList = this.elementRef.nativeElement.querySelectorAll('.users-list');
-
-    // @ts-ignore
-    usersList.forEach((value, key) => {
-      let name = value.querySelector('.name-class');
-
-      if (key !== index) {
-        value.classList.remove('green-background');
-        name?.classList.remove('text-white');
-        name?.classList.add('text-gray-700');
-
-      } else {
-        value.classList.add('green-background');
-        value.classList.add('text-gray-600');
-        name?.classList.add('text-white');
-        name?.classList.remove('text-gray-700');
-      }
-    })
+  openSidenav() {
+    this.store.dispatch(openSidenavAction());
   }
 }

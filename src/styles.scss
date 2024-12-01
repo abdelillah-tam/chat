@@ -1,7 +1,7 @@
 // Custom Theming for Angular Material
 // For more information: https://material.angular.io/guide/theming
-@use '@angular/material' as mat;
-@use '../m3-theme.scss' as m3;
+@use "@angular/material" as mat;
+@use "../m3-theme.scss" as m3;
 // Plus imports for other components in your app.
 
 // Include the common styles for Angular Material. We include this here so that you only
@@ -9,14 +9,19 @@
 // Be sure that you only ever include this mixin once!
 @include mat.core();
 
-
 // Define the theme object.
-$chat-theme: mat.define-theme((color: (theme-type: light,
-        primary: mat.$blue-palette,
-        tertiary: mat.$blue-palette,
-      ),
-      density: (scale: 0,
-      )));
+$chat-theme: mat.define-theme(
+  (
+    color: (
+      theme-type: light,
+      primary: mat.$blue-palette,
+      tertiary: mat.$blue-palette,
+    ),
+    density: (
+      scale: 0,
+    ),
+  )
+);
 
 .mdc-notched-outline__notch {
   border-left: none !important;
@@ -45,19 +50,26 @@ $chat-theme: mat.define-theme((color: (theme-type: light,
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  font-family: 'Zain', 'sans-serif';
+  font-family: "Zain", "sans-serif";
 }
 
-.mat-drawer{
+.mat-drawer {
   --mat-sidenav-container-background-color: #fff;
+}
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 0, "wght" 300, "GRAD" 200, "opsz" 48;
 }
 
 html,
 body {
   height: 100%;
+  width: 100%;
 }
 
 body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+.mdc-text-field--outlined {
+  --mdc-outlined-text-field-container-shape: 0.75rem !important;
 }

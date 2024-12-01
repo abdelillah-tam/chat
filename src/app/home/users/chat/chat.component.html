@@ -1,10 +1,29 @@
-<main class="h-full w-full flex flex-col">
+<header></header>
+<main class="h-full w-full flex flex-col bg-light-gray">
+  <div
+    class="w-full h-14 flex items-center rounded-full overflow-hidden mt-2 pl-2"
+  >
+    <a class="hidden mb:flex mb:items-center"
+      routerLink="/"
+      ><mat-icon
+        fontIcon="arrow_back"
+        class="material-symbols-outlined"
+      ></mat-icon
+    ></a>
+    <div class="w-11 h-11 rounded-full overflow-hidden">
+      <img src="./assets/user.png" class="h-full w-full object-cover" />
+    </div>
+    <p class="ml-2 text-xl">
+      {{ receiverUser?.firstName }} {{ receiverUser?.lastName }}
+    </p>
+  </div>
+
   @if(messages.length === 0){
   <p class="w-full text-center bg-gray-500 text-white">No messages here</p>
   }
 
   <div
-    class="basis-[94%] flex flex-col py-3 bg-white rounded-md overflow-y-auto"
+    class="basis-[94%] flex flex-col py-3 mt-2 mb-4 bg-white overflow-y-auto"
   >
     @for(msg of messages; track msg.timestamp){
     <ul
@@ -15,15 +34,14 @@
           : 'justify-start flex-row'
       "
     >
-      <li class="w-11 rounded-full">
-        @if($first || messages[$index].senderId !==
-        messages[$index-1].senderId){
-        <img src="./assets/user.jpg" class="rounded-full" />
-        }
+      @if($first || messages[$index].senderId !== messages[$index-1].senderId){
+      <li class="w-11 h-11 rounded-xl overflow-hidden">
+        <img src="./assets/user.png" class="w-full h-full object-fill" />
       </li>
+      }
       <li class="w-full flex flex-col">
         <div
-          class="w-full flex text-xl"
+          class="w-full flex text-lg"
           [ngClass]="
             msg.senderId === getCurrentObjectId()
               ? 'justify-end pr-2'
@@ -77,11 +95,14 @@
     </ul>
     } @empty{ }
   </div>
-  <div class="basis-[6%] flex items-center bg-white rounded-md pb-3">
+  <div
+    class="relative basis-[3%] flex items-center bg-white rounded-xl mx-4 mb-4"
+  >
     <mat-form-field
-      class="relative basis-[90%] w-full h-full"
+      class="basis-full h-full"
       subscriptSizing="dynamic"
       appearance="outline"
+      subscriptSizing="dynamic"
     >
       <mat-label>Message</mat-label>
       <input
@@ -106,20 +127,29 @@
       </div>
     </mat-form-field>
 
-    <button class="basis-[5%]">
-      <input
-        class="hidden"
-        type="file"
-        id="inputFile"
-        (change)="onImageAdded($event)"
-        accept="image/*"
-      />
-      <label class="right-0 flex items-center" for="inputFile"
-        ><mat-icon fontIcon="attach_file"></mat-icon
-      ></label>
-    </button>
-    <button class="basis-[5%] flex items-center p-2" (click)="sendMessage()">
-      <mat-icon class="cursor-pointer" color="#F6EFEE">send</mat-icon>
-    </button>
+    <div class="absolute flex right-0">
+      <button>
+        <input
+          class="hidden"
+          type="file"
+          id="inputFile"
+          (change)="onImageAdded($event)"
+          accept="image/*"
+        />
+        <label class="right-0 flex items-center" for="inputFile"
+          ><mat-icon
+            class="material-symbols-outlined"
+            fontIcon="attach_file"
+          ></mat-icon
+        ></label>
+      </button>
+      <button class="basis-[5%] flex items-center p-2" (click)="sendMessage()">
+        <mat-icon
+          class="cursor-pointer material-symbols-outlined"
+          color="#F6EFEE"
+          >send</mat-icon
+        >
+      </button>
+    </div>
   </div>
 </main>

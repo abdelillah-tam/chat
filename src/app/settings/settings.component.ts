@@ -1,76 +1,143 @@
-import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AfterContentInit, Component, OnInit } from '@angular/core';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
 import { User } from '../model/user';
+import { Store } from '@ngrx/store';
+import {
+  selectCurrentLoggedInUser,
+  selectState,
+} from '../state/auth/auth.selectors';
+import {
+  updateUserInfoAction,
+  uploadProfilePicAction,
+} from '../state/auth/auth.actions';
+import { getCurrentUser } from '../model/get-current-user';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule],
+  imports: [
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatProgressSpinnerModule,
+    CommonModule,
+  ],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss',
 })
-export class SettingsComponent implements OnInit {
-
+export class SettingsComponent implements OnInit, AfterContentInit {
   currentUser: User | undefined;
 
-  constructor(private authService: AuthService, private router: Router) {
+  file: File | null = null;
 
+  profileImageUrl: string = '';
+
+  loading: boolean = false;
+
+  constructor(private store: Store, private router: Router) {
+    getCurrentUser(this.store);
   }
-  ngOnInit(): void {
-    this.authService.findUserByEmail(localStorage.getItem('email')!, (user) => {
-      this.currentUser = user;
+
+  ngAfterContentInit(): void {
+    this.store.select(selectCurrentLoggedInUser).subscribe((result) => {
+      this.currentUser = result;
       this.infoGroup.controls.firstName.setValue(this.currentUser!.firstName);
       this.infoGroup.controls.lastName.setValue(this.currentUser!.lastName);
       this.infoGroup.controls.email.setValue(this.currentUser!.email);
+
+      if (this.currentUser!.profileImageLink.length > 0) {
+        this.profileImageUrl = this.currentUser!.profileImageLink;
+      }
 
       if (this.currentUser!.provider === 'google') {
         this.infoGroup.controls.email.disable();
         this.infoGroup.controls.password.disable();
       }
-
-    })
+    });
   }
 
+  ngOnInit(): void {
+    this.store.select(selectState).subscribe((result) => {
+      if (result.newProfilePictureUrl.length > 0) {
+        this.profileImageUrl = result.newProfilePictureUrl;
+        this.updateInfos();
+      }
+    });
+  }
 
   infoGroup = new FormGroup({
     firstName: new FormControl('', [Validators.required]),
     lastName: new FormControl('', [Validators.required]),
     email: new FormControl('', [Validators.required, Validators.email]),
-    password: new FormControl('')
+    password: new FormControl(''),
   });
 
   updateInfos() {
-    if (this.infoGroup.valid && this.currentUser!.provider !== 'google') {
-      this.authService.updateInfos(
-        localStorage.getItem('objectId')!,
-        this.infoGroup.value.firstName!,
-        this.infoGroup.value.lastName!,
-        this.infoGroup.value.email!,
-        this.infoGroup.value.password!.length >= 8 ? this.infoGroup.value.password! : undefined,
-        (user) => {
-          localStorage.setItem('email', user.email!);
-        }
-      )
-
-
-    } else if (this.infoGroup.valid) {
-      this.authService.updateInfos(
-        localStorage.getItem('objectId')!,
-        this.infoGroup.value.firstName!,
-        this.infoGroup.value.lastName!,
-        undefined,
-        undefined,
-        (user) => { }
-      )
+    this.infoGroup.enable();
+    this.loading = false;
+    if (this.currentUser!.provider === 'google') {
+      this.infoGroup.controls.email.disable();
+      this.infoGroup.controls.password.disable();
+    }
+    if (this.infoGroup.valid) {
+      this.store.dispatch(
+        updateUserInfoAction({
+          objectId: localStorage.getItem('objectId')!,
+          firstName: this.infoGroup.value.firstName!,
+          lastName: this.infoGroup.value.lastName!,
+          email: this.infoGroup.value.email!,
+          password:
+            this.currentUser!.provider === 'google'
+              ? undefined
+              : this.infoGroup.value.password!,
+          profileImageLink: this.profileImageUrl,
+        })
+      );
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     }
   }
 
   hideSettings() {
-    this.router.navigate(['/home']);
+    this.router.navigate(['/']);
+  }
+
+  onImageAdded(e: any) {
+    this.file = e.target.files[0];
+    this.showImage();
+  }
+
+  showImage() {
+    let fileReader = new FileReader();
+    fileReader.readAsDataURL(this.file!);
+    fileReader.onload = (event: any) => {
+      this.profileImageUrl = event.target.result;
+    };
+  }
+
+  saveProfilePictureChange() {
+    if (this.file && this.currentUser) {
+      this.loading = true;
+      this.infoGroup.disable();
+      this.store.dispatch(
+        uploadProfilePicAction({
+          file: this.file,
+          user: this.currentUser.objectId,
+        })
+      );
+    }
   }
 }

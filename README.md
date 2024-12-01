@@ -9,6 +9,6 @@ Live : [Chat](https://abdelillah-tam.github.io/chat/)
     - Services
     - Http
   - Angular material components
-  - NGRX state management
+  - NgRx state management
   - Tailwind CSS
   - Google auth

@@ -9,12 +9,12 @@
   >
     <div class="w-full flex justify-center px-2">
       <button
-        class="basis-[10%] mb:flex items-center justify-evenly hidden cursor-pointer"
+        class="mb:basis-[10%] mb:flex items-center justify-evenly hidden cursor-pointer"
         (click)="openSidenav()"
       >
         <mat-icon fontIcon="menu" class="material-symbols-outlined"></mat-icon>
       </button>
-      <div class="basis-[90%] bg-white rounded-xl">
+      <div class="basis-full mb:basis-[90%] bg-white rounded-xl">
         <mat-form-field
           class="w-full"
           appearance="outline"
@@ -33,7 +33,7 @@
       @for(user of users; track user.email){
       <li
         class="flex p-5 mt-5 cursor-pointer"
-        [ngClass]="$index === selectedUser ? 'selected-user' : ''"
+        [ngClass]="$index === selectedUserIndex ? 'selected-user' : ''"
         (click)="openChatWindow(user.objectId, $index)"
       >
         <div class="flex items-center">

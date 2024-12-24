@@ -11,9 +11,7 @@ import { selectUsers } from '../../state/auth/auth.selectors';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { MatIconModule } from '@angular/material/icon';
-import {
-  openSidenavAction,
-} from '../../state/app/app.actions';
+import { openSidenavAction } from '../../state/app/app.actions';
 
 @Component({
   selector: 'app-users',
@@ -35,7 +33,7 @@ export class UsersComponent implements OnInit {
 
   users: Array<User> = [];
 
-  selectedUser: number = -1;
+  selectedUserIndex: number = -1;
 
   closedChat: boolean = true;
 
@@ -52,9 +50,13 @@ export class UsersComponent implements OnInit {
       if (result && result.length) {
         this.users = result;
         let currentUser = this.router.url.slice(6);
-        this.selectedUser = this.users.findIndex((user) => {
+
+        this.selectedUserIndex = this.users.findIndex((user) => {
           return user.objectId === currentUser;
         });
+        if (this.router.url !== '/') {
+          this.closedChat = false;
+        }
       }
     });
 
@@ -70,12 +72,6 @@ export class UsersComponent implements OnInit {
         }
       });
 
-    if (this.router.url === '/') {
-      this.closedChat = true;
-      this.selectedUser = -1;
-    } else if (this.router.url.startsWith('/chat')) {
-      this.closedChat = false;
-    }
   }
 
   findUsers() {
@@ -89,7 +85,8 @@ export class UsersComponent implements OnInit {
   }
 
   openChatWindow(objectId: string, index: number) {
-    this.selectedUser = index;
+    this.closedChat = false;
+    this.selectedUserIndex = index;
     this.router.navigate([`chat/${objectId}`]);
   }
 

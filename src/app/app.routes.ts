@@ -15,6 +15,10 @@ export const routes: Routes = [
         path: 'chat/:objectId',
         component: ChatComponent,
       },
+      {
+        path: 'chat',
+        redirectTo: '',
+      },
     ],
   },
   {

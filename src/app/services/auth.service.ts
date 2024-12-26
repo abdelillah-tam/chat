@@ -144,3 +144,5 @@ export class AuthService {
     return downloadUrl;
   }
 }
+
+export class MockAuthService{}

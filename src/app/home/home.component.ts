@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import {
   NavigationEnd,
   Router,
@@ -14,7 +14,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
-import { filter } from 'rxjs';
+import { filter, Subscriber, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -32,8 +32,12 @@ import { filter } from 'rxjs';
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
-export class HomeComponent {
-  constructor(private router: Router, private store: Store) {
+export class HomeComponent implements OnInit, OnDestroy {
+  selectToken: Subscription | undefined;
+
+  constructor(private router: Router, private store: Store) {}
+
+  ngOnInit(): void {
     if (
       !localStorage.getItem('email') ||
       !localStorage.getItem('userToken') ||
@@ -45,17 +49,17 @@ export class HomeComponent {
         checkIfTokenIsValidAction({ token: localStorage.getItem('userToken')! })
       );
 
-      this.store.select(selectTokenValidation).subscribe((valid) => {
-        if (valid !== undefined && !valid) {
-          this.router.navigate(['/login']);
-        }
-      });
+      this.selectToken = this.store
+        .select(selectTokenValidation)
+        .subscribe((valid) => {
+          if (valid !== undefined && !valid) {
+            this.router.navigate(['/login']);
+          }
+        });
     }
+  }
 
-    this.router.events
-      .pipe(filter((event) => event instanceof NavigationEnd))
-      .subscribe((result) => {
-        console.log(result);
-      });
+  ngOnDestroy(): void {
+    this.selectToken?.unsubscribe();
   }
 }

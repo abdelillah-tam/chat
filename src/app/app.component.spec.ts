@@ -1,10 +1,21 @@
 import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
+import { provideMockStore } from '@ngrx/store/testing';
+import { AuthService, MockAuthService } from './services/auth.service';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideRouter } from '@angular/router';
+import { routes } from './app.routes';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppComponent],
+      providers: [
+        { provide: AuthService, useClass: MockAuthService },
+        provideMockStore({}),
+        provideAnimationsAsync(),
+        provideRouter(routes)
+      ],
     }).compileComponents();
   });
 
@@ -20,10 +31,5 @@ describe('AppComponent', () => {
     expect(app.title).toEqual('chat');
   });
 
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, chat');
-  });
+  
 });

@@ -4,7 +4,7 @@ import { AppComponent } from './app/app.component';
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, set} from "firebase/database"
 
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: "AIzaSyBy_ShNxJDybd_kvZ4wqdxJ1iVC2R9wIhg",
   authDomain: "feedmedia-572e2.firebaseapp.com",
   databaseURL: "https://feedmedia-572e2-default-rtdb.firebaseio.com",

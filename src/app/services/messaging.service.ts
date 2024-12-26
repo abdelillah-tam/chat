@@ -102,3 +102,7 @@ export class MessagingService {
     return downloadUrl;
   }
 }
+
+export class MockMessagingService {
+  getUsers() {}
+}

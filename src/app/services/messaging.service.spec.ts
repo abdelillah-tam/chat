@@ -1,12 +1,25 @@
 import { TestBed } from '@angular/core/testing';
-
+import { provideMockStore } from '@ngrx/store/testing';
 import { MessagingService } from './messaging.service';
+import { Store } from '@ngrx/store';
+import { initializeApp } from 'firebase/app';
+import { firebaseConfig } from '../../main';
 
 describe('MessagingService', () => {
   let service: MessagingService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    initializeApp(firebaseConfig);
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: MessagingService,
+          useFactory: (store: Store) => new MessagingService(store),
+          deps: [Store],
+        },
+        provideMockStore({}),
+      ],
+    });
     service = TestBed.inject(MessagingService);
   });
 

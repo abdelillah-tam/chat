@@ -36,5 +36,5 @@ export const routes: Routes = [
     path: 'signup',
     component: SignupComponent,
     data: { animation: 'Signup' },
-  },
+  }
 ];

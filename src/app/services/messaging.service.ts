@@ -1,6 +1,6 @@
 import { getDatabase, ref, onValue, set, get } from 'firebase/database';
 import { Message } from '../model/message';
-import { from } from 'rxjs';
+import { from, of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { receiveMessageAction } from '../state/messaging/messaging.actions';
 import { getAllUsersInContactAction } from '../state/auth/auth.actions';
@@ -88,6 +88,7 @@ export class MessagingService {
       });
       this.store.dispatch(getAllUsersInContactAction({ objectsId: users }));
     });
+
   }
 
   async uploadImageMsg(file: File, sender: string) {

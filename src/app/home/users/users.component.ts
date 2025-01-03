@@ -7,7 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MessagingService } from '../../services/messaging.service';
 import { Store } from '@ngrx/store';
 import { findUsersAction } from '../../state/auth/auth.actions';
-import { selectUsers } from '../../state/auth/auth.selectors';
+import { selectFoundUsers } from '../../state/auth/auth.selectors';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { MatIconModule } from '@angular/material/icon';
@@ -46,7 +46,7 @@ export class UsersComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.store.select(selectUsers).subscribe((result) => {
+    this.store.select(selectFoundUsers).subscribe((result) => {
       if (result && result.length) {
         this.users = result;
         let currentUser = this.router.url.slice(6);

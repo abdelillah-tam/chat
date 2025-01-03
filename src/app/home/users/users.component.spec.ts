@@ -9,7 +9,7 @@ import { provideMockStore } from '@ngrx/store/testing';
 import { provideRouter, Router } from '@angular/router';
 import { routes } from '../../app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { selectUsers } from '../../state/auth/auth.selectors';
+import { selectFoundUsers } from '../../state/auth/auth.selectors';
 import { User } from '../../model/user';
 import { By } from '@angular/platform-browser';
 import { HarnessLoader } from '@angular/cdk/testing';
@@ -43,7 +43,7 @@ describe('UsersComponent', () => {
         provideMockStore({
           selectors: [
             {
-              selector: selectUsers,
+              selector: selectFoundUsers,
               value: [mockUser],
             },
           ],

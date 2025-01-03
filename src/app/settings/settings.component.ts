@@ -1,8 +1,9 @@
-import { AfterContentInit, Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import {
   FormControl,
   FormGroup,
   ReactiveFormsModule,
+  ValidatorFn,
   Validators,
 } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -37,7 +38,7 @@ import { CommonModule } from '@angular/common';
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss',
 })
-export class SettingsComponent implements OnInit, AfterContentInit {
+export class SettingsComponent implements OnInit, AfterViewInit {
   currentUser: User | undefined;
 
   file: File | null = null;
@@ -46,11 +47,33 @@ export class SettingsComponent implements OnInit, AfterContentInit {
 
   loading: boolean = false;
 
+  infoGroup = new FormGroup({
+    firstName: new FormControl('', [Validators.required]),
+    lastName: new FormControl('', [Validators.required]),
+    email: new FormControl('', [Validators.required, Validators.email]),
+    password: new FormControl(''),
+  });
+
   constructor(private store: Store, private router: Router) {
-    getCurrentUser(this.store);
+    let validator: ValidatorFn = (formGroup) => {
+      if (!this.infoGroup.controls.email.disabled) {
+        return formGroup.get('firstName')?.valid &&
+          formGroup.get('lastName')?.valid &&
+          formGroup.get('email')?.valid
+          ? null
+          : { error: 'invalid' };
+      } else {
+        return formGroup.get('firstName')?.valid &&
+          formGroup.get('lastName')?.valid
+          ? null
+          : { error: 'invalid' };
+      }
+    };
+    this.infoGroup.addValidators(validator);
   }
 
-  ngAfterContentInit(): void {
+  ngOnInit(): void {
+    getCurrentUser(this.store);
     this.store.select(selectCurrentLoggedInUser).subscribe((result) => {
       this.currentUser = result;
       this.infoGroup.controls.firstName.setValue(this.currentUser!.firstName);
@@ -61,14 +84,11 @@ export class SettingsComponent implements OnInit, AfterContentInit {
         this.profileImageUrl = this.currentUser!.profileImageLink;
       }
 
-      if (this.currentUser!.provider === 'google') {
+      if (this.currentUser?.provider === 'google') {
         this.infoGroup.controls.email.disable();
         this.infoGroup.controls.password.disable();
       }
     });
-  }
-
-  ngOnInit(): void {
     this.store.select(selectState).subscribe((result) => {
       if (result.newProfilePictureUrl.length > 0) {
         this.profileImageUrl = result.newProfilePictureUrl;
@@ -77,20 +97,11 @@ export class SettingsComponent implements OnInit, AfterContentInit {
     });
   }
 
-  infoGroup = new FormGroup({
-    firstName: new FormControl('', [Validators.required]),
-    lastName: new FormControl('', [Validators.required]),
-    email: new FormControl('', [Validators.required, Validators.email]),
-    password: new FormControl(''),
-  });
+  ngAfterViewInit(): void {}
 
   updateInfos() {
-    this.infoGroup.enable();
     this.loading = false;
-    if (this.currentUser!.provider === 'google') {
-      this.infoGroup.controls.email.disable();
-      this.infoGroup.controls.password.disable();
-    }
+
     if (this.infoGroup.valid) {
       this.store.dispatch(
         updateUserInfoAction({
@@ -105,9 +116,6 @@ export class SettingsComponent implements OnInit, AfterContentInit {
           profileImageLink: this.profileImageUrl,
         })
       );
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
     }
   }
 

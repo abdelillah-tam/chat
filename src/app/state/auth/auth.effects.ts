@@ -2,38 +2,26 @@ import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { AuthService } from '../../services/auth.service';
 import {
-  CHECKTOKENIFVALID,
+  CHECK_TOKEN_IF_VALID,
   errorAction,
-  FINDUSERS,
-  GETALLUSERSINCONTACT,
-  GETCURRENTLOGGEDINUSER,
-  GETUSERBYOBJECTID,
-  gottenCurrentLoggedInUserAction,
-  gottenProfilePictureUrlAction,
-  GOTTENUSER,
-  gottenUserAction,
-  gottenUsersAction,
+  FIND_USERS,
+  GET_ALL_USERS_IN_CONTACT,
+  GET_CURRENT_LOGGED_IN_USER,
+  GET_USER_BY_OBJECTID,
+  retrievedCurrentLoggedInUserAction,
+  retrievedProfilePictureUrlAction,
+  retrievedUserAction,
+  retrievedUsersAction,
   loginAction,
-  LOGINACTION,
+  LOGIN,
   loginResultAction,
   resultOfTokenCheckingAction,
-  SIGNUPACTION,
+  SIGNUP,
   UPDATE_USER_INFO,
   UPLOAD_PROFILE_PICTURE,
 } from './auth.actions';
-import {
-  catchError,
-  debounce,
-  debounceTime,
-  exhaustMap,
-  firstValueFrom,
-  from,
-  map,
-  of,
-  pipe,
-} from 'rxjs';
+import { catchError, debounceTime, exhaustMap, from, map, of } from 'rxjs';
 import { User } from '../../model/user';
-import { UPLOAD_IMG_MSG } from '../messaging/messaging.actions';
 
 @Injectable()
 export class AuthEffects {
@@ -50,14 +38,14 @@ export class AuthEffects {
   constructor(private action$: Actions, private authService: AuthService) {
     this.login$ = createEffect(() =>
       this.action$.pipe(
-        ofType(LOGINACTION),
+        ofType(LOGIN),
         exhaustMap((value: { email: string; password: string }) =>
           this.authService.login(value.email, value.password).pipe(
             map((data) =>
               loginResultAction({
                 email: data.email,
                 objectId: data.objectId,
-                'user-token': data['user-token'],
+                userToken: data.userToken,
               })
             ),
             catchError(() => of(errorAction()))
@@ -68,7 +56,7 @@ export class AuthEffects {
 
     this.signup$ = createEffect(() =>
       this.action$.pipe(
-        ofType(SIGNUPACTION),
+        ofType(SIGNUP),
         exhaustMap(
           (value: { user: User; password: string; provider: string }) =>
             this.authService
@@ -88,7 +76,7 @@ export class AuthEffects {
 
     this.tokenValid$ = createEffect(() =>
       this.action$.pipe(
-        ofType(CHECKTOKENIFVALID),
+        ofType(CHECK_TOKEN_IF_VALID),
         exhaustMap((value: { token: string }) =>
           this.authService.verifyIfTokenValid(value.token).pipe(
             map((valid) => resultOfTokenCheckingAction({ valid: valid })),
@@ -100,11 +88,11 @@ export class AuthEffects {
 
     this.getCurrentLoggedInUser$ = createEffect(() =>
       this.action$.pipe(
-        ofType(GETCURRENTLOGGEDINUSER),
+        ofType(GET_CURRENT_LOGGED_IN_USER),
         exhaustMap((value: { objectId: string }) =>
           this.authService.findUserByObjectId(value.objectId).pipe(
             map((data) =>
-              gottenCurrentLoggedInUserAction({
+              retrievedCurrentLoggedInUserAction({
                 currentUserLoggedIn: data,
               })
             ),
@@ -116,10 +104,10 @@ export class AuthEffects {
 
     this.getUserByObjectId$ = createEffect(() =>
       this.action$.pipe(
-        ofType(GETUSERBYOBJECTID),
+        ofType(GET_USER_BY_OBJECTID),
         exhaustMap((value: { objectId: string }) =>
           this.authService.findUserByObjectId(value.objectId).pipe(
-            map((data) => gottenUserAction({ user: data })),
+            map((data) => retrievedUserAction({ user: data })),
             catchError(() => of(errorAction()))
           )
         )
@@ -128,10 +116,10 @@ export class AuthEffects {
 
     this.getAllUsers$ = createEffect(() =>
       this.action$.pipe(
-        ofType(GETALLUSERSINCONTACT),
+        ofType(GET_ALL_USERS_IN_CONTACT),
         exhaustMap((value: { objectsId: string[] }) =>
           this.authService.findUsersByObjectId(value.objectsId).pipe(
-            map((data) => gottenUsersAction({ users: data })),
+            map((data) => retrievedUsersAction({ users: data })),
             catchError(() => of(errorAction()))
           )
         )
@@ -141,10 +129,10 @@ export class AuthEffects {
     this.findUsers$ = createEffect(() =>
       this.action$.pipe(
         debounceTime(500),
-        ofType(FINDUSERS),
+        ofType(FIND_USERS),
         exhaustMap((value: { name: string }) =>
           this.authService.findUsersByName(value.name).pipe(
-            map((data) => gottenUsersAction({ users: data })),
+            map((data) => retrievedUsersAction({ users: data })),
             catchError(() => of(errorAction()))
           )
         )
@@ -158,7 +146,7 @@ export class AuthEffects {
           from(
             this.authService.uploadImageProfile(value.file, value.user)
           ).pipe(
-            map((result) => gottenProfilePictureUrlAction({ url: result }))
+            map((result) => retrievedProfilePictureUrlAction({ url: result }))
           )
         )
       )

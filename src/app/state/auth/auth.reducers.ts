@@ -2,16 +2,18 @@ import { createReducer, on } from '@ngrx/store';
 import {
   emptyStateAction,
   errorAction,
-  gottenCurrentLoggedInUserAction,
-  gottenProfilePictureUrlAction,
-  gottenUserAction,
-  gottenUsersAction,
+  retrievedCurrentLoggedInUserAction,
+  retrievedProfilePictureUrlAction,
+  retrievedUserAction,
+  retrievedUsersAction,
   loginResultAction,
   resultOfTokenCheckingAction,
 } from './auth.actions';
 import { AuthState } from './auth-state';
 
-const initialState: AuthState = {
+
+
+export const initialState: AuthState = {
   state: 'none',
   userData: undefined,
   validToken: undefined,
@@ -21,6 +23,7 @@ const initialState: AuthState = {
   newProfilePictureUrl: '',
 };
 
+
 export const authReducer = createReducer(
   initialState,
   on(loginResultAction, (state, data) => {
@@ -29,7 +32,7 @@ export const authReducer = createReducer(
       state: 'success',
       userData: {
         email: data.email,
-        userToken: data['user-token'],
+        userToken: data.userToken,
         objectId: data.objectId,
       },
     };
@@ -49,19 +52,20 @@ export const authReducer = createReducer(
       currentLoggedInUser: undefined
     };
   }),
-  on(gottenCurrentLoggedInUserAction, (state, data) => {
+  on(retrievedCurrentLoggedInUserAction, (state, data) => {
     return { ...state, currentLoggedInUser: data.currentUserLoggedIn };
   }),
-  on(gottenUserAction, (state, data) => {
+  on(retrievedUserAction, (state, data) => {
     return { ...state, userInContact: data.user };
   }),
-  on(gottenUsersAction, (state, data) => {
+  on(retrievedUsersAction, (state, data) => {
     return { ...state, foundUsers: data.users };
   }),
   on(resultOfTokenCheckingAction, (state, data) => {
     return { ...state, validToken: data.valid };
   }),
-  on(gottenProfilePictureUrlAction, (state, data) => {
+  on(retrievedProfilePictureUrlAction, (state, data) => {
     return { ...state, newProfilePictureUrl: data.url };
   })
 );
+

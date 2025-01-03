@@ -13,6 +13,6 @@ export const selectCurrentLoggedInUser = createSelector(selectFeature, (state) =
 
 export const selectUser = createSelector(selectFeature, (state) => state.userInContact);
 
-export const selectUsers = createSelector(selectFeature, (state) => state.foundUsers);
+export const selectFoundUsers = createSelector(selectFeature, (state) => state.foundUsers);
 
 export const selectTokenValidation = createSelector(selectFeature, (state) => state.validToken);

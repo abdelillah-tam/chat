@@ -6,12 +6,6 @@ import {
   errorAction,
   FIND_USERS,
   GET_ALL_USERS_IN_CONTACT,
-  GET_CURRENT_LOGGED_IN_USER,
-  GET_USER_BY_OBJECTID,
-  retrievedCurrentLoggedInUserAction,
-  retrievedProfilePictureUrlAction,
-  retrievedUserAction,
-  retrievedUsersAction,
   loginAction,
   LOGIN,
   loginResultAction,
@@ -19,9 +13,26 @@ import {
   SIGNUP,
   UPDATE_USER_INFO,
   UPLOAD_PROFILE_PICTURE,
+  GET_CURRENT_LOGGEDIN_USER,
+  retrievedCurrentLoggedInUserAction,
+  GET_USER_BY_OBJECT_ID,
+  retrievedUsersAction,
+  retrievedUserAction,
+  retrievedProfilePictureUrlAction
 } from './auth.actions';
-import { catchError, debounceTime, exhaustMap, from, map, of } from 'rxjs';
+import {
+  catchError,
+  concatAll,
+  debounceTime,
+  exhaustMap,
+  forkJoin,
+  from,
+  map,
+  of,
+  switchMap,
+} from 'rxjs';
 import { User } from '../../model/user';
+import { MessagingService } from '../../services/messaging.service';
 
 @Injectable()
 export class AuthEffects {
@@ -35,7 +46,11 @@ export class AuthEffects {
   uploadProfilePicture$;
   updateUserInfo$;
 
-  constructor(private action$: Actions, private authService: AuthService) {
+  constructor(
+    private action$: Actions,
+    private authService: AuthService,
+    private messagingService: MessagingService
+  ) {
     this.login$ = createEffect(() =>
       this.action$.pipe(
         ofType(LOGIN),
@@ -62,7 +77,7 @@ export class AuthEffects {
             this.authService
               .signUp(value.user, value.password, value.provider)
               .pipe(
-                map((data) =>
+                map(() =>
                   loginAction({
                     email: value.user.email,
                     password: value.password,
@@ -88,13 +103,11 @@ export class AuthEffects {
 
     this.getCurrentLoggedInUser$ = createEffect(() =>
       this.action$.pipe(
-        ofType(GET_CURRENT_LOGGED_IN_USER),
+        ofType(GET_CURRENT_LOGGEDIN_USER),
         exhaustMap((value: { objectId: string }) =>
           this.authService.findUserByObjectId(value.objectId).pipe(
             map((data) =>
-              retrievedCurrentLoggedInUserAction({
-                currentUserLoggedIn: data,
-              })
+              retrievedCurrentLoggedInUserAction({ currentUserLoggedIn: data })
             ),
             catchError(() => of(errorAction()))
           )
@@ -104,7 +117,7 @@ export class AuthEffects {
 
     this.getUserByObjectId$ = createEffect(() =>
       this.action$.pipe(
-        ofType(GET_USER_BY_OBJECTID),
+        ofType(GET_USER_BY_OBJECT_ID),
         exhaustMap((value: { objectId: string }) =>
           this.authService.findUserByObjectId(value.objectId).pipe(
             map((data) => retrievedUserAction({ user: data })),
@@ -117,10 +130,18 @@ export class AuthEffects {
     this.getAllUsers$ = createEffect(() =>
       this.action$.pipe(
         ofType(GET_ALL_USERS_IN_CONTACT),
-        exhaustMap((value: { objectsId: string[] }) =>
-          this.authService.findUsersByObjectId(value.objectsId).pipe(
-            map((data) => retrievedUsersAction({ users: data })),
-            catchError(() => of(errorAction()))
+        exhaustMap(() =>
+          this.messagingService.getUsers().pipe(
+            switchMap((value) => {
+              let ids: string[] = [];
+              value.forEach((child) => {
+                ids.push(child.key);
+              });
+              return this.authService.findUsersByObjectId(ids).pipe(
+                map((data) => retrievedUsersAction({ users: data })),
+                catchError(() => of(errorAction()))
+              );
+            })
           )
         )
       )

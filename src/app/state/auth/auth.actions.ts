@@ -7,25 +7,24 @@ export const LOGIN = '[Login Component] login';
 export const AUTH_API_LOGIN = '[Auth API] login success';
 export const AUTH_API_SIGNUP = '[Auth API] signup success';
 
-export const FULL_NAME = '[Chat Component] get full name';
+export const FULLNAME = '[Chat Component] get full name';
 
-export const GET_CURRENT_LOGGED_IN_USER =
-  '[Chat Component] get current full name';
+export const GET_CURRENT_LOGGEDIN_USER = '[Chat Component] get current full name';
 
-export const RETRIEVED_CURRENT_LOGGED_IN_USER =
+export const RETRIEVED_CURRENT_LOGGEDIN_USER =
   '[Auth API] gotten current logged in user full name';
 
-export const GET_USER_BY_OBJECTID = '[Chat Component] get user';
+export const GET_USER_BY_OBJECT_ID = '[Chat Component] get user';
 
-export const RETRIEVED_USER = '[Auth API] gotten user';
+export const RETRIEVED_USER = '[Auth API] retrieved user';
 
 export const GET_ALL_USERS_IN_CONTACT = '[Auth API] get all users in contact';
 
-export const RETRIEVED_USERS = '[Auth API] gotten users';
+export const RETRIEVED_USERS = '[Auth API] retrieved users';
 
 export const CHECK_TOKEN_IF_VALID = '[Home Component] check if token is valid';
 
-export const TOKEN_CHECK_RESULT = '[Auth API] result of token check';
+export const RETRIEVED_TOCKEN_CHECK = '[Auth API] result of token check';
 
 export const FIND_USERS = '[Users Component] find users';
 
@@ -34,8 +33,7 @@ export const ERROR_API = '[Auth API] error';
 export const UPLOAD_PROFILE_PICTURE =
   '[Settings Component] upload profile picture';
 
-export const RETRIEVED_PROFILE_PICTURE_URL =
-  '[Effect] gotten profile picture url';
+export const GOTTEN_PROFILE_PICTURE_URL = '[Effect] gotten profile picture url';
 
 export const UPDATE_USER_INFO = '[Settings Component] update user information';
 
@@ -59,28 +57,27 @@ export const errorAction = createAction(ERROR_API);
 export const emptyStateAction = createAction('[Login Component] empty state');
 
 export const getFullNameAction = createAction(
-  FULL_NAME,
+  FULLNAME,
   props<{ objectId: string }>()
 );
 
 export const getCurrentLoggedInUser = createAction(
-  GET_CURRENT_LOGGED_IN_USER,
+  GET_CURRENT_LOGGEDIN_USER,
   props<{ objectId: string }>()
 );
 
 export const retrievedCurrentLoggedInUserAction = createAction(
-  RETRIEVED_CURRENT_LOGGED_IN_USER,
+  RETRIEVED_CURRENT_LOGGEDIN_USER,
   props<{ currentUserLoggedIn: User }>()
 );
 
 export const getUserByObjectIdAction = createAction(
-  GET_USER_BY_OBJECTID,
+  GET_USER_BY_OBJECT_ID,
   props<{ objectId: string }>()
 );
 
 export const getAllUsersInContactAction = createAction(
-  GET_ALL_USERS_IN_CONTACT,
-  props<{ objectsId: string[] }>()
+  GET_ALL_USERS_IN_CONTACT
 );
 
 export const retrievedUserAction = createAction(
@@ -99,7 +96,7 @@ export const checkIfTokenIsValidAction = createAction(
 );
 
 export const resultOfTokenCheckingAction = createAction(
-  TOKEN_CHECK_RESULT,
+  RETRIEVED_TOCKEN_CHECK,
   props<{ valid: boolean }>()
 );
 
@@ -114,7 +111,7 @@ export const uploadProfilePicAction = createAction(
 );
 
 export const retrievedProfilePictureUrlAction = createAction(
-  RETRIEVED_PROFILE_PICTURE_URL,
+  GOTTEN_PROFILE_PICTURE_URL,
   props<{ url: string }>()
 );
 

@@ -1,6 +1,6 @@
 import { getDatabase, ref, onValue, set, get } from 'firebase/database';
 import { Message } from '../model/message';
-import { from, of } from 'rxjs';
+import { from } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { receiveMessageAction } from '../state/messaging/messaging.actions';
 import { getAllUsersInContactAction } from '../state/auth/auth.actions';
@@ -81,14 +81,10 @@ export class MessagingService {
       this.db,
       'chats/' + localStorage.getItem('objectId')!
     );
-    get(reference).then((result) => {
-      let users: string[] = [];
-      result.forEach((child) => {
-        users.push(child.key);
-      });
-      this.store.dispatch(getAllUsersInContactAction({ objectsId: users }));
-    });
 
+    let result = from(get(reference));
+
+    return result;
   }
 
   async uploadImageMsg(file: File, sender: string) {

@@ -7,12 +7,14 @@ import {
   AUTH_API_LOGIN,
   checkIfTokenIsValidAction,
   errorAction,
+  getAllUsersInContactAction,
   getCurrentLoggedInUser,
   LOGIN,
   loginAction,
   loginResultAction,
   resultOfTokenCheckingAction,
   retrievedCurrentLoggedInUserAction,
+  retrievedUsersAction,
   signupAction,
 } from './auth.actions';
 import { AuthService } from '../../services/auth.service';
@@ -22,11 +24,16 @@ import { provideMockStore } from '@ngrx/store/testing';
 import { HttpClient, provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { User } from '../../model/user';
+import { MessagingService } from '../../services/messaging.service';
+import { DataSnapshot } from 'firebase/database';
+import { Data } from '@angular/router';
 
 describe('Effects', () => {
   let actions$ = new Observable<Action>();
 
   let authService: AuthService;
+
+  let messagingService: MessagingService;
 
   let authEffects: AuthEffects;
 
@@ -44,11 +51,16 @@ describe('Effects', () => {
           useFactory: (httpClient: HttpClient) => new AuthService(httpClient),
           deps: [HttpClient],
         },
+        {
+          provide: MessagingService,
+          useFactory: () => new MessagingService(),
+        },
         provideEffects(AuthEffects),
       ],
     });
 
     authService = TestBed.inject(AuthService);
+    messagingService = TestBed.inject(MessagingService);
     authEffects = TestBed.inject(AuthEffects);
     mockUser = {
       email: 'a@a.com',
@@ -146,6 +158,35 @@ describe('Effects', () => {
 
     authEffects.getCurrentLoggedInUser$.subscribe((data) => {
       expect(data).toEqual(errorAction());
+      done();
+    });
+  });
+
+  it('should return retrievedUsersAction', (done) => {
+    actions$ = of(getAllUsersInContactAction());
+
+    let mockUsers: User[] = [
+      {
+        email: 'a@a.com',
+        firstName: 'Abdelillah',
+        lastName: 'Tamoussat',
+        objectId: 'id',
+        profileImageLink: 'link',
+        provider: 'google',
+        sex: 'man',
+      },
+    ];
+
+    let getUsers = spyOn(messagingService, 'getUsers');
+    getUsers.and.resolveTo(['obj one', 'obj two']);
+
+    let findUsersSpy = spyOn(authService, 'findUsersByObjectId');
+    findUsersSpy.and.returnValue(of(mockUsers));
+
+    authEffects.getAllUsers$.subscribe((data) => {
+      expect(messagingService.getUsers).toHaveBeenCalled();
+      expect(authService.findUsersByObjectId).toHaveBeenCalled();
+      expect(data).toEqual(retrievedUsersAction({ users: mockUsers }));
       done();
     });
   });

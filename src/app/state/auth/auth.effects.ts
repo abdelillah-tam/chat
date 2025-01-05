@@ -18,7 +18,7 @@ import {
   GET_USER_BY_OBJECT_ID,
   retrievedUsersAction,
   retrievedUserAction,
-  retrievedProfilePictureUrlAction
+  retrievedProfilePictureUrlAction,
 } from './auth.actions';
 import {
   catchError,
@@ -27,6 +27,7 @@ import {
   exhaustMap,
   forkJoin,
   from,
+  lastValueFrom,
   map,
   of,
   switchMap,
@@ -131,13 +132,9 @@ export class AuthEffects {
       this.action$.pipe(
         ofType(GET_ALL_USERS_IN_CONTACT),
         exhaustMap(() =>
-          this.messagingService.getUsers().pipe(
+          from(this.messagingService.getUsers()).pipe(
             switchMap((value) => {
-              let ids: string[] = [];
-              value.forEach((child) => {
-                ids.push(child.key);
-              });
-              return this.authService.findUsersByObjectId(ids).pipe(
+              return this.authService.findUsersByObjectId(value).pipe(
                 map((data) => retrievedUsersAction({ users: data })),
                 catchError(() => of(errorAction()))
               );

@@ -85,8 +85,7 @@ export class AuthService {
       `${environment.BACKENDLESS_BASE_URL}/data/Users/${objectId}`,
       {
         headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-          'user-token': localStorage.getItem('userToken')!,
+          'Content-Type': 'application/json'
         }),
       }
     );

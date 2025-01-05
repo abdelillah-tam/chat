@@ -42,7 +42,7 @@ export const appConfig: ApplicationConfig = {
     {
       provide: MessagingService,
       useFactory: (store: Store) => new MessagingService(store),
-      deps: [Store],
+      deps: [Store]
     },
   ],
 };

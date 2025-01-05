@@ -108,5 +108,6 @@ describe('ChatComponent', () => {
 
     expect(component.onImageAdded).toHaveBeenCalled();
     expect(component.file).toBeTruthy();
+    
   });
 });

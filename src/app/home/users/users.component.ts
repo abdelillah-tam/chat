@@ -4,9 +4,8 @@ import { User } from '../../model/user';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MessagingService } from '../../services/messaging.service';
 import { Store } from '@ngrx/store';
-import { findUsersAction } from '../../state/auth/auth.actions';
+import { findUsersAction, getAllUsersInContactAction } from '../../state/auth/auth.actions';
 import { selectFoundUsers } from '../../state/auth/auth.selectors';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
@@ -40,7 +39,6 @@ export class UsersComponent implements OnInit {
   closedSidenav = true;
 
   constructor(
-    private messagingService: MessagingService,
     private store: Store,
     private router: Router
   ) {}
@@ -60,7 +58,7 @@ export class UsersComponent implements OnInit {
       }
     });
 
-    this.messagingService.getUsers();
+    this.store.dispatch(getAllUsersInContactAction());
 
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
@@ -79,7 +77,7 @@ export class UsersComponent implements OnInit {
       this.store.dispatch(findUsersAction({ name: this.searchInput }));
     } else {
       setTimeout(() => {
-        this.messagingService.getUsers();
+        this.store.dispatch(getAllUsersInContactAction());
       }, 50);
     }
   }

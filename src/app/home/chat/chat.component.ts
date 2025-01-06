@@ -1,24 +1,24 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Message } from '../../../model/message';
-import { User } from '../../../model/user';
+import { Message } from '../../model/message';
+import { User } from '../../model/user';
 import { Store } from '@ngrx/store';
 import {
   emptyImageMsgAction,
   listenForMessagesAction,
   sendMessageAction,
   uploadImageMsgAction,
-} from '../../../state/messaging/messaging.actions';
+} from '../../state/messaging/messaging.actions';
 import {
   selectImageMsgUrl,
   selectMessages,
-} from '../../../state/messaging/messaging.selectors';
-import { getUserByObjectIdAction } from '../../../state/auth/auth.actions';
+} from '../../state/messaging/messaging.selectors';
+import { getUserByObjectIdAction } from '../../state/auth/auth.actions';
 import {
   selectCurrentLoggedInUser,
   selectUser,
-} from '../../../state/auth/auth.selectors';
+} from '../../state/auth/auth.selectors';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -34,7 +34,7 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
     MatFormFieldModule,
     MatInputModule,
     RouterLink,
-    RouterLinkActive
+    RouterLinkActive,
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
@@ -160,7 +160,17 @@ export class ChatComponent implements OnInit {
     this.store.dispatch(getUserByObjectIdAction({ objectId: objectId }));
   }
 
-  closeChat(){
+  closeChat() {
     this.router.navigate(['/']);
+  }
+
+  profileImageSetter(index: number) {
+    if (this.messages[index].senderId === this.senderUser?.objectId) {
+      return this.senderUser.profileImageLink;
+    } else if (this.messages[index].senderId === this.receiverUser?.objectId) {
+      return this.receiverUser.profileImageLink;
+    } else {
+      return './assets/user.png';
+    }
   }
 }

@@ -4,13 +4,13 @@ import { UsersComponent } from './users.component';
 import {
   MessagingService,
   MockMessagingService,
-} from '../../services/messaging.service';
+} from '../services/messaging.service';
 import { provideMockStore } from '@ngrx/store/testing';
 import { provideRouter, Router } from '@angular/router';
-import { routes } from '../../app.routes';
+import { routes } from '../app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { selectFoundUsers } from '../../state/auth/auth.selectors';
-import { User } from '../../model/user';
+import { selectFoundUsers } from '../state/auth/auth.selectors';
+import { User } from '../model/user';
 import { By } from '@angular/platform-browser';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';

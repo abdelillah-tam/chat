@@ -26,7 +26,11 @@
       </div>
     </div>
     <ul class="basis-full w-full flex flex-col">
-      @for(user of users; track user.email){
+      @if (loading) {
+      <div class="h-full w-full flex justify-center mt-3">
+        <mat-spinner diameter="50"></mat-spinner>
+      </div>
+      } @else { @for(user of users; track user.email){
       <li
         class="user-item flex p-5 mt-5 cursor-pointer"
         [ngClass]="$index === selectedUserIndex ? 'selected-user' : ''"
@@ -40,7 +44,7 @@
                   ? user.profileImageLink
                   : './assets/user.png'
               "
-              class="rounded-xl"
+              class="rounded-xl object-contain"
             />
           </div>
           <div class="user-name flex flex-col items-center pl-3">
@@ -53,7 +57,7 @@
 
       } @empty{
       <p class="w-full text-center">No users</p>
-      }
+      } }
     </ul>
   </div>
   @if (users.length > 0 && !closedChat) {

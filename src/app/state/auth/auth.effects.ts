@@ -61,7 +61,7 @@ export class AuthEffects {
               loginResultAction({
                 email: data.email,
                 objectId: data.objectId,
-                userToken: data.userToken,
+                userToken: data['user-token'],
               })
             ),
             catchError(() => of(errorAction()))

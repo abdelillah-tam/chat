@@ -4,11 +4,10 @@ module.exports = {
     "./src/app/home/home.component.html",
     "./src/app/login/login.component.html",
     "./src/app/signup/signup.component.html",
-    "./src/app/home/chat/contact-information/contact-information.component.html",
-    "./src/app/home/users/users.component.html",
+    "./src/app/home/users.component.html",
     "./src/app/settings/settings.component.html",
     "./src/index.html",
-    "./src/app/home/users/chat/chat.component.html",
+    "./src/app/home/chat/chat.component.html",
     "./src/app/app.component.html",
   ],
   theme: {

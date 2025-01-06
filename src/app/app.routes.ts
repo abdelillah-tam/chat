@@ -1,10 +1,9 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { SignupComponent } from './signup/signup.component';
-import { HomeComponent } from './home/home.component';
-import { UsersComponent } from './home/users/users.component';
+import { UsersComponent } from './home/users.component';
 import { SettingsComponent } from './settings/settings.component';
-import { ChatComponent } from './home/users/chat/chat.component';
+import { ChatComponent } from './home/chat/chat.component';
 
 export const routes: Routes = [
   {

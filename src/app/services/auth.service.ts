@@ -1,7 +1,14 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpEventType,
+  HttpHandlerFn,
+  HttpHeaders,
+  HttpRequest,
+} from '@angular/common/http';
 import { User } from '../model/user';
 import { environment } from '../../environments/environment';
 import { getStorage, uploadBytes, getDownloadURL, ref } from 'firebase/storage';
+import { tap } from 'rxjs';
 
 export class AuthService {
   constructor(private http: HttpClient) {}
@@ -16,9 +23,6 @@ export class AuthService {
         lastName: user.lastName,
         sex: user.sex,
         provider: provider,
-      },
-      {
-        headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
       }
     );
   }
@@ -26,18 +30,12 @@ export class AuthService {
   login(email: string, password: string) {
     return this.http.post<{
       email: string;
-      userToken: string;
+      'user-token': string;
       objectId: string;
-    }>(
-      `${environment.BACKENDLESS_BASE_URL}/users/login`,
-      {
-        login: email,
-        password: password,
-      },
-      {
-        headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
-      }
-    );
+    }>(`${environment.BACKENDLESS_BASE_URL}/users/login`, {
+      login: email,
+      password: password,
+    });
   }
 
   verifyIfTokenValid(userToken: string) {
@@ -47,34 +45,20 @@ export class AuthService {
   }
 
   logout() {
-    this.http.get(`${environment.BACKENDLESS_BASE_URL}/users/logout`, {
-      headers: new HttpHeaders({
-        'user-token': localStorage.getItem('userToken')!,
-      }),
-    });
+    this.http.get(`${environment.BACKENDLESS_BASE_URL}/users/logout`);
   }
 
   findUsersByName(name: string) {
     return this.http.get<Array<User>>(
-      `${environment.BACKENDLESS_BASE_URL}/data/Users?where=firstName%20%3D%20'${name}'`,
-      {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-          'user-token': localStorage.getItem('userToken')!,
-        }),
-      }
+      `${environment.BACKENDLESS_BASE_URL}/data/Users?where=firstName%20%3D%20'${name}'`
     );
   }
 
   findUserByEmail(email: string, onFind: (user: User | undefined) => void) {
     this.http
       .get<Array<User>>(
-        `${environment.BACKENDLESS_BASE_URL}/data/Users?where=email%3D'${email}'&property=%60provider%60&property=%60email%60&property=%60firstName%60&property=%60lastName%60`,
-        {
-          headers: new HttpHeaders({
-            'Content-Type': 'application/json',
-          }),
-        }
+        `${environment.BACKENDLESS_BASE_URL}/data/Users?where=email%3D'${email}'` +
+          `&property=%60provider%60&property=%60email%60&property=%60firstName%60&property=%60lastName%60`
       )
       .subscribe((result) => {
         onFind(result[0]);
@@ -82,12 +66,7 @@ export class AuthService {
   }
   findUserByObjectId(objectId: string) {
     return this.http.get<User>(
-      `${environment.BACKENDLESS_BASE_URL}/data/Users/${objectId}`,
-      {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json'
-        }),
-      }
+      `${environment.BACKENDLESS_BASE_URL}/data/Users/${objectId}`
     );
   }
 
@@ -121,12 +100,6 @@ export class AuthService {
         email: email,
         password: password,
         profileImageLink: profileImageLink,
-      },
-      {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-          'user-token': localStorage.getItem('userToken')!,
-        }),
       }
     );
   }
@@ -144,4 +117,20 @@ export class AuthService {
   }
 }
 
+export function interceptor(req: HttpRequest<unknown>, next: HttpHandlerFn) {
+  let token = localStorage.getItem('userToken');
+  let newReq: HttpRequest<unknown>;
+  if (token) {
+    newReq = req.clone({
+      headers: req.headers
+        .append('Content-Type', 'application/json')
+        .append('user-token', token),
+    });
+  } else {
+    newReq = req.clone({
+      headers: req.headers.append('Content-Type', 'application/json'),
+    });
+  }
+  return next(newReq);
+}
 export class MockAuthService {}

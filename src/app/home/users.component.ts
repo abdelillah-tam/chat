@@ -1,17 +1,24 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { User } from '../../model/user';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { User } from '../model/user';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { Store } from '@ngrx/store';
-import { findUsersAction, getAllUsersInContactAction } from '../../state/auth/auth.actions';
-import { selectFoundUsers } from '../../state/auth/auth.selectors';
+import {
+  checkIfTokenIsValidAction,
+  findUsersAction,
+  getAllUsersInContactAction,
+} from '../state/auth/auth.actions';
+import {
+  selectFoundUsers,
+  selectTokenValidation,
+} from '../state/auth/auth.selectors';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { filter } from 'rxjs';
+import { filter, Subscription } from 'rxjs';
 import { MatIconModule } from '@angular/material/icon';
-import { openSidenavAction } from '../../state/app/app.actions';
-
+import { openSidenavAction } from '../state/app/app.actions';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 @Component({
   selector: 'app-users',
   standalone: true,
@@ -23,11 +30,12 @@ import { openSidenavAction } from '../../state/app/app.actions';
     RouterOutlet,
     ReactiveFormsModule,
     MatIconModule,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './users.component.html',
   styleUrl: './users.component.scss',
 })
-export class UsersComponent implements OnInit {
+export class UsersComponent implements OnInit, OnDestroy {
   searchInput: string = '';
 
   users: Array<User> = [];
@@ -38,12 +46,33 @@ export class UsersComponent implements OnInit {
 
   closedSidenav = true;
 
-  constructor(
-    private store: Store,
-    private router: Router
-  ) {}
+  selectToken: Subscription | undefined;
+
+  loading = true;
+
+  constructor(private store: Store, private router: Router) {}
 
   ngOnInit(): void {
+    if (
+      !localStorage.getItem('email') ||
+      !localStorage.getItem('userToken') ||
+      !localStorage.getItem('objectId')
+    ) {
+      this.router.navigate(['/login']);
+    } else {
+      this.store.dispatch(
+        checkIfTokenIsValidAction({ token: localStorage.getItem('userToken')! })
+      );
+      this.selectToken = this.store
+        .select(selectTokenValidation)
+        .subscribe((valid) => {
+          if (valid !== undefined) {
+            if (!valid) {
+              this.router.navigate(['/login']);
+            }
+          }
+        });
+    }
     this.store.select(selectFoundUsers).subscribe((result) => {
       if (result && result.length) {
         this.users = result;
@@ -55,6 +84,7 @@ export class UsersComponent implements OnInit {
         if (this.router.url !== '/') {
           this.closedChat = false;
         }
+        this.loading = false;
       }
     });
 
@@ -69,14 +99,19 @@ export class UsersComponent implements OnInit {
           this.closedChat = true;
         }
       });
+  }
 
+  ngOnDestroy(): void {
+    this.selectToken?.unsubscribe();
   }
 
   findUsers() {
     if (this.searchInput.length !== 0) {
+      this.loading = true;
       this.store.dispatch(findUsersAction({ name: this.searchInput }));
     } else {
       setTimeout(() => {
+        this.loading = true;
         this.store.dispatch(getAllUsersInContactAction());
       }, 50);
     }

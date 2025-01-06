@@ -2,16 +2,16 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideMockStore } from '@ngrx/store/testing';
 import { ChatComponent } from './chat.component';
 import { provideRouter } from '@angular/router';
-import { routes } from '../../../app.routes';
+import { routes } from '../../app.routes';
 import {
   selectImageMsgUrl,
   selectMessages,
-} from '../../../state/messaging/messaging.selectors';
+} from '../../state/messaging/messaging.selectors';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import {
   selectCurrentLoggedInUser,
   selectUser,
-} from '../../../state/auth/auth.selectors';
+} from '../../state/auth/auth.selectors';
 import { By } from '@angular/platform-browser';
 
 describe('ChatComponent', () => {

@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { Action, provideStore } from '@ngrx/store';
+import { Action, provideStore, Store } from '@ngrx/store';
 import { provideMockActions } from '@ngrx/effects/testing';
 import { from, Observable, of, throwError } from 'rxjs';
 import { TestScheduler } from 'rxjs/testing';
@@ -53,7 +53,8 @@ describe('Effects', () => {
         },
         {
           provide: MessagingService,
-          useFactory: () => new MessagingService(),
+          useFactory: (store: Store) => new MessagingService(store),
+          deps: [Store],
         },
         provideEffects(AuthEffects),
       ],
@@ -79,7 +80,7 @@ describe('Effects', () => {
     let loginSpy = spyOn(authService, 'login');
 
     loginSpy.and.returnValue(
-      of({ email: 'a@a.com', userToken: 'token', objectId: 'id' })
+      of({ email: 'a@a.com', ['user-token']: 'token', objectId: 'id' })
     );
 
     authEffects.login$.subscribe((data) => {

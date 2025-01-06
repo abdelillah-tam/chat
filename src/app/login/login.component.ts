@@ -81,7 +81,13 @@ export class LoginComponent implements OnInit {
   changed = 0;
 
   ngOnInit(): void {
-    getCurrentUser(this.store);
+    if (
+      localStorage.getItem('email') &&
+      localStorage.getItem('userToken') &&
+      localStorage.getItem('objectId')
+    ) {
+      getCurrentUser(this.store);
+    }
     this.store.select(selectState).subscribe((state) => {
       if (state.state === 'failed') {
       } else if (
@@ -177,9 +183,9 @@ export class LoginComponent implements OnInit {
     localStorage.setItem('objectId', objectId);
 
     if (
-      localStorage.getItem('email') !== null &&
-      localStorage.getItem('userToken') !== null &&
-      localStorage.getItem('objectId') !== null
+      localStorage.getItem('email') &&
+      localStorage.getItem('userToken') &&
+      localStorage.getItem('objectId')
     ) {
       this.router.navigate(['/']);
     }

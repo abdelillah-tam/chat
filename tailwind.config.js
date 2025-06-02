@@ -9,6 +9,7 @@ module.exports = {
     "./src/index.html",
     "./src/app/home/chat/chat.component.html",
     "./src/app/app.component.html",
+    "./src/app/home/user-item/user-item.component.html"
   ],
   theme: {
     extend: {

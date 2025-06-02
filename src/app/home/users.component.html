@@ -30,30 +30,13 @@
       <div class="h-full w-full flex justify-center mt-3">
         <mat-spinner diameter="50"></mat-spinner>
       </div>
-      } @else { @for(user of users; track user.email){
-      <li
-        class="user-item flex p-5 mt-5 cursor-pointer"
-        [ngClass]="$index === selectedUserIndex ? 'selected-user' : ''"
-        (click)="openChatWindow(user.objectId, $index)"
-      >
-        <div class="flex items-center">
-          <div class="h-12 w-12 rounded-xl">
-            <img
-              [src]="
-                user.profileImageLink
-                  ? user.profileImageLink
-                  : './assets/user.png'
-              "
-              class="rounded-xl object-contain"
-            />
-          </div>
-          <div class="user-name flex flex-col items-center pl-3">
-            <p class="text-xl text-gray-950">
-              {{ user.firstName }} {{ user.lastName }}
-            </p>
-          </div>
-        </div>
-      </li>
+      } @else { @for(user of users; track trackByFn(user)){
+      <app-user-item
+        (click)="openChatWindow(passUser(user).id, $index)"
+        [user]="passUser(user)"
+        [index]="$index"
+        [selectedUserIndex]="selectedUserIndex"
+      ></app-user-item>
 
       } @empty{
       <p class="w-full text-center">No users</p>

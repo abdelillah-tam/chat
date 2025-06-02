@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -10,18 +10,15 @@ import { AuthService } from '../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { MatDividerModule } from '@angular/material/divider';
 import * as jose from 'jose';
-import { User } from '../model/user';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Store } from '@ngrx/store';
 import {
   emptyStateAction,
-  loginAction,
   signupAction,
 } from '../state/auth/auth.actions';
 import { AuthState } from '../state/auth/auth-state';
 import {
   selectCurrentLoggedInUser,
-  selectState,
 } from '../state/auth/auth.selectors';
 import {
   MAT_FORM_FIELD_DEFAULT_OPTIONS,
@@ -33,6 +30,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { GoogleUser } from '../model/google-user.interface';
 import { environment } from '../../environments/environment';
 import { getCurrentUser } from '../model/get-current-user';
+import { Subscription } from 'rxjs';
+import { selectLoginState } from '../state/login/login.selector';
+import { loginAction } from '../state/login/login.actions';
 
 @Component({
   selector: 'app-login',
@@ -64,8 +64,10 @@ import { getCurrentUser } from '../model/get-current-user';
     ]),
   ],
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, OnDestroy {
   public googleToken = environment.GOOGLE_TOKEN;
+
+  selectCurrentUserLoggedInUser: Subscription | undefined;
 
   constructor(
     private authService: AuthService,
@@ -88,28 +90,28 @@ export class LoginComponent implements OnInit {
     ) {
       getCurrentUser(this.store);
     }
-    this.store.select(selectState).subscribe((state) => {
+
+    this.store.select(selectLoginState).subscribe((state) => {
       if (state.state === 'failed') {
-      } else if (
-        state.state === 'success' &&
-        typeof state.userData !== undefined
-      ) {
-        let data = state.userData as {
-          email: string;
-          userToken: string;
-          objectId: string;
-        };
+      } else if (state.state === 'success') {
+        let data = state;
         this.saveDataLocally(data.email, data.userToken, data.objectId);
         this.store.dispatch(emptyStateAction());
         getCurrentUser(this.store);
       }
     });
 
-    this.store.select(selectCurrentLoggedInUser).subscribe((result) => {
-      if (result) {
-        this.router.navigate(['/']);
-      }
-    });
+    this.selectCurrentUserLoggedInUser = this.store
+      .select(selectCurrentLoggedInUser)
+      .subscribe((result) => {
+        if (result && 'email' in result) {
+          this.router.navigate(['/']);
+        }
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.selectCurrentUserLoggedInUser?.unsubscribe();
   }
 
   isPasswordVisible = false;
@@ -144,11 +146,11 @@ export class LoginComponent implements OnInit {
   handleCredential(credential: string) {
     let googleUser = jose.decodeJwt<GoogleUser>(credential);
 
-    this.authService.findUserByEmail(googleUser.email, (user) => {
-      if (typeof user !== 'undefined') {
-        if (user.provider === 'backendless') {
+    this.authService.findUserByEmail(googleUser.email).subscribe((data) => {
+      if ('email' in data) {
+        if (data.provider === 'backendless') {
           alert('Try to login using email !');
-        } else if (user!.provider === 'google') {
+        } else if (data!.provider === 'google') {
           this.store.dispatch(
             loginAction({ email: googleUser.email!, password: googleUser.sub! })
           );
@@ -161,9 +163,9 @@ export class LoginComponent implements OnInit {
               lastName: googleUser.family_name,
               email: googleUser.email,
               sex: '',
-              objectId: '',
+              id: '',
               provider: 'google',
-              profileImageLink: '',
+              profilePictureLink: ''
             },
             password: googleUser!.sub!,
             provider: 'google',

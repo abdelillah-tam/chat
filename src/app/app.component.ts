@@ -20,6 +20,10 @@ import { CommonModule } from '@angular/common';
 import { filter } from 'rxjs';
 import { sideNavStateSelector } from './state/app/app.selectors';
 
+import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
+import { environment } from '../environments/environment.development';
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -42,11 +46,19 @@ import { sideNavStateSelector } from './state/app/app.selectors';
 export class AppComponent implements OnInit {
   title = 'chat';
 
+  
   constructor(
     private store: Store,
     private authService: AuthService,
     private router: Router
-  ) {}
+  ) {
+    (window as any).Pusher = Pusher;
+
+    Pusher.logToConsole;
+
+    
+  
+  }
 
   openSide: boolean = false;
 
@@ -79,6 +91,8 @@ export class AppComponent implements OnInit {
         }
       }
     });
+    
+
   }
 
   onResize(event: Event) {

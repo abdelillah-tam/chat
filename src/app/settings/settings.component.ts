@@ -1,4 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -15,14 +21,19 @@ import { User } from '../model/user';
 import { Store } from '@ngrx/store';
 import {
   selectCurrentLoggedInUser,
-  selectState,
+  selectProfilePictureLink,
+  selectTokenValidation,
 } from '../state/auth/auth.selectors';
 import {
+  checkIfTokenIsValidAction,
+  getProfilePictureLinkAction,
   updateUserInfoAction,
   uploadProfilePicAction,
 } from '../state/auth/auth.actions';
 import { getCurrentUser } from '../model/get-current-user';
 import { CommonModule } from '@angular/common';
+import { Subscription } from 'rxjs';
+import { isLoggedIn } from '../model/is-logged-in';
 
 @Component({
   selector: 'app-settings',
@@ -38,14 +49,24 @@ import { CommonModule } from '@angular/common';
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss',
 })
-export class SettingsComponent implements OnInit {
+export class SettingsComponent implements OnInit, OnDestroy {
+  @ViewChild('fileInput') fileInput: ElementRef | undefined;
+
   currentUser: User | undefined;
 
-  file: File | null = null;
+  file: File | undefined;
 
   profileImageUrl: string = '';
 
   loading: boolean = false;
+
+  selectCurrentLoggedInUser: Subscription | undefined;
+
+  selectTokenValidation: Subscription | undefined;
+
+  selectNewProfilePictureState: Subscription | undefined;
+
+  selectProfilePictureLinkState: Subscription | undefined;
 
   infoGroup = new FormGroup({
     firstName: new FormControl('', [Validators.required]),
@@ -73,30 +94,64 @@ export class SettingsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    getCurrentUser(this.store);
-    this.store.select(selectCurrentLoggedInUser).subscribe((result) => {
-      this.currentUser = result;
-      if (this.currentUser) {
-        this.infoGroup.controls.firstName.setValue(this.currentUser.firstName);
-        this.infoGroup.controls.lastName.setValue(this.currentUser.lastName);
-        this.infoGroup.controls.email.setValue(this.currentUser.email);
+    if (!isLoggedIn()) {
+      this.router.navigate(['/login']);
+    } else {
+      getCurrentUser(this.store);
+    }
 
-        if (this.currentUser!.profileImageLink.length > 0) {
-          this.profileImageUrl = this.currentUser.profileImageLink;
-        }
+    this.store.dispatch(
+      getProfilePictureLinkAction({
+        objectId: localStorage.getItem('objectId')!,
+      })
+    );
 
-        if (this.currentUser?.provider === 'google') {
-          this.infoGroup.controls.email.disable();
-          this.infoGroup.controls.password.disable();
+    this.store.dispatch(checkIfTokenIsValidAction());
+
+    this.selectTokenValidation = this.store
+      .select(selectTokenValidation)
+      .subscribe((result) => {
+        if (result === false) {
+          localStorage.clear(); // delete any existing data
+          this.router.navigate(['/login']);
         }
-      }
-    });
-    this.store.select(selectState).subscribe((result) => {
-      if (result.newProfilePictureUrl.length > 0) {
-        this.profileImageUrl = result.newProfilePictureUrl;
-        this.updateInfos();
-      }
-    });
+      });
+
+    this.selectCurrentLoggedInUser = this.store
+      .select(selectCurrentLoggedInUser)
+      .subscribe((result) => {
+        if (result && 'firstName' in result) {
+          this.currentUser = result;
+          if (this.currentUser) {
+            this.infoGroup.controls.firstName.setValue(
+              this.currentUser.firstName
+            );
+            this.infoGroup.controls.lastName.setValue(
+              this.currentUser.lastName
+            );
+            this.infoGroup.controls.email.setValue(this.currentUser.email);
+
+            if (this.currentUser?.provider === 'google') {
+              this.infoGroup.controls.email.disable();
+              this.infoGroup.controls.password.disable();
+            }
+          }
+        }
+      });
+
+    this.selectProfilePictureLinkState = this.store
+      .select(selectProfilePictureLink)
+      .subscribe((result) => {
+        if (result) {
+          this.profileImageUrl = result;
+        }
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.selectCurrentLoggedInUser?.unsubscribe();
+    this.selectNewProfilePictureState?.unsubscribe();
+    this.selectProfilePictureLinkState?.unsubscribe();
   }
 
   updateInfos() {
@@ -115,11 +170,6 @@ export class SettingsComponent implements OnInit {
           firstName: this.infoGroup.value.firstName!,
           lastName: this.infoGroup.value.lastName!,
           email: this.infoGroup.value.email!,
-          password:
-            this.currentUser!.provider === 'google'
-              ? undefined
-              : this.infoGroup.value.password!,
-          profileImageLink: this.profileImageUrl,
         })
       );
     }
@@ -144,14 +194,23 @@ export class SettingsComponent implements OnInit {
 
   saveProfilePictureChange() {
     if (this.file && this.currentUser) {
-      this.loading = true;
-      this.infoGroup.disable();
       this.store.dispatch(
         uploadProfilePicAction({
           file: this.file,
-          user: this.currentUser.objectId,
+          user: this.currentUser.id,
         })
       );
     }
+  }
+
+  cancel() {
+    this.file = undefined;
+    if (this.currentUser) {
+      //this.profileImageUrl = this.currentUser.profileImageLink;
+    } else {
+      this.profileImageUrl = '';
+    }
+
+    this.fileInput!.nativeElement.value = '';
   }
 }

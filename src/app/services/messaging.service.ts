@@ -8,89 +8,66 @@ import {
   uploadBytes,
 } from 'firebase/storage';
 import { Store } from '@ngrx/store';
-import { receiveMessageAction } from '../state/messaging/messaging.actions';
+import { newMessageAction } from '../state/messaging/messaging.actions';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
+import Echo from 'laravel-echo';
 
 export class MessagingService {
   private db = getDatabase();
+  echo: Echo<'reverb'>;
+  channels: { [key: string]: any } = {};
 
-  constructor(private store: Store) {}
-
-  sendMessage(message: Message) {
-    const receiverMessageListRef = ref(
-      this.db,
-      'chats/' +
-        message.senderId +
-        '/' +
-        message.receiverId +
-        '/' +
-        message.timestamp
-    );
-    const senderMessageListRef = ref(
-      this.db,
-      'chats/' +
-        message.receiverId +
-        '/' +
-        message.senderId +
-        '/' +
-        message.timestamp
-    );
-
-    from(
-      set(receiverMessageListRef, {
-        messageText: message.messageText,
-        senderId: message.senderId,
-        receiverId: message.receiverId,
-        timestamp: message.timestamp,
-        type: message.type,
-        imageUrl: message.imageUrl,
-      })
-    );
-    return from(
-      set(senderMessageListRef, {
-        messageText: message.messageText,
-        senderId: message.senderId,
-        receiverId: message.receiverId,
-        timestamp: message.timestamp,
-        type: message.type,
-        imageUrl: message.imageUrl,
-      })
-    );
+  constructor(private store: Store, private httpClient: HttpClient) {
+    this.echo = new Echo({
+      broadcaster: 'reverb',
+      key: 'la1tngxd6dhbtrugv9ay',
+      wsHost: window.location.hostname,
+      wsPort: 8080,
+      wssPort: 8080,
+      forceTLS: false,
+      enabledTransports: ['ws', 'wss'],
+      authEndpoint: 'http://localhost:8000/broadcasting/auth',
+      auth: {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('userToken')}`,
+        },
+      },
+    });
   }
 
-  listenForMessages(objectId: string) {
-    const reference = ref(
-      this.db,
-      'chats/' + localStorage.getItem('objectId')! + '/' + objectId
-    );
+  sendMessage(message: Message, channel: string) {
+    this.httpClient
+      .post(`${environment.API}/send`, {
+        message: message,
+        channel: channel,
+      })
+      .subscribe();
+  }
 
-    let msgs: any[] = [];
-
-    onValue(reference, (snapshot) => {
-      msgs = [];
-      snapshot.forEach((child) => {
-        msgs.push(child.val());
+  listenForMessages(channel: string) {
+    if (!this.channels[channel]) {
+      this.channels[channel] = this.echo.private(`channel.${channel}`);
+      this.channels[channel].listen('.chat', (data: Message) => {
+        this.store.dispatch(newMessageAction({ message: data }));
       });
-
-      this.store.dispatch(receiveMessageAction({ messages: msgs }));
-    });
-
+    }
   }
 
-  async getUsers() {
-    const reference = ref(
-      this.db,
-      'chats/' + localStorage.getItem('objectId')!
+  getAllMessages(chatChannel: string) {
+    return this.httpClient.get<Message[]>(
+      `${environment.API}/getMessages/${chatChannel}`
     );
+  }
 
-    let data = await get(reference);
+  getAllChatChannels() {
+    return this.httpClient.get<string[]>(`${environment.API}/getAllChannels`);
+  }
 
-    let ids: string[] = [];
-    
-    data.forEach((child) => {
-      ids.push(child.key);
-    });
-
-    return ids;
+  getChatChannel(otherUserId: string) {
+    return this.httpClient.get<string>(
+      `${environment.API}/chatchannel/${otherUserId}`
+    );
   }
 
   async uploadImageMsg(file: File, sender: string) {

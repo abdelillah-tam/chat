@@ -2,7 +2,6 @@
   <div class="flex items-center cursor-pointer" (click)="hideSettings()">
     <div class="h-8 w-8">
       <img src="./assets/back.png" />
-      <div>a div</div>
     </div>
     <p class="ml-2 font-bold">Back</p>
   </div>
@@ -32,7 +31,29 @@
       id="profile-picture"
       type="file"
       (change)="onImageAdded($event)"
+      #fileInput
     />
+
+    @if(file){
+    <div class="flex w-1/4 mb:w-1/2 justify-around">
+      <button
+        mat-flat-button
+        class="text-white h-9 text-xl font-light rounded-md"
+        type="button"
+        (click)="saveProfilePictureChange()"
+      >
+        Update
+      </button>
+      <button
+        mat-stroked-button
+        class="h-9 font-light"
+        type="button"
+        (click)="cancel()"
+      >
+        Cancel
+      </button>
+    </div>
+    }
 
     <mat-form-field appearance="outline" class="w-[90%]">
       <mat-label class="text-xl font-bold">First name</mat-label>
@@ -79,7 +100,7 @@
     <button
       mat-flat-button
       class="text-white h-9 text-xl font-light rounded-md w-[90%]"
-      (click)="file ? saveProfilePictureChange() : updateInfos()"
+      (click)="updateInfos()"
     >
       Save
     </button>

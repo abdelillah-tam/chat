@@ -9,8 +9,8 @@
     <div class="w-11 h-11 rounded-full overflow-hidden">
       <img
         [src]="
-          receiverUser?.profileImageLink
-            ? receiverUser?.profileImageLink
+          receiverUser?.profilePictureLink
+            ? receiverUser?.profilePictureLink
             : './assets/user.png'
         "
         class="h-full w-full object-cover"
@@ -29,40 +29,48 @@
   <div class="basis-full flex flex-col py-3 mb-4 bg-white overflow-y-auto">
     @for(msg of messages; track msg.timestamp){
     <ul
-      class="flex px-5"
+      class="flex flex-col px-5"
       [ngClass]="
-        msg.senderId === getCurrentObjectId()
+        msg.senderId == getCurrentObjectId()
           ? 'justify-end flex-row-reverse'
           : 'justify-start flex-row'
       "
     >
-      @if($first || messages[$index].senderId !== messages[$index-1].senderId){
-      <li class="w-11 h-11 rounded-xl overflow-hidden">
-        <img
-          [src]="profileImageSetter($index)"
-          class="w-full h-full object-fill"
-        />
+      @if($first || calculateOneDay(msg.timestamp,
+      messages[$index - 1].timestamp)){
+      <li class="m-4 flex justify-center">
+        <p class="rounded-2xl bg-gray-200 w-fit py-1 px-2">
+          {{ whichDay(msg.timestamp) | datePipe }}
+        </p>
       </li>
-      }
+      } @if($first || messages[$index].senderId !==
+      messages[$index-1].senderId){ }
+
       <li class="w-full flex flex-col">
         <div
           class="w-full flex text-lg"
           [ngClass]="
-            msg.senderId === getCurrentObjectId()
-              ? 'justify-end pr-2'
+            msg.senderId == getCurrentObjectId()
+              ? 'flex-row-reverse pr-2'
               : 'justify-start pl-2'
           "
         >
           @if($first || messages[$index].senderId !== messages[$index -
           1].senderId){
-          <p>
+          <div class="w-11 h-11 rounded-xl overflow-hidden">
+            <img
+              [src]="profileImageSetter($index)"
+              class="w-full h-full object-cover"
+            />
+          </div>
+          <p class="mx-1">
             {{
-              msg.senderId === senderUser?.objectId
+              msg.senderId == senderUser?.id
                 ? senderUser?.firstName
                 : receiverUser?.firstName
             }}
             {{
-              msg.senderId === senderUser?.objectId
+              msg.senderId == senderUser?.id
                 ? senderUser?.lastName
                 : receiverUser?.lastName
             }}
@@ -72,7 +80,7 @@
         <div
           class="flex items-center select-text"
           [ngClass]="
-            msg.senderId === getCurrentObjectId()
+            msg.senderId == getCurrentObjectId()
               ? 'pr-2 flex-row-reverse'
               : 'flex-row pl-2'
           "
@@ -81,14 +89,14 @@
             {{ msg.messageText }}
           </p>
           <p class="ml-2 font-light text-xs px-2">
-            {{ msg.timestamp | date : "hh:mm aa" }}
+            {{ msg.timestamp * 1000 | date : "hh:mm aa" }}
           </p>
         </div>
-        @if (msg.imageUrl.length > 0) {
+        @if (msg.imageUrl && msg.imageUrl.length > 0) {
         <div
           class="w-full flex"
           [ngClass]="
-            msg.senderId === getCurrentObjectId()
+            msg.senderId == getCurrentObjectId()
               ? 'justify-end pr-2'
               : 'justify-start pl-2'
           "

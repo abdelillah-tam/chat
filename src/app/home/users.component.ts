@@ -6,19 +6,30 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { Store } from '@ngrx/store';
 import {
-  checkIfTokenIsValidAction,
   findUsersAction,
   getAllUsersInContactAction,
+  getCurrentLoggedInUser,
 } from '../state/auth/auth.actions';
 import {
+  selectCurrentLoggedInUser,
   selectFoundUsers,
-  selectTokenValidation,
 } from '../state/auth/auth.selectors';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
 import { MatIconModule } from '@angular/material/icon';
 import { openSidenavAction } from '../state/app/app.actions';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { getCurrentUser } from '../model/get-current-user';
+import { isLoggedIn } from '../model/is-logged-in';
+import {
+  getAllMessagesAction,
+  listenForMessagesAction,
+} from '../state/messaging/messaging.actions';
+import {
+  selectChatChannel,
+  selectLastMessage,
+} from '../state/messaging/messaging.selectors';
+import { UserItemComponent } from './user-item/user-item.component';
 @Component({
   selector: 'app-users',
   standalone: true,
@@ -31,6 +42,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     ReactiveFormsModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    UserItemComponent,
   ],
   templateUrl: './users.component.html',
   styleUrl: './users.component.scss',
@@ -38,7 +50,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 export class UsersComponent implements OnInit, OnDestroy {
   searchInput: string = '';
 
-  users: Array<User> = [];
+  users: (
+    | { user: User; channel: string; lastMessageTimestamp: number }
+    | User
+  )[] = [];
 
   selectedUserIndex: number = -1;
 
@@ -46,47 +61,50 @@ export class UsersComponent implements OnInit, OnDestroy {
 
   closedSidenav = true;
 
-  selectToken: Subscription | undefined;
+  selectCurrentUser: Subscription | undefined;
+  selectFoundUsers: Subscription | undefined;
 
   loading = true;
 
   constructor(private store: Store, private router: Router) {}
 
   ngOnInit(): void {
-    if (
-      !localStorage.getItem('email') ||
-      !localStorage.getItem('userToken') ||
-      !localStorage.getItem('objectId')
-    ) {
+    if (!isLoggedIn()) {
       this.router.navigate(['/login']);
     } else {
-      this.store.dispatch(
-        checkIfTokenIsValidAction({ token: localStorage.getItem('userToken')! })
-      );
-      this.selectToken = this.store
-        .select(selectTokenValidation)
-        .subscribe((valid) => {
-          if (valid !== undefined) {
-            if (!valid) {
-              this.router.navigate(['/login']);
-            }
-          }
-        });
+      getCurrentUser(this.store);
     }
-    this.store.select(selectFoundUsers).subscribe((result) => {
-      if (result && result.length) {
-        this.users = result;
-        let currentUser = this.router.url.slice(6);
 
-        this.selectedUserIndex = this.users.findIndex((user) => {
-          return user.objectId === currentUser;
-        });
-        if (this.router.url !== '/') {
-          this.closedChat = false;
+    this.selectCurrentUser = this.store
+      .select(selectCurrentLoggedInUser)
+      .subscribe((result) => {
+        if (result && 'code' in result) {
+          localStorage.clear();
+          this.router.navigate(['/login']);
         }
-        this.loading = false;
-      }
-    });
+      });
+    this.selectFoundUsers = this.store
+      .select(selectFoundUsers)
+      .subscribe((result) => {
+        if (result) {
+          this.users = this.sortUsers(result);
+
+          this.users.forEach((item) => {
+            if ('lastMessageTimestamp' in item) {
+              this.store.dispatch(
+                listenForMessagesAction({ channelId: item.channel })
+              );
+            }
+          });
+
+          this.selectIndex();
+          
+          if (this.router.url !== '/') {
+            this.closedChat = false;
+          }
+          this.loading = false;
+        }
+      });
 
     this.store.dispatch(getAllUsersInContactAction());
 
@@ -99,10 +117,35 @@ export class UsersComponent implements OnInit, OnDestroy {
           this.closedChat = true;
         }
       });
+
+    this.store.select(selectLastMessage).subscribe((result) => {
+      if (result) {
+        let itemIndex = this.users.findIndex((user) => {
+          if ('channel' in user) {
+            return user.channel == result.channel;
+          }
+
+          return null;
+        });
+
+        const newList = this.users.map((item, index) => {
+          return index == itemIndex
+            ? { ...item, lastMessageTimestamp: result.timestamp }
+            : item;
+        });
+
+        this.users = this.sortUsers(newList);
+
+        this.selectIndex();
+
+      
+      }
+    });
   }
 
   ngOnDestroy(): void {
-    this.selectToken?.unsubscribe();
+    this.selectCurrentUser?.unsubscribe();
+    this.selectFoundUsers?.unsubscribe();
   }
 
   findUsers() {
@@ -125,5 +168,33 @@ export class UsersComponent implements OnInit, OnDestroy {
 
   openSidenav() {
     this.store.dispatch(openSidenavAction());
+  }
+
+  trackByFn(user: any) {
+    return 'user' in user ? user.user.id : user.id;
+  }
+
+  passUser(user: any): User {
+    return 'user' in user ? user.user : user;
+  }
+
+  private sortUsers(users: any[]) {
+    return Array.from(users).sort((a, b) => {
+      if ('lastMessageTimestamp' in a && 'lastMessageTimestamp'! in b) {
+        return b.lastMessageTimestamp - a.lastMessageTimestamp;
+      }
+      return 1;
+    });
+  }
+
+  selectIndex(){
+    let currentUserId = this.router.url.slice(6);
+    this.selectedUserIndex = this.users.findIndex((userItem) => {
+          if ('user' in userItem) {
+            return userItem.user.id == currentUserId;
+          } else {
+            return userItem.id == currentUserId;
+          }
+        });
   }
 }

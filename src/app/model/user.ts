@@ -3,8 +3,7 @@ export interface User {
   lastName: string;
   email: string;
   sex: string;
-  objectId: string;
+  id: string;
   provider: string;
-  profileImageLink: string;
-
+  profilePictureLink: string;
 }

@@ -32,7 +32,9 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [
+              "src/assets/pusher.min.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -95,7 +97,9 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [
+              "src/assets/pusher.min.js"
+            ]
           }
         },
         "cypress-run": {

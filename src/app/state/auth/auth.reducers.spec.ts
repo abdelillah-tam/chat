@@ -4,7 +4,7 @@ import {
   errorAction,
   loginResultAction,
   retrievedCurrentLoggedInUserAction,
-  retrievedProfilePictureUrlAction,
+  retrievedProfilePictureAction,
 } from './auth.actions';
 import * as fromReducer from './auth.reducers';
 import { provideMockStore } from '@ngrx/store/testing';
@@ -86,7 +86,7 @@ describe('AuthReducer', () => {
 
     const state = fromReducer.authReducer(
       initialState,
-      retrievedProfilePictureUrlAction({ url: url })
+      retrievedProfilePictureAction({ url: url })
     );
 
     expect(state.newProfilePictureUrl).toBe(url);

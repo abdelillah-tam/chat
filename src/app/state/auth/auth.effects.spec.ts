@@ -12,7 +12,7 @@ import {
   LOGIN,
   loginAction,
   loginResultAction,
-  resultOfTokenCheckingAction,
+  retrievedTokenCheckingAction,
   retrievedCurrentLoggedInUserAction,
   retrievedUsersAction,
   signupAction,
@@ -120,7 +120,7 @@ describe('Effects', () => {
     tokenSpy.and.returnValue(of(true));
 
     authEffects.tokenValid$.subscribe((data) => {
-      expect(data).toEqual(resultOfTokenCheckingAction({ valid: true }));
+      expect(data).toEqual(retrievedTokenCheckingAction({ valid: true }));
       done();
     });
   });
@@ -140,7 +140,7 @@ describe('Effects', () => {
   it('should return retrieved action with mocking user data', (done) => {
     actions$ = of(getCurrentLoggedInUser({ objectId: 'id' }));
 
-    let currentUserSpy = spyOn(authService, 'findUserByObjectId');
+    let currentUserSpy = spyOn(authService, 'findUserById');
     currentUserSpy.and.returnValue(of(mockUser));
 
     authEffects.getCurrentLoggedInUser$.subscribe((data) => {
@@ -154,7 +154,7 @@ describe('Effects', () => {
   it('should findUserByObjectId throw error then return error action', (done) => {
     actions$ = of(getCurrentLoggedInUser({ objectId: 'id' }));
 
-    let currentUserSpy = spyOn(authService, 'findUserByObjectId');
+    let currentUserSpy = spyOn(authService, 'findUserById');
     currentUserSpy.and.returnValue(throwError(() => new Error('')));
 
     authEffects.getCurrentLoggedInUser$.subscribe((data) => {
@@ -181,7 +181,7 @@ describe('Effects', () => {
     let getUsers = spyOn(messagingService, 'getUsers');
     getUsers.and.resolveTo(['obj one', 'obj two']);
 
-    let findUsersSpy = spyOn(authService, 'findUsersByObjectId');
+    let findUsersSpy = spyOn(authService, 'findUsersByIds');
     findUsersSpy.and.returnValue(of(mockUsers));
 
     authEffects.getAllUsers$.subscribe((data) => {

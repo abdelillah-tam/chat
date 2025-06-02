@@ -79,12 +79,12 @@ export class SignupComponent implements OnInit {
             lastName: this.signUpForm.value.lastName!,
             email: this.signUpForm.value.email!,
             sex: this.signUpForm.value.sex!,
-            objectId: '',
+            id: '',
             provider: '',
-            profileImageLink: '',
+            profilePictureLink: ''
           },
           password: this.signUpForm.value.password!,
-          provider: 'backendless',
+          provider: 'backendless'
         })
       );
     }

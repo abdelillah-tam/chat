@@ -1,19 +1,14 @@
 import { User } from '../../model/user';
 
-type StateType = 'none' | 'success' | 'loading' | 'failed' | string;
+export type StateType = 'none' | 'success' | 'loading' | 'failed' | string;
 
 export interface AuthState {
   state: StateType;
-  userData:
-    | {
-        userToken: string;
-        email: string;
-        objectId: string;
-      }
+  currentLoggedInUser: User | undefined | { code: number; error: string };
+  currentProfilePictureLink: string | undefined;
+  userInContact: User | undefined | { code: number; error: string };
+  foundUsers:
+    | ({ user: User; channel: string; lastMessageTimestamp: number } | User)[]
     | undefined;
-  validToken: boolean | undefined;
-  currentLoggedInUser: User | undefined;
-  userInContact: User | undefined;
-  foundUsers: User[] | undefined;
-  newProfilePictureUrl: string;
+  tokenValidation: boolean | undefined;
 }

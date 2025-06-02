@@ -3,40 +3,25 @@ import {
   emptyStateAction,
   errorAction,
   retrievedCurrentLoggedInUserAction,
-  retrievedProfilePictureUrlAction,
   retrievedUserAction,
   retrievedUsersAction,
-  loginResultAction,
-  resultOfTokenCheckingAction,
+  retrievedTokenCheckingAction,
+  retrievedProfilePictureLinkAction,
 } from './auth.actions';
 import { AuthState } from './auth-state';
-
-
+import { User } from '../../model/user';
 
 export const initialState: AuthState = {
   state: 'none',
-  userData: undefined,
-  validToken: undefined,
   currentLoggedInUser: undefined,
   userInContact: undefined,
   foundUsers: [],
-  newProfilePictureUrl: '',
+  tokenValidation: undefined,
+  currentProfilePictureLink: undefined,
 };
-
 
 export const authReducer = createReducer(
   initialState,
-  on(loginResultAction, (state, data) => {
-    return {
-      ...state,
-      state: 'success',
-      userData: {
-        email: data.email,
-        userToken: data.userToken,
-        objectId: data.objectId,
-      },
-    };
-  }),
   on(errorAction, (state) => {
     return { ...state, state: 'failed' };
   }),
@@ -44,16 +29,15 @@ export const authReducer = createReducer(
     return {
       ...state,
       state: 'none',
-      userData: undefined,
       userInContact: undefined,
       newProfilePictureUrl: '',
       foundUsers: [],
       validToken: undefined,
-      currentLoggedInUser: undefined
+      currentLoggedInUser: undefined,
     };
   }),
   on(retrievedCurrentLoggedInUserAction, (state, data) => {
-    return { ...state, currentLoggedInUser: data.currentUserLoggedIn };
+    return { ...state, currentLoggedInUser: data.currentUserLoggedInOrError };
   }),
   on(retrievedUserAction, (state, data) => {
     return { ...state, userInContact: data.user };
@@ -61,11 +45,10 @@ export const authReducer = createReducer(
   on(retrievedUsersAction, (state, data) => {
     return { ...state, foundUsers: data.users };
   }),
-  on(resultOfTokenCheckingAction, (state, data) => {
-    return { ...state, validToken: data.valid };
+  on(retrievedTokenCheckingAction, (state, data) => {
+    return { ...state, tokenValidation: data.valid };
   }),
-  on(retrievedProfilePictureUrlAction, (state, data) => {
-    return { ...state, newProfilePictureUrl: data.url };
+  on(retrievedProfilePictureLinkAction, (state, data) => {
+    return { ...state, currentProfilePictureLink: data.link };
   })
 );
-

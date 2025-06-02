@@ -1,16 +1,19 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Message } from '../../model/message';
 import { User } from '../../model/user';
 import { Store } from '@ngrx/store';
 import {
   emptyImageMsgAction,
+  getAllMessagesAction,
+  getChatChannelAction,
   listenForMessagesAction,
   sendMessageAction,
   uploadImageMsgAction,
 } from '../../state/messaging/messaging.actions';
 import {
+  selectChatChannel,
   selectImageMsgUrl,
   selectMessages,
 } from '../../state/messaging/messaging.selectors';
@@ -22,7 +25,9 @@ import {
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { DatePipePipe } from '../../date-pipe.pipe';
 
 @Component({
   selector: 'app-chat',
@@ -34,13 +39,15 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
     MatFormFieldModule,
     MatInputModule,
     RouterLink,
-    RouterLinkActive,
+    DatePipePipe,
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
 })
-export class ChatComponent implements OnInit {
+export class ChatComponent implements OnInit, OnDestroy {
   messages: Message[] = [];
+
+  another: Message[] = [];
 
   message: Message | null = null;
 
@@ -48,33 +55,85 @@ export class ChatComponent implements OnInit {
 
   receiverUser: User | undefined;
 
+  channel: string | undefined;
+
   text = '';
 
   file: File | null = null;
 
   imageUrl: string = '';
 
+  selectSender: Subscription | undefined;
+
+  selectReceiver: Subscription | undefined;
+
+  selectChatChannel: Subscription | undefined;
+
+  selectMessages: Subscription | undefined;
+
+  selectImageMessageUrl: Subscription | undefined;
+
   constructor(private store: Store, private router: Router) {}
   ngOnInit(): void {
-    this.store.select(selectMessages).subscribe((result) => {
-      this.messages = result;
-    });
+    console.log('OnInit');
+    this.selectSender = this.store
+      .select(selectCurrentLoggedInUser)
+      .subscribe((result) => {
+        if (result && 'firstName' in result) {
+          this.senderUser = result;
+        }
+      });
 
-    this.store.select(selectCurrentLoggedInUser).subscribe((result) => {
-      this.senderUser = result;
-    });
-
-    this.store.select(selectUser).subscribe((result) => {
-      this.receiverUser = result;
-    });
-
-    this.store.select(selectImageMsgUrl).subscribe((result) => {
-      if (result.length > 0) {
-        this.message!.imageUrl = result;
-        this.store.dispatch(sendMessageAction({ message: this.message! }));
-        this.store.dispatch(emptyImageMsgAction());
+    this.selectReceiver = this.store.select(selectUser).subscribe((result) => {
+      if (result && 'firstName' in result) {
+        this.receiverUser = result;
       }
     });
+
+    this.selectChatChannel = this.store
+      .select(selectChatChannel)
+      .subscribe((result) => {
+        if (result.chatChannel.length) {
+          this.channel = result.chatChannel;
+          this.store.dispatch(
+            getAllMessagesAction({ channelId: result.chatChannel })
+          );
+        }
+      });
+
+    this.selectMessages = this.store
+      .select(selectMessages)
+      .subscribe((result) => {
+        if (result.length) {
+          this.messages = result.filter((item) => {
+            return item.channel == this.channel;
+          });
+        }
+      });
+
+    this.selectImageMessageUrl = this.store
+      .select(selectImageMsgUrl)
+      .subscribe((result) => {
+        if (result.length > 0) {
+          this.message!.imageUrl = result;
+          this.store.dispatch(
+            sendMessageAction({
+              message: this.message!,
+              channel: crypto.randomUUID(),
+            })
+          );
+          this.store.dispatch(emptyImageMsgAction());
+        }
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.messages = [];
+    this.selectReceiver?.unsubscribe();
+    this.selectSender?.unsubscribe();
+    this.selectChatChannel?.unsubscribe();
+    this.selectMessages?.unsubscribe();
+    this.selectImageMessageUrl?.unsubscribe();
   }
 
   sendMessage() {
@@ -82,10 +141,11 @@ export class ChatComponent implements OnInit {
       this.message = {
         messageText: this.text,
         senderId: localStorage.getItem('objectId')!,
-        receiverId: this.receiverUser!.objectId,
-        timestamp: Date.now().toString(),
+        receiverId: this.receiverUser!.id,
+        timestamp: Date.now(),
         type: 'image and text',
         imageUrl: '',
+        channel: '',
       };
 
       this.store.dispatch(
@@ -102,22 +162,35 @@ export class ChatComponent implements OnInit {
       this.message = {
         messageText: this.text,
         senderId: localStorage.getItem('objectId')!,
-        receiverId: this.receiverUser!.objectId,
-        timestamp: Date.now().toString(),
+        receiverId: this.receiverUser!.id,
+        timestamp: Date.now(),
         type: 'text',
         imageUrl: '',
+        channel: '',
       };
 
-      this.store.dispatch(sendMessageAction({ message: this.message }));
+      let uuid: string | undefined;
+      if (!this.channel) {
+        uuid = crypto.randomUUID();
+        this.channel = uuid;
+        this.store.dispatch(listenForMessagesAction({ channelId: uuid }));
+      }
+      this.store.dispatch(
+        sendMessageAction({
+          message: this.message,
+          channel: uuid ?? crypto.randomUUID(),
+        })
+      );
       this.text = '';
     } else if (this.text === '' && this.file !== null) {
       this.message = {
         messageText: '',
         senderId: localStorage.getItem('objectId')!,
-        receiverId: this.receiverUser!.objectId,
-        timestamp: Date.now().toString(),
+        receiverId: this.receiverUser!.id,
+        timestamp: Date.now(),
         type: 'image',
         imageUrl: '',
+        channel: '',
       };
 
       this.store.dispatch(
@@ -156,8 +229,15 @@ export class ChatComponent implements OnInit {
 
   @Input()
   set objectId(objectId: string) {
-    this.store.dispatch(listenForMessagesAction({ objectId: objectId }));
-    this.store.dispatch(getUserByObjectIdAction({ objectId: objectId }));
+    this.channel = undefined;
+    this.messages = [];
+    this.store.dispatch(
+      getUserByObjectIdAction({
+        objectId: objectId,
+      })
+    );
+
+    this.store.dispatch(getChatChannelAction({ otherUserId: objectId }));
   }
 
   closeChat() {
@@ -165,12 +245,54 @@ export class ChatComponent implements OnInit {
   }
 
   profileImageSetter(index: number) {
-    if (this.messages[index].senderId === this.senderUser?.objectId) {
-      return this.senderUser.profileImageLink;
-    } else if (this.messages[index].senderId === this.receiverUser?.objectId) {
-      return this.receiverUser.profileImageLink;
+    if (
+      this.messages[index].senderId == this.senderUser?.id &&
+      this.senderUser.profilePictureLink
+    ) {
+      return this.senderUser.profilePictureLink;
+    } else if (
+      this.messages[index].senderId == this.receiverUser?.id &&
+      this.receiverUser.profilePictureLink
+    ) {
+      return this.receiverUser.profilePictureLink;
     } else {
       return './assets/user.png';
+    }
+  }
+
+  calculateOneDay(currTimestamp: number, prevTimestamp: number) {
+    let currentDate = new Date(currTimestamp * 1000);
+    let previousDate = new Date(prevTimestamp * 1000);
+
+    currentDate.setHours(0, 0, 0, 0);
+    previousDate.setHours(0, 0, 0, 0);
+
+    return previousDate.getTime() < currentDate.getTime();
+  }
+
+  whichDay(currTimestamp: number) {
+    let now = new Date(); // Get the current date and time
+    now.setHours(0, 0, 0, 0); // Set to the beginning of today
+
+    let timestampDate = new Date(currTimestamp * 1000); // Convert timestamp to Date object
+    timestampDate.setHours(0, 0, 0, 0); // Set to the beginning of the timestamp's day
+
+    const oneDay = 24 * 60 * 60 * 1000; // Milliseconds in one day
+
+    // Calculate the difference in days
+    // We divide by oneDay and round to handle potential minor time differences
+    // that don't affect the day itself.
+    const diffDays = Math.round(
+      (now.getTime() - timestampDate.getTime()) / oneDay
+    );
+
+    if (diffDays === 0) {
+      return 'Today';
+    } else if (diffDays === 1) {
+      return 'Yesterday';
+    } else {
+      // If it's not today or yesterday, return the original timestamp in milliseconds
+      return currTimestamp * 1000;
     }
   }
 }

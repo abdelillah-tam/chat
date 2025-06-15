@@ -23,8 +23,6 @@ export const initialChatChannelState: {
   chatChannels: string[];
 } = { chatChannel: '', chatChannels: [] };
 
-export const initialImageMsgUrlState = '';
-
 export const sendMessageReducer = createReducer(initialSendMessageState);
 
 export const messagesReducer = createReducer(
@@ -52,10 +50,3 @@ export const chatChannelReducer = createReducer(
   })
 );
 
-export const imageMsgUrlReducer = createReducer(
-  initialImageMsgUrlState,
-  on(imageMsgUrlAction, (state, data) => {
-    return data.imageUrl;
-  }),
-  on(emptyImageMsgAction, (state) => initialImageMsgUrlState)
-);

@@ -14,7 +14,6 @@ import { authReducer } from './state/auth/auth.reducers';
 import { AuthEffects } from './state/auth/auth.effects';
 import {
   chatChannelReducer,
-  imageMsgUrlReducer,
   messagesReducer,
   sendMessageReducer,
 } from './state/messaging/messaging.reducers';
@@ -36,7 +35,6 @@ export const appConfig: ApplicationConfig = {
     provideState('auth', authReducer),
     provideState('sendMessage', sendMessageReducer),
     provideState('messages', messagesReducer),
-    provideState('imageMsgUrl', imageMsgUrlReducer),
     provideState('chatChannel', chatChannelReducer),
     provideState('appState', appReducer),
     provideEffects(AuthEffects, LoginEffect, MessagingEffects),

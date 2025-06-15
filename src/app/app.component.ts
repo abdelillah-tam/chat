@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import {
   NavigationEnd,
   NavigationStart,
-  Route,
   Router,
   RouterLink,
   RouterLinkActive,
@@ -15,14 +14,12 @@ import { MatListModule } from '@angular/material/list';
 import { Store } from '@ngrx/store';
 import { emptyStateAction } from './state/auth/auth.actions';
 import { AuthService } from './services/auth.service';
-import { getCurrentUser } from './model/get-current-user';
 import { CommonModule } from '@angular/common';
 import { filter } from 'rxjs';
 import { sideNavStateSelector } from './state/app/app.selectors';
 
-import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
-import { environment } from '../environments/environment.development';
+import { logoutAction } from './state/login/login.actions';
 
 @Component({
   selector: 'app-root',
@@ -46,18 +43,13 @@ import { environment } from '../environments/environment.development';
 export class AppComponent implements OnInit {
   title = 'chat';
 
-  
   constructor(
     private store: Store,
-    private authService: AuthService,
     private router: Router
   ) {
     (window as any).Pusher = Pusher;
 
     Pusher.logToConsole;
-
-    
-  
   }
 
   openSide: boolean = false;
@@ -91,8 +83,6 @@ export class AppComponent implements OnInit {
         }
       }
     });
-    
-
   }
 
   onResize(event: Event) {
@@ -106,7 +96,7 @@ export class AppComponent implements OnInit {
 
   logout() {
     localStorage.clear();
-    this.authService.logout();
+    this.store.dispatch(logoutAction());
     this.store.dispatch(emptyStateAction());
     if (localStorage.length === 0) {
       this.router.navigate(['/login']);

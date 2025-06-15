@@ -29,3 +29,8 @@ export const selectProfilePictureLink = createSelector(
   selectFeature,
   (state) => state.currentProfilePictureLink
 );
+
+export const selectFoundUserByEmail = createSelector(
+  selectFeature,
+  (state) => state.foundUserByEmail
+);

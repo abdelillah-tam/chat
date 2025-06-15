@@ -25,6 +25,8 @@ export const RETRIEVED_TOCKEN_CHECK = '[Auth API] result of token check';
 
 export const FIND_USERS = '[Users Component] find users';
 
+export const FIND_BY_EMAIL = '[Login Component] find user by email';
+
 export const ERROR_API = '[Auth API] error';
 
 export const UPLOAD_PROFILE_PICTURE =
@@ -38,19 +40,26 @@ export const UPDATED_USER_INFO = '[Effect] updated';
 
 export const CHECK_TOKEN_IF_VALID = '[Home Component] check if token is valid';
 
-
 export const GET_PROFILE_PICTURE_LINK =
   '[Settings Or Users Component] get profile picture link';
 
 export const RETRIEVED_PROFILE_PICTURE_LINK =
   '[Effect] retrieved profile picture link';
 
+export const RETRIEVED_FOUND_USER = '[Effect] retrieved found user';
+
 export const signupAction = createAction(
   SIGNUP,
-  props<{ user: User; password: string; provider: string }>()
+  props<{ user: User; password: string | null;}>()
 );
 
-export const errorAction = createAction(ERROR_API);
+export const errorAction = createAction(
+  ERROR_API,
+  props<{
+    code: number;
+    error: string;
+  }>()
+);
 
 export const emptyStateAction = createAction('[Login Component] empty state');
 
@@ -101,7 +110,7 @@ export const findUsersAction = createAction(
 
 export const uploadProfilePicAction = createAction(
   UPLOAD_PROFILE_PICTURE,
-  props<{ file: File; user: string }>()
+  props<{ file: File; userId: string }>()
 );
 
 export const updateUserInfoAction = createAction(
@@ -115,7 +124,6 @@ export const updateUserInfoAction = createAction(
 );
 
 export const updatedInfosAction = createAction(UPDATED_USER_INFO, props<any>());
-
 
 export const getProfilePictureLinkAction = createAction(
   GET_PROFILE_PICTURE_LINK,
@@ -132,4 +140,14 @@ export const checkIfTokenIsValidAction = createAction(CHECK_TOKEN_IF_VALID);
 export const retrievedTokenCheckingAction = createAction(
   RETRIEVED_TOCKEN_CHECK,
   props<{ valid: boolean }>()
+);
+
+export const findUserByEmailAction = createAction(
+  FIND_BY_EMAIL,
+  props<{ email: string }>()
+);
+
+export const retrievedFoundUserByEmailAction = createAction(
+  RETRIEVED_FOUND_USER,
+  props<{ data: User | { code: number; error: string } }>()
 );

@@ -143,7 +143,9 @@ export class SettingsComponent implements OnInit, OnDestroy {
       .select(selectProfilePictureLink)
       .subscribe((result) => {
         if (result) {
-          this.profileImageUrl = result;
+          this.profileImageUrl = result.toString();
+          this.file = undefined;
+          
         }
       });
   }
@@ -197,7 +199,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
       this.store.dispatch(
         uploadProfilePicAction({
           file: this.file,
-          user: this.currentUser.id,
+          userId: this.currentUser.id,
         })
       );
     }
@@ -206,7 +208,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   cancel() {
     this.file = undefined;
     if (this.currentUser) {
-      //this.profileImageUrl = this.currentUser.profileImageLink;
+      this.profileImageUrl = this.currentUser.profilePictureLink;
     } else {
       this.profileImageUrl = '';
     }

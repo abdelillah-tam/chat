@@ -35,8 +35,8 @@ export class MessagingEffects {
       () =>
         this.actions$.pipe(
           ofType(SEND_MESSAGE),
-          map((value: { message: Message; channel: string }) =>
-            this.messagingService.sendMessage(value.message, value.channel)
+          map((value: { message: FormData }) =>
+            this.messagingService.sendMessage(value.message)
           )
         ),
       { dispatch: false }

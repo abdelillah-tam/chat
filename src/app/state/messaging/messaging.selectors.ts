@@ -7,8 +7,6 @@ export const selectMessageFeature = createFeatureSelector<{
   lastMessage: Message | undefined;
 }>('messages');
 
-export const selectImageMsgUrlFeature =
-  createFeatureSelector<string>('imageMsgUrl');
 
 export const selectChatChannelFeature = createFeatureSelector<{
   chatChannel: string;
@@ -22,10 +20,7 @@ export const selectMessages = createSelector(
 
 export const selectLastMessage = createSelector(selectMessageFeature, state => state.lastMessage);
 
-export const selectImageMsgUrl = createSelector(
-  selectImageMsgUrlFeature,
-  (state) => state
-);
+
 
 export const selectChatChannel = createSelector(
   selectChatChannelFeature,

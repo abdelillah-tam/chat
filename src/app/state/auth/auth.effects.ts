@@ -17,6 +17,8 @@ import {
   retrievedTokenCheckingAction,
   GET_PROFILE_PICTURE_LINK,
   retrievedProfilePictureLinkAction,
+  FIND_BY_EMAIL,
+  retrievedFoundUserByEmailAction,
 } from './auth.actions';
 import { catchError, debounceTime, exhaustMap, from, map, of } from 'rxjs';
 
@@ -30,6 +32,7 @@ export class AuthEffects {
   updateUserInfo$;
   tokenValidation$;
   getProfilePictureLink$;
+  findUserByEmail$;
 
   constructor(private action$: Actions, private authService: AuthService) {
     this.getCurrentLoggedInUser$ = createEffect(() =>
@@ -41,9 +44,6 @@ export class AuthEffects {
               return retrievedCurrentLoggedInUserAction({
                 currentUserLoggedInOrError: data,
               });
-            }),
-            catchError((error) => {
-              return of(errorAction());
             })
           )
         )
@@ -57,8 +57,7 @@ export class AuthEffects {
           this.authService.findUserById(value.objectId).pipe(
             map((data) => {
               return retrievedUserAction({ user: data });
-            }),
-            catchError(() => of(errorAction()))
+            })
           )
         )
       )
@@ -85,8 +84,16 @@ export class AuthEffects {
         ofType(FIND_USERS),
         exhaustMap((value: { name: string }) =>
           this.authService.findUsersByName(value.name).pipe(
-            map((data) => retrievedUsersAction({ users: data })),
-            catchError(() => of(errorAction()))
+            map((data) => {
+              if ('error' in data) {
+                return errorAction({
+                  code: data.code,
+                  error: data.error,
+                });
+              } else {
+                return retrievedUsersAction({ users: data });
+              }
+            })
           )
         )
       )
@@ -95,12 +102,12 @@ export class AuthEffects {
     this.uploadProfilePicture$ = createEffect(() =>
       this.action$.pipe(
         ofType(UPLOAD_PROFILE_PICTURE),
-        exhaustMap((value: { file: File; user: string }) =>
-          this.authService
-            .updateProfilePictureLink(value.file, value.user)
-            .pipe(
-              map((data) => retrievedProfilePictureLinkAction({ link: data }))
-            )
+        exhaustMap((value: { file: File; userId: string }) =>
+          this.authService.updateProfilePicture(value.file).pipe(
+            map((data) => {
+              return retrievedProfilePictureLinkAction({ link: data });
+            })
+          )
         )
       )
     );
@@ -124,7 +131,6 @@ export class AuthEffects {
               )
               .pipe(
                 map((data) => {
-                  console.log(data);
                   return updatedInfosAction(data);
                 })
               );
@@ -156,6 +162,19 @@ export class AuthEffects {
               map((response) =>
                 retrievedProfilePictureLinkAction({ link: response.link })
               )
+            )
+        )
+      )
+    );
+
+    this.findUserByEmail$ = createEffect(() =>
+      this.action$.pipe(
+        ofType(FIND_BY_EMAIL),
+        exhaustMap((value: { email: string }) =>
+          this.authService
+            .findUserByEmail(value.email)
+            .pipe(
+              map((data) => retrievedFoundUserByEmailAction({ data: data }))
             )
         )
       )

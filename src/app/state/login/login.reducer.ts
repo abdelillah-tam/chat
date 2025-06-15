@@ -1,5 +1,5 @@
 import { createReducer, on } from '@ngrx/store';
-import { loginResultAction } from './login.actions';
+import { loginResultAction, logoutAction } from './login.actions';
 import { LoginState } from './login-state';
 
 const initialState: LoginState = {
@@ -19,5 +19,8 @@ export const loginReducer = createReducer(
       userToken: data.userToken,
       objectId: data.objectId,
     };
+  }),
+  on(logoutAction, (state, data) => {
+    return { ...state, email: '', objectId: '', userToken: '', state: 'none' };
   })
 );

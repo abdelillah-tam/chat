@@ -14,11 +14,13 @@ import { animate, style, transition, trigger } from '@angular/animations';
 import { Store } from '@ngrx/store';
 import {
   emptyStateAction,
+  findUserByEmailAction,
   signupAction,
 } from '../state/auth/auth.actions';
 import { AuthState } from '../state/auth/auth-state';
 import {
   selectCurrentLoggedInUser,
+  selectFoundUserByEmail,
 } from '../state/auth/auth.selectors';
 import {
   MAT_FORM_FIELD_DEFAULT_OPTIONS,
@@ -69,11 +71,11 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   selectCurrentUserLoggedInUser: Subscription | undefined;
 
-  constructor(
-    private authService: AuthService,
-    private router: Router,
-    private store: Store<AuthState>
-  ) {
+  selectFoundUserByEmail: Subscription | undefined;
+
+  googleUser: (GoogleUser & jose.JWTPayload) | undefined;
+
+  constructor(private router: Router, private store: Store<AuthState>) {
     if (sessionStorage.getItem('credential') !== null) {
       this.handleCredential(sessionStorage.getItem('credential')!);
       sessionStorage.removeItem('credential');
@@ -92,10 +94,13 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
 
     this.store.select(selectLoginState).subscribe((state) => {
-      if (state.state === 'failed') {
-      } else if (state.state === 'success') {
-        let data = state;
-        this.saveDataLocally(data.email, data.userToken, data.objectId);
+      if (
+        state.email &&
+        state.userToken &&
+        state.objectId &&
+        state.state === 'success'
+      ) {
+        this.saveDataLocally(state.email, state.userToken, state.objectId);
         this.store.dispatch(emptyStateAction());
         getCurrentUser(this.store);
       }
@@ -105,19 +110,55 @@ export class LoginComponent implements OnInit, OnDestroy {
       .select(selectCurrentLoggedInUser)
       .subscribe((result) => {
         if (result && 'email' in result) {
+          console.log(result);
           this.router.navigate(['/']);
+        }
+      });
+
+    this.selectFoundUserByEmail = this.store
+      .select(selectFoundUserByEmail)
+      .subscribe((data) => {
+        if (data) {
+          if ('email' in data) {
+            if (data.provider === 'user') {
+              alert('Try to login using email !');
+            } else if (data!.provider === 'google') {
+              this.store.dispatch(
+                loginAction({
+                  email: this.googleUser?.email!,
+                  password: '',
+                  provider: 'google',
+                })
+              );
+            }
+          } else {
+            this.store.dispatch(
+              signupAction({
+                user: {
+                  firstName: this.googleUser!.given_name,
+                  lastName: this.googleUser!.family_name,
+                  email: this.googleUser!.email,
+                  sex: '',
+                  id: '',
+                  provider: 'google',
+                  profilePictureLink: '',
+                },
+                password: null,
+              })
+            );
+          }
+
+          this.store.dispatch(emptyStateAction());
         }
       });
   }
 
   ngOnDestroy(): void {
     this.selectCurrentUserLoggedInUser?.unsubscribe();
+    this.selectFoundUserByEmail?.unsubscribe();
   }
 
   isPasswordVisible = false;
-
-  isEmailValid = true;
-  isPasswordValid = true;
 
   loginGroup = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
@@ -129,50 +170,22 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   onSubmitLogin() {
     if (this.loginGroup.valid) {
-      this.isEmailValid = this.loginGroup.valid;
-      this.isPasswordValid = this.loginGroup.valid;
       this.store.dispatch(
         loginAction({
           email: this.loginGroup.value.email!,
           password: this.loginGroup.value.password!,
+          provider: 'user',
         })
       );
-    } else {
-      this.isEmailValid = this.loginGroup.controls.email.valid;
-      this.isPasswordValid = this.loginGroup.controls.password.valid;
     }
   }
 
   handleCredential(credential: string) {
-    let googleUser = jose.decodeJwt<GoogleUser>(credential);
+    this.googleUser = jose.decodeJwt<GoogleUser>(credential);
 
-    this.authService.findUserByEmail(googleUser.email).subscribe((data) => {
-      if ('email' in data) {
-        if (data.provider === 'backendless') {
-          alert('Try to login using email !');
-        } else if (data!.provider === 'google') {
-          this.store.dispatch(
-            loginAction({ email: googleUser.email!, password: googleUser.sub! })
-          );
-        }
-      } else {
-        this.store.dispatch(
-          signupAction({
-            user: {
-              firstName: googleUser.given_name,
-              lastName: googleUser.family_name,
-              email: googleUser.email,
-              sex: '',
-              id: '',
-              provider: 'google',
-              profilePictureLink: ''
-            },
-            password: googleUser!.sub!,
-            provider: 'google',
-          })
-        );
-      }
-    });
+    this.store.dispatch(
+      findUserByEmailAction({ email: this.googleUser.email })
+    );
   }
 
   makePasswordVisible() {

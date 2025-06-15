@@ -7,9 +7,9 @@ import {
   retrievedUsersAction,
   retrievedTokenCheckingAction,
   retrievedProfilePictureLinkAction,
+  retrievedFoundUserByEmailAction,
 } from './auth.actions';
 import { AuthState } from './auth-state';
-import { User } from '../../model/user';
 
 export const initialState: AuthState = {
   state: 'none',
@@ -18,11 +18,15 @@ export const initialState: AuthState = {
   foundUsers: [],
   tokenValidation: undefined,
   currentProfilePictureLink: undefined,
+  foundUserByEmail: undefined,
 };
 
 export const authReducer = createReducer(
   initialState,
-  on(errorAction, (state) => {
+  on(errorAction, (state, data) => {
+    if (data.code === 4044) {
+      return { ...state, foundUsers: [] };
+    }
     return { ...state, state: 'failed' };
   }),
   on(emptyStateAction, (state) => {
@@ -34,6 +38,7 @@ export const authReducer = createReducer(
       foundUsers: [],
       validToken: undefined,
       currentLoggedInUser: undefined,
+      foundUserByEmail: undefined
     };
   }),
   on(retrievedCurrentLoggedInUserAction, (state, data) => {
@@ -49,6 +54,9 @@ export const authReducer = createReducer(
     return { ...state, tokenValidation: data.valid };
   }),
   on(retrievedProfilePictureLinkAction, (state, data) => {
-    return { ...state, currentProfilePictureLink: data.link };
+    return { ...state, currentProfilePictureLink: new String(data.link) };
+  }),
+  on(retrievedFoundUserByEmailAction, (state, data) => {
+    return { ...state, foundUserByEmail: data.data };
   })
 );

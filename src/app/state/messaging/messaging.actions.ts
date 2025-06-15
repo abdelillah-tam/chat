@@ -19,7 +19,7 @@ export const GET_ALL_MESSAGES = '[Chat Component] get all messages';
 
 export const sendMessageAction = createAction(
   SEND_MESSAGE,
-  props<{ message: Message; channel: string }>()
+  props<{ message: FormData;}>()
 );
 
 export const newMessageAction = createAction(

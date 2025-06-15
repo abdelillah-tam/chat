@@ -1,12 +1,5 @@
-import { getDatabase, ref, onValue, set, get } from 'firebase/database';
 import { Message } from '../model/message';
 import { from } from 'rxjs';
-import {
-  getDownloadURL,
-  getStorage,
-  ref as stRef,
-  uploadBytes,
-} from 'firebase/storage';
 import { Store } from '@ngrx/store';
 import { newMessageAction } from '../state/messaging/messaging.actions';
 import { HttpClient } from '@angular/common/http';
@@ -14,7 +7,6 @@ import { environment } from '../../environments/environment';
 import Echo from 'laravel-echo';
 
 export class MessagingService {
-  private db = getDatabase();
   echo: Echo<'reverb'>;
   channels: { [key: string]: any } = {};
 
@@ -36,15 +28,9 @@ export class MessagingService {
     });
   }
 
-  sendMessage(message: Message, channel: string) {
-    this.httpClient
-      .post(`${environment.API}/send`, {
-        message: message,
-        channel: channel,
-      })
-      .subscribe();
+  sendMessage(message: FormData) {
+    this.httpClient.post(`${environment.API}/send`, message).subscribe();
   }
-
   listenForMessages(channel: string) {
     if (!this.channels[channel]) {
       this.channels[channel] = this.echo.private(`channel.${channel}`);
@@ -71,15 +57,15 @@ export class MessagingService {
   }
 
   async uploadImageMsg(file: File, sender: string) {
-    const storage = getStorage();
+    /*const storage = getStorage();
     let downloadUrl: string;
 
     const storageRef = stRef(storage, `chats/${sender}/${file.name}`);
     await uploadBytes(storageRef, file);
     let url = await getDownloadURL(storageRef);
-    downloadUrl = url;
+    downloadUrl = url;*/
 
-    return downloadUrl;
+    return 'downloadUrl';
   }
 }
 

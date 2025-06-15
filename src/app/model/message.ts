@@ -3,7 +3,6 @@ export interface Message {
   senderId: string;
   receiverId: string;
   timestamp: number;
-  type: 'image' | 'text' | 'image and text';
   imageUrl: string;
   channel: string;
 }

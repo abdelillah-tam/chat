@@ -1,20 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, contentChild, ElementRef, Input, OnDestroy, OnInit, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Message } from '../../model/message';
 import { User } from '../../model/user';
 import { Store } from '@ngrx/store';
 import {
-  emptyImageMsgAction,
   getAllMessagesAction,
   getChatChannelAction,
-  listenForMessagesAction,
   sendMessageAction,
-  uploadImageMsgAction,
 } from '../../state/messaging/messaging.actions';
 import {
   selectChatChannel,
-  selectImageMsgUrl,
   selectMessages,
 } from '../../state/messaging/messaging.selectors';
 import { getUserByObjectIdAction } from '../../state/auth/auth.actions';
@@ -61,6 +57,8 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   file: File | null = null;
 
+  inputFile = viewChild<ElementRef<HTMLInputElement>>('inputFile');
+
   imageUrl: string = '';
 
   selectSender: Subscription | undefined;
@@ -71,11 +69,8 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   selectMessages: Subscription | undefined;
 
-  selectImageMessageUrl: Subscription | undefined;
-
   constructor(private store: Store, private router: Router) {}
   ngOnInit(): void {
-    console.log('OnInit');
     this.selectSender = this.store
       .select(selectCurrentLoggedInUser)
       .subscribe((result) => {
@@ -83,6 +78,7 @@ export class ChatComponent implements OnInit, OnDestroy {
           this.senderUser = result;
         }
       });
+
 
     this.selectReceiver = this.store.select(selectUser).subscribe((result) => {
       if (result && 'firstName' in result) {
@@ -111,20 +107,6 @@ export class ChatComponent implements OnInit, OnDestroy {
         }
       });
 
-    this.selectImageMessageUrl = this.store
-      .select(selectImageMsgUrl)
-      .subscribe((result) => {
-        if (result.length > 0) {
-          this.message!.imageUrl = result;
-          this.store.dispatch(
-            sendMessageAction({
-              message: this.message!,
-              channel: crypto.randomUUID(),
-            })
-          );
-          this.store.dispatch(emptyImageMsgAction());
-        }
-      });
   }
 
   ngOnDestroy(): void {
@@ -133,75 +115,23 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.selectSender?.unsubscribe();
     this.selectChatChannel?.unsubscribe();
     this.selectMessages?.unsubscribe();
-    this.selectImageMessageUrl?.unsubscribe();
   }
 
   sendMessage() {
-    if (this.text !== '' && this.file !== null) {
-      this.message = {
-        messageText: this.text,
-        senderId: localStorage.getItem('objectId')!,
-        receiverId: this.receiverUser!.id,
-        timestamp: Date.now(),
-        type: 'image and text',
-        imageUrl: '',
-        channel: '',
-      };
-
-      this.store.dispatch(
-        uploadImageMsgAction({
-          file: this.file!,
-          sender: this.message.senderId,
-        })
-      );
-
-      this.text = '';
-      this.file = null;
-      this.imageUrl = '';
-    } else if (this.text !== '' && this.file === null) {
-      this.message = {
-        messageText: this.text,
-        senderId: localStorage.getItem('objectId')!,
-        receiverId: this.receiverUser!.id,
-        timestamp: Date.now(),
-        type: 'text',
-        imageUrl: '',
-        channel: '',
-      };
-
-      let uuid: string | undefined;
-      if (!this.channel) {
-        uuid = crypto.randomUUID();
-        this.channel = uuid;
-        this.store.dispatch(listenForMessagesAction({ channelId: uuid }));
+    if (this.file || this.text.length) {
+      let message = new FormData();
+      message.append('messageText', this.text ?? '');
+      message.append('senderId', localStorage.getItem('objectId')!);
+      message.append('receiverId', this.receiverUser!.id);
+      message.append('channel', crypto.randomUUID());
+      if (this.file) {
+        message.append('image', this.file);
       }
-      this.store.dispatch(
-        sendMessageAction({
-          message: this.message,
-          channel: uuid ?? crypto.randomUUID(),
-        })
-      );
-      this.text = '';
-    } else if (this.text === '' && this.file !== null) {
-      this.message = {
-        messageText: '',
-        senderId: localStorage.getItem('objectId')!,
-        receiverId: this.receiverUser!.id,
-        timestamp: Date.now(),
-        type: 'image',
-        imageUrl: '',
-        channel: '',
-      };
 
-      this.store.dispatch(
-        uploadImageMsgAction({
-          file: this.file!,
-          sender: this.message.senderId,
-        })
-      );
-      this.text = '';
+      this.store.dispatch(sendMessageAction({ message: message }));
       this.file = null;
-      this.imageUrl = '';
+      this.text = '';
+
     }
   }
 
@@ -212,6 +142,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   onImageAdded(e: any) {
     this.file = e.target.files[0];
     this.showImage();
+    
   }
 
   showImage() {
@@ -220,11 +151,13 @@ export class ChatComponent implements OnInit, OnDestroy {
     fileReader.onload = (event: any) => {
       this.imageUrl = event.target.result;
     };
+    
   }
 
   removeImage() {
     this.file = null;
     this.imageUrl = '';
+    this.inputFile()!.nativeElement.value = '';
   }
 
   @Input()

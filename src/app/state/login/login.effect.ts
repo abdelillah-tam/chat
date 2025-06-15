@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { AuthService } from '../../services/auth.service';
-import { LOGIN, loginAction, loginResultAction } from './login.actions';
+import { LOGIN, loginAction, loginResultAction, LOGOUT } from './login.actions';
 import { exhaustMap, map, catchError, of } from 'rxjs';
 import { errorAction, SIGNUP } from '../auth/auth.actions';
 import { User } from '../../model/user';
@@ -10,22 +10,25 @@ import { User } from '../../model/user';
 export class LoginEffect {
   login$;
   signup$;
+  logout$;
 
   constructor(private action$: Actions, private authService: AuthService) {
     this.login$ = createEffect(() =>
       this.action$.pipe(
         ofType(LOGIN),
-        exhaustMap((value: { email: string; password: string }) =>
-          this.authService.login(value.email, value.password).pipe(
-            map((data) =>
-              loginResultAction({
-                email: data.email,
-                objectId: data.id,
-                userToken: data.token,
-              })
-            ),
-            catchError(() => of(errorAction()))
-          )
+        exhaustMap(
+          (value: { email: string; password: string; provider: string }) =>
+            this.authService
+              .login(value.email, value.password, value.provider)
+              .pipe(
+                map((data) => {
+                  return loginResultAction({
+                    email: data.email,
+                    objectId: data.id,
+                    userToken: data.token,
+                  });
+                })
+              )
         )
       )
     );
@@ -34,20 +37,31 @@ export class LoginEffect {
       this.action$.pipe(
         ofType(SIGNUP),
         exhaustMap(
-          (value: { user: User; password: string; provider: string }) =>
+          (value: { user: User; password: string; }) =>
             this.authService
-              .signUp(value.user, value.password, value.provider)
+              .signUp(value.user, value.password, value.user.provider)
               .pipe(
                 map(() =>
                   loginAction({
                     email: value.user.email,
-                    password: value.password,
+                    password: value.password ?? '',
+                    provider: value.user.provider,
                   })
-                ),
-                catchError(() => of(errorAction()))
+                )
               )
         )
       )
+    );
+
+    this.logout$ = createEffect(
+      () =>
+        this.action$.pipe(
+          ofType(LOGOUT),
+          map(() => this.authService.logout())
+        ),
+      {
+        dispatch: false,
+      }
     );
   }
 }

@@ -37,9 +37,13 @@ export class LoginEffect {
       this.action$.pipe(
         ofType(SIGNUP),
         exhaustMap(
-          (value: { user: User; password: string; }) =>
+          (value: {
+            user: User;
+            password: string;
+            confirmationPassword: string;
+          }) =>
             this.authService
-              .signUp(value.user, value.password, value.user.provider)
+              .signUp(value.user, value.password, value.confirmationPassword)
               .pipe(
                 map(() =>
                   loginAction({

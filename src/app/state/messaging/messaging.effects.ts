@@ -8,20 +8,21 @@ import {
   LISTEN,
   receivedAllMessagesAction,
   receivedChatChannelAction,
-  newMessageAction,
   SEND_MESSAGE,
   UPLOAD_IMG_MSG,
-  NEW_MESSAGE,
   GET_ALL_CHAT_CHANNELS,
   receivedAllChatChannelsAction,
+  CREATE_CHANNEL,
+  listenForMessagesAction,
 } from './messaging.actions';
-import { exhaustMap, from, map } from 'rxjs';
+import { concatMap, exhaustMap, from, map } from 'rxjs';
 import { Message } from '../../model/message';
 
 @Injectable()
 export class MessagingEffects {
   sendMessage$;
   listenForMessages$;
+  createChannelIfNotExist$;
   uploadImgMsg$;
   getChatChannel$;
   getAllChatChannels$;
@@ -35,8 +36,8 @@ export class MessagingEffects {
       () =>
         this.actions$.pipe(
           ofType(SEND_MESSAGE),
-          map((value: { message: FormData }) =>
-            this.messagingService.sendMessage(value.message)
+          map((value: { message: FormData; firstMessage: boolean }) =>
+            this.messagingService.sendMessage(value.message, value.firstMessage)
           )
         ),
       { dispatch: false }
@@ -46,11 +47,36 @@ export class MessagingEffects {
       () =>
         this.actions$.pipe(
           ofType(LISTEN),
-          map((value: { channelId: string }) =>
-            this.messagingService.listenForMessages(value.channelId)
+          map((value: { channelId: string; firstMessage: boolean }) =>
+            this.messagingService.listenForMessages(
+              value.channelId,
+              value.firstMessage
+            )
           )
         ),
       { dispatch: false }
+    );
+
+    this.createChannelIfNotExist$ = createEffect(() =>
+      this.actions$.pipe(
+        ofType(CREATE_CHANNEL),
+        exhaustMap((value: { message: FormData }) =>
+          this.messagingService
+            .createChannel(
+              value.message.get('channel')!.toString(),
+              value.message.get('senderId')!.toString(),
+              value.message.get('receiverId')!.toString()
+            )
+            .pipe(
+              map((data) =>
+                listenForMessagesAction({
+                  channelId: data,
+                  firstMessage: true,
+                })
+              )
+            )
+        )
+      )
     );
 
     this.uploadImgMsg$ = createEffect(() =>

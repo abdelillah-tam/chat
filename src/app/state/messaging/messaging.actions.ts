@@ -7,6 +7,8 @@ export const RECEIVED_ALL_MESSAGES = '[Effect] received all messages';
 export const CLOSECHAT = '[Users Component] close chat window';
 export const OPENCHAT = '[Home Component] open chat window';
 export const LISTEN = '[Chat Component] listen for messages';
+export const CREATE_CHANNEL =
+  '[Chat Component] create channel if not exist then return it';
 export const UPLOAD_IMG_MSG = '[Chat Component] Upload Image Message';
 export const GOTTEN_IMG_MSG_URL = '[Effect] gotten image url';
 export const EMPTY_IMG_MSG = '[Chat Component] empty img msg';
@@ -19,7 +21,7 @@ export const GET_ALL_MESSAGES = '[Chat Component] get all messages';
 
 export const sendMessageAction = createAction(
   SEND_MESSAGE,
-  props<{ message: FormData;}>()
+  props<{ message: FormData; firstMessage: boolean }>()
 );
 
 export const newMessageAction = createAction(
@@ -41,7 +43,7 @@ export const openChatWindowAction = createAction(
 
 export const listenForMessagesAction = createAction(
   LISTEN,
-  props<{ channelId: string }>()
+  props<{ channelId: string; firstMessage: boolean }>()
 );
 
 export const uploadImageMsgAction = createAction(
@@ -77,3 +79,8 @@ export const getAllMessagesAction = createAction(
 );
 
 export const emptyImageMsgAction = createAction(EMPTY_IMG_MSG);
+
+export const createChannelAction = createAction(
+  CREATE_CHANNEL,
+  props<{ message: FormData }>()
+);

@@ -9,7 +9,7 @@ import { environment } from '../../environments/environment';
 export class AuthService {
   constructor(private http: HttpClient) {}
 
-  signUp(user: User, password: string) {
+  signUp(user: User, password: string, confirmationPassword: string) {
     if (user.provider === 'google') {
       return this.http.post<User>(
         `${environment.API}/register/google`,
@@ -36,6 +36,7 @@ export class AuthService {
           last_name: user.lastName,
           sex: user.sex,
           provider: user.provider,
+          confirmationPassword: confirmationPassword,
         },
         {
           headers: new HttpHeaders({

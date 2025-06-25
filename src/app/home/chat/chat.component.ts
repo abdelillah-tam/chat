@@ -1,12 +1,22 @@
 import { CommonModule } from '@angular/common';
-import { Component, contentChild, ElementRef, Input, OnDestroy, OnInit, viewChild } from '@angular/core';
+import {
+  Component,
+  contentChild,
+  ElementRef,
+  Input,
+  OnDestroy,
+  OnInit,
+  viewChild,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Message } from '../../model/message';
 import { User } from '../../model/user';
 import { Store } from '@ngrx/store';
 import {
+  createChannelAction,
   getAllMessagesAction,
   getChatChannelAction,
+  listenForMessagesAction,
   sendMessageAction,
 } from '../../state/messaging/messaging.actions';
 import {
@@ -79,7 +89,6 @@ export class ChatComponent implements OnInit, OnDestroy {
         }
       });
 
-
     this.selectReceiver = this.store.select(selectUser).subscribe((result) => {
       if (result && 'firstName' in result) {
         this.receiverUser = result;
@@ -106,7 +115,6 @@ export class ChatComponent implements OnInit, OnDestroy {
           });
         }
       });
-
   }
 
   ngOnDestroy(): void {
@@ -120,18 +128,28 @@ export class ChatComponent implements OnInit, OnDestroy {
   sendMessage() {
     if (this.file || this.text.length) {
       let message = new FormData();
+      let channelUUID = crypto.randomUUID();
       message.append('messageText', this.text ?? '');
       message.append('senderId', localStorage.getItem('objectId')!);
       message.append('receiverId', this.receiverUser!.id);
-      message.append('channel', crypto.randomUUID());
+      message.append('channel', channelUUID);
       if (this.file) {
         message.append('image', this.file);
       }
 
-      this.store.dispatch(sendMessageAction({ message: message }));
+      if (!this.messages.length) {
+        this.channel = channelUUID;
+      }
+
+      this.store.dispatch(
+        sendMessageAction({
+          message: message,
+          firstMessage: this.messages.length === 0 ? true : false,
+        })
+      );
+      //this.store.dispatch(createChannelAction({ message: message }));
       this.file = null;
       this.text = '';
-
     }
   }
 
@@ -142,7 +160,6 @@ export class ChatComponent implements OnInit, OnDestroy {
   onImageAdded(e: any) {
     this.file = e.target.files[0];
     this.showImage();
-    
   }
 
   showImage() {
@@ -151,7 +168,6 @@ export class ChatComponent implements OnInit, OnDestroy {
     fileReader.onload = (event: any) => {
       this.imageUrl = event.target.result;
     };
-    
   }
 
   removeImage() {

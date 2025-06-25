@@ -92,13 +92,16 @@ export class UsersComponent implements OnInit, OnDestroy {
           this.users.forEach((item) => {
             if ('lastMessageTimestamp' in item) {
               this.store.dispatch(
-                listenForMessagesAction({ channelId: item.channel })
+                listenForMessagesAction({
+                  channelId: item.channel,
+                  firstMessage: false,
+                })
               );
             }
           });
 
           this.selectIndex();
-          
+
           if (this.router.url !== '/') {
             this.closedChat = false;
           }
@@ -137,8 +140,6 @@ export class UsersComponent implements OnInit, OnDestroy {
         this.users = this.sortUsers(newList);
 
         this.selectIndex();
-
-      
       }
     });
   }
@@ -187,14 +188,14 @@ export class UsersComponent implements OnInit, OnDestroy {
     });
   }
 
-  selectIndex(){
+  selectIndex() {
     let currentUserId = this.router.url.slice(6);
     this.selectedUserIndex = this.users.findIndex((userItem) => {
-          if ('user' in userItem) {
-            return userItem.user.id == currentUserId;
-          } else {
-            return userItem.id == currentUserId;
-          }
-        });
+      if ('user' in userItem) {
+        return userItem.user.id == currentUserId;
+      } else {
+        return userItem.id == currentUserId;
+      }
+    });
   }
 }

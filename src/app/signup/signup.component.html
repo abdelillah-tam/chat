@@ -1,6 +1,6 @@
 <div class="h-full w-screen select-none bg-white" [@ani]>
   <div
-    class="signup-div h-5/6 flex flex-col justify-evenly items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+    class="signup-div h-full flex flex-col justify-evenly items-center">
     <div class="flex justify-center items-center w-full">
       <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#16a34a" height="72px"
         width="72px" version="1.1" id="Capa_1" viewBox="0 0 60 60" xml:space="preserve">
@@ -13,15 +13,15 @@
     <p class="text-3xl">Create an account</p>
 
 
-    <form class="flex w-96 flex-col" [formGroup]="signUpForm" (ngSubmit)="onSubmit()">
+    <form class="flex w-1/2 flex-col" [formGroup]="signUpForm" (ngSubmit)="onSubmit()">
 
       <div class="flex justify-between">
-        <mat-form-field class="mr-1" appearance="outline">
+        <mat-form-field class="mr-1 basis-1/2" appearance="outline">
           <mat-label>First Name</mat-label>
           <input matInput formControlName="firstName" />
           <mat-error>Enter your first name</mat-error>
         </mat-form-field>
-        <mat-form-field class="ml-1" appearance="outline">
+        <mat-form-field class="ml-1 basis-1/2" appearance="outline">
           <mat-label>Last Name</mat-label>
           <input matInput formControlName="lastName" />
           <mat-error>Enter your last name</mat-error>

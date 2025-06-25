@@ -143,7 +143,8 @@ export class LoginComponent implements OnInit, OnDestroy {
                   provider: 'google',
                   profilePictureLink: '',
                 },
-                password: null,
+                password: undefined,
+                confirmationPassword: undefined,
               })
             );
           }

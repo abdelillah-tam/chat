@@ -50,7 +50,11 @@ export const RETRIEVED_FOUND_USER = '[Effect] retrieved found user';
 
 export const signupAction = createAction(
   SIGNUP,
-  props<{ user: User; password: string | null;}>()
+  props<{
+    user: User;
+    password: string | undefined;
+    confirmationPassword: string | undefined;
+  }>()
 );
 
 export const errorAction = createAction(

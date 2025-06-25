@@ -84,6 +84,7 @@ export class SignupComponent implements OnInit {
             profilePictureLink: '',
           },
           password: this.signUpForm.value.password!,
+          confirmationPassword: this.signUpForm.value.confirmPassword!
         })
       );
     }

@@ -28,18 +28,48 @@ export class MessagingService {
     });
   }
 
-  sendMessage(message: FormData) {
-    this.httpClient.post(`${environment.API}/send`, message).subscribe();
-  }
-  listenForMessages(channel: string) {
-    if (!this.channels[channel]) {
-      this.channels[channel] = this.echo.private(`channel.${channel}`);
-      this.channels[channel].listen('.chat', (data: Message) => {
-        this.store.dispatch(newMessageAction({ message: data }));
-      });
+  sendMessage(message: FormData, firstMessage: boolean) {
+    if (firstMessage) {
+      this.channels[message.get('channel')!.toString()] = this.echo.private(
+        `channel.${message.get('channel')!.toString()}`
+      );
+
+      this.channels[message.get('channel')!.toString()].on(
+        'pusher:subscription_succeeded',
+        () => {
+          console.log('called');
+          this.listenForMessages(message.get('channel')!.toString(), true);
+          this.httpClient.post(`${environment.API}/send`, message).subscribe();
+        }
+      );
+    } else {
+      this.httpClient.post(`${environment.API}/send`, message).subscribe();
     }
   }
 
+  createChannel(channel: string, firstUser: string, secondUser: string) {
+    return this.httpClient.post<string>(`${environment.API}/createChannel`, {
+      channel: channel,
+      firstUser: firstUser,
+      secondUser: secondUser,
+    }); // if channel already exist it won't create a new one, instead it will return the existing channel
+  }
+
+  listenForMessages(channel: string, firstMessage: boolean) {
+    if (firstMessage) {
+      this.channels[channel].listen('.chat', (data: Message) => {
+        console.log(data);
+        this.store.dispatch(newMessageAction({ message: data }));
+      });
+    } else {
+      if (!this.channels[channel]) {
+        this.channels[channel] = this.echo.private(`channel.${channel}`);
+        this.channels[channel].listen('.chat', (data: Message) => {
+          this.store.dispatch(newMessageAction({ message: data }));
+        });
+      }
+    }
+  }
   getAllMessages(chatChannel: string) {
     return this.httpClient.get<Message[]>(
       `${environment.API}/getMessages/${chatChannel}`

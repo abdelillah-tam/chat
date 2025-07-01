@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, provideZoneChangeDetection, isDevMode } from '@angular/core';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -23,6 +23,7 @@ import { MessagingService } from './services/messaging.service';
 import { appReducer } from './state/app/app.reducers';
 import { loginReducer } from './state/login/login.reducer';
 import { LoginEffect } from './state/login/login.effect';
+import { provideStoreDevtools } from '@ngrx/store-devtools';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -39,14 +40,14 @@ export const appConfig: ApplicationConfig = {
     provideState('appState', appReducer),
     provideEffects(AuthEffects, LoginEffect, MessagingEffects),
     {
-      provide: AuthService,
-      useFactory: (httpClient: HttpClient) => new AuthService(httpClient),
-      deps: [HttpClient],
+        provide: AuthService,
+        useFactory: (httpClient: HttpClient) => new AuthService(httpClient),
+        deps: [HttpClient],
     },
     {
-      provide: MessagingService,
-      useFactory: (store: Store, httpClient: HttpClient) => new MessagingService(store, httpClient),
-      deps: [Store, HttpClient],
-    },
-  ],
+        provide: MessagingService,
+        useFactory: (store: Store, httpClient: HttpClient) => new MessagingService(store, httpClient),
+        deps: [Store, HttpClient],
+    }
+],
 };

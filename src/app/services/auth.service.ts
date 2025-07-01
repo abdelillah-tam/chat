@@ -165,15 +165,18 @@ export class AuthService {
     objectId: string,
     firstName: string | undefined,
     lastName: string | undefined,
-    email: string | undefined
+    email: string | undefined,
+    password: string | undefined,
+    provider: string
   ) {
-    if (email) {
-      return this.http.patch<User>(
+    if (provider !== 'google') {
+      return this.http.patch<boolean>(
         `${environment.API}/update/${objectId}`,
         {
           first_name: firstName,
           last_name: lastName,
           email: email,
+          password: password,
         },
         {
           headers: new HttpHeaders({
@@ -182,8 +185,8 @@ export class AuthService {
         }
       );
     } else {
-      return this.http.patch<User>(
-        `${environment.API}/update/${objectId}`,
+      return this.http.patch<boolean>(
+        `${environment.API}/updateGoogle/${objectId}`,
         {
           first_name: firstName,
           last_name: lastName,

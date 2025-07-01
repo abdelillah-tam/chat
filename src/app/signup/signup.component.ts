@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import {
   AbstractControl,
@@ -12,13 +12,16 @@ import { User } from '../model/user';
 import { CommonModule } from '@angular/common';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Store } from '@ngrx/store';
-import { signupAction } from '../state/auth/auth.actions';
+import { emptyStateAction, signupAction } from '../state/auth/auth.actions';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { getCurrentUser } from '../model/get-current-user';
+import { saveDataLocally } from '../model/save-user-locally';
 import { selectCurrentLoggedInUser } from '../state/auth/auth.selectors';
+import { Subscription } from 'rxjs';
+import { selectLoginState } from '../state/login/login.selector';
 
 @Component({
   selector: 'app-signup',
@@ -42,7 +45,7 @@ import { selectCurrentLoggedInUser } from '../state/auth/auth.selectors';
     ]),
   ],
 })
-export class SignupComponent implements OnInit {
+export class SignupComponent implements OnInit, OnDestroy {
   constructor(private store: Store, private router: Router) {}
 
   signUpForm = new FormGroup({
@@ -56,16 +59,51 @@ export class SignupComponent implements OnInit {
     ]),
     confirmPassword: new FormControl('', [Validators.required]),
   });
+
+  selectCurrentLoggedInUser: Subscription | undefined;
+
+  selectLoginState: Subscription | undefined;
+
   ngOnInit(): void {
     this.signUpForm.addValidators([
       this.comparePasswordValidator('password', 'confirmPassword'),
     ]);
-    getCurrentUser(this.store);
-    this.store.select(selectCurrentLoggedInUser).subscribe((result) => {
-      if (result) {
-        this.router.navigate(['/']);
-      }
-    });
+
+    if (
+      localStorage.getItem('objectId') &&
+      localStorage.getItem('email') &&
+      localStorage.getItem('userToken')
+    ) {
+      getCurrentUser(this.store);
+    }
+
+    this.selectCurrentLoggedInUser = this.store
+      .select(selectCurrentLoggedInUser)
+      .subscribe((result) => {
+        if (result) {
+          this.router.navigate(['/']);
+        }
+      });
+
+    this.selectLoginState = this.store
+      .select(selectLoginState)
+      .subscribe((state) => {
+        if (
+          state.email &&
+          state.userToken &&
+          state.objectId &&
+          state.state === 'success'
+        ) {
+          saveDataLocally(state.email, state.userToken, state.objectId);
+          this.store.dispatch(emptyStateAction());
+          getCurrentUser(this.store);
+        }
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.selectCurrentLoggedInUser?.unsubscribe();
+    this.selectLoginState?.unsubscribe();
   }
 
   show = true;
@@ -84,11 +122,12 @@ export class SignupComponent implements OnInit {
             profilePictureLink: '',
           },
           password: this.signUpForm.value.password!,
-          confirmationPassword: this.signUpForm.value.confirmPassword!
+          confirmationPassword: this.signUpForm.value.confirmPassword!,
         })
       );
     }
   }
+
   comparePasswordValidator(
     controlName: string,
     matchingControlName: string

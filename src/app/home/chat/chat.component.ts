@@ -244,4 +244,17 @@ export class ChatComponent implements OnInit, OnDestroy {
       return currTimestamp * 1000;
     }
   }
+
+  showSenderInfo(currentMessage: Message, index: number) {
+    if (index === 0) {
+      return true;
+    } else {
+      const prevMsg = this.messages[index - 1];
+      if (currentMessage.senderId != prevMsg.senderId) {
+        return true;
+      }
+
+      return false;
+    }
+  }
 }

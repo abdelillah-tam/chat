@@ -7,37 +7,21 @@ import { environment } from '../../environments/environment';
 import Echo from 'laravel-echo';
 
 export class MessagingService {
-  echo: Echo<'reverb'>;
+  echo: Echo<'reverb'> | undefined;
   channels: { [key: string]: any } = {};
 
-  constructor(private store: Store, private httpClient: HttpClient) {
-    this.echo = new Echo({
-      broadcaster: 'reverb',
-      key: 'la1tngxd6dhbtrugv9ay',
-      wsHost: window.location.hostname,
-      wsPort: 8080,
-      wssPort: 8080,
-      forceTLS: false,
-      enabledTransports: ['ws', 'wss'],
-      authEndpoint: 'http://localhost:8000/broadcasting/auth',
-      auth: {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('userToken')}`,
-        },
-      },
-    });
-  }
+  constructor(private store: Store, private httpClient: HttpClient) {}
 
   sendMessage(message: FormData, firstMessage: boolean) {
+    this.initializeEcho();
     if (firstMessage) {
-      this.channels[message.get('channel')!.toString()] = this.echo.private(
+      this.channels[message.get('channel')!.toString()] = this.echo!.private(
         `channel.${message.get('channel')!.toString()}`
       );
-
+      console.log(this.channels[message.get('channel')!.toString()]);
       this.channels[message.get('channel')!.toString()].on(
         'pusher:subscription_succeeded',
         () => {
-          console.log('called');
           this.listenForMessages(message.get('channel')!.toString(), true);
           this.httpClient.post(`${environment.API}/send`, message).subscribe();
         }
@@ -56,14 +40,15 @@ export class MessagingService {
   }
 
   listenForMessages(channel: string, firstMessage: boolean) {
+    this.initializeEcho();
     if (firstMessage) {
       this.channels[channel].listen('.chat', (data: Message) => {
-        console.log(data);
+        console.log('listen', data);
         this.store.dispatch(newMessageAction({ message: data }));
       });
     } else {
       if (!this.channels[channel]) {
-        this.channels[channel] = this.echo.private(`channel.${channel}`);
+        this.channels[channel] = this.echo!.private(`channel.${channel}`);
         this.channels[channel].listen('.chat', (data: Message) => {
           this.store.dispatch(newMessageAction({ message: data }));
         });
@@ -84,6 +69,26 @@ export class MessagingService {
     return this.httpClient.get<string>(
       `${environment.API}/chatchannel/${otherUserId}`
     );
+  }
+
+  private initializeEcho() {
+    if (!this.echo) {
+      this.echo = new Echo({
+        broadcaster: 'reverb',
+        key: 'la1tngxd6dhbtrugv9ay',
+        wsHost: window.location.hostname,
+        wsPort: 8080,
+        wssPort: 8080,
+        forceTLS: false,
+        enabledTransports: ['ws', 'wss'],
+        authEndpoint: 'http://localhost:8000/broadcasting/auth',
+        auth: {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('userToken')}`,
+          },
+        },
+      });
+    }
   }
 
   async uploadImageMsg(file: File, sender: string) {

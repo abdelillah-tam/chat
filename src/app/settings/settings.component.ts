@@ -26,6 +26,7 @@ import {
 } from '../state/auth/auth.selectors';
 import {
   checkIfTokenIsValidAction,
+  emptyStateAction,
   getProfilePictureLinkAction,
   updateUserInfoAction,
   uploadProfilePicAction,
@@ -34,6 +35,7 @@ import { getCurrentUser } from '../model/get-current-user';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { isLoggedIn } from '../model/is-logged-in';
+import { selectLoginState } from '../state/login/login.selector';
 
 @Component({
   selector: 'app-settings',
@@ -67,6 +69,8 @@ export class SettingsComponent implements OnInit, OnDestroy {
   selectNewProfilePictureState: Subscription | undefined;
 
   selectProfilePictureLinkState: Subscription | undefined;
+
+
 
   infoGroup = new FormGroup({
     firstName: new FormControl('', [Validators.required]),
@@ -106,12 +110,15 @@ export class SettingsComponent implements OnInit, OnDestroy {
       })
     );
 
+    
+
     this.store.dispatch(checkIfTokenIsValidAction());
 
     this.selectTokenValidation = this.store
       .select(selectTokenValidation)
       .subscribe((result) => {
         if (result === false) {
+          console.log(result);
           localStorage.clear(); // delete any existing data
           this.router.navigate(['/login']);
         }
@@ -145,7 +152,6 @@ export class SettingsComponent implements OnInit, OnDestroy {
         if (result) {
           this.profileImageUrl = result.toString();
           this.file = undefined;
-          
         }
       });
   }
@@ -166,14 +172,29 @@ export class SettingsComponent implements OnInit, OnDestroy {
     }
 
     if (this.infoGroup.valid) {
-      this.store.dispatch(
-        updateUserInfoAction({
-          objectId: localStorage.getItem('objectId')!,
-          firstName: this.infoGroup.value.firstName!,
-          lastName: this.infoGroup.value.lastName!,
-          email: this.infoGroup.value.email!,
-        })
-      );
+      if (this.currentUser?.provider === 'google') {
+        this.store.dispatch(
+          updateUserInfoAction({
+            objectId: localStorage.getItem('objectId')!,
+            firstName: this.infoGroup.value.firstName!,
+            lastName: this.infoGroup.value.lastName!,
+            email: this.infoGroup.value.email!,
+            password: undefined,
+            provider: this.currentUser.provider,
+          })
+        );
+      } else {
+        this.store.dispatch(
+          updateUserInfoAction({
+            objectId: localStorage.getItem('objectId')!,
+            firstName: this.infoGroup.value.firstName!,
+            lastName: this.infoGroup.value.lastName!,
+            email: this.infoGroup.value.email!,
+            password: this.infoGroup.value.password!,
+            provider: this.currentUser!.provider,
+          })
+        );
+      }
     }
   }
 
@@ -215,4 +236,5 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
     this.fileInput!.nativeElement.value = '';
   }
+
 }

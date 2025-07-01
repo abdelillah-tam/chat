@@ -76,6 +76,7 @@
       />
     </mat-form-field>
 
+    @if (currentUser?.provider !== 'google') {
     <mat-form-field appearance="outline" class="w-[90%]">
       <mat-label class="text-xl font-bold">Email</mat-label>
       <input
@@ -96,6 +97,7 @@
         formControlName="password"
       />
     </mat-form-field>
+    }
 
     <button
       mat-flat-button

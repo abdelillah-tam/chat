@@ -55,8 +55,7 @@
               : 'justify-start pl-2'
           "
         >
-          @if($first || messages[$index].senderId !== messages[$index -
-          1].senderId){
+          @if(showSenderInfo(msg, $index)){
           <div class="w-11 h-11 rounded-xl overflow-hidden">
             <img
               [src]="profileImageSetter($index)"
@@ -139,7 +138,10 @@
           (click)="removeImage()"
           type="button"
         >
-          <mat-icon class="material-symbols-outlined" fontIcon="close"></mat-icon>
+          <mat-icon
+            class="material-symbols-outlined"
+            fontIcon="close"
+          ></mat-icon>
         </button>
         <img class="w-full h-full object-contain" [src]="imageUrl" />
       </div>

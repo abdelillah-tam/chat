@@ -124,10 +124,15 @@ export const updateUserInfoAction = createAction(
     firstName: string | undefined;
     lastName: string | undefined;
     email: string | undefined;
+    password: string | undefined;
+    provider: string;
   }>()
 );
 
-export const updatedInfosAction = createAction(UPDATED_USER_INFO, props<any>());
+export const updatedInfosAction = createAction(
+  UPDATED_USER_INFO,
+  props<{ result: boolean }>()
+);
 
 export const getProfilePictureLinkAction = createAction(
   GET_PROFILE_PICTURE_LINK,

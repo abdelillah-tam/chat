@@ -35,6 +35,7 @@ import { getCurrentUser } from '../model/get-current-user';
 import { Subscription } from 'rxjs';
 import { selectLoginState } from '../state/login/login.selector';
 import { loginAction } from '../state/login/login.actions';
+import { saveDataLocally } from '../model/save-user-locally';
 
 @Component({
   selector: 'app-login',
@@ -69,6 +70,8 @@ import { loginAction } from '../state/login/login.actions';
 export class LoginComponent implements OnInit, OnDestroy {
   public googleToken = environment.GOOGLE_TOKEN;
 
+  selectLoginState: Subscription | undefined;
+
   selectCurrentUserLoggedInUser: Subscription | undefined;
 
   selectFoundUserByEmail: Subscription | undefined;
@@ -93,24 +96,25 @@ export class LoginComponent implements OnInit, OnDestroy {
       getCurrentUser(this.store);
     }
 
-    this.store.select(selectLoginState).subscribe((state) => {
-      if (
-        state.email &&
-        state.userToken &&
-        state.objectId &&
-        state.state === 'success'
-      ) {
-        this.saveDataLocally(state.email, state.userToken, state.objectId);
-        this.store.dispatch(emptyStateAction());
-        getCurrentUser(this.store);
-      }
-    });
+    this.selectLoginState = this.store
+      .select(selectLoginState)
+      .subscribe((state) => {
+        if (
+          state.email &&
+          state.userToken &&
+          state.objectId &&
+          state.state === 'success'
+        ) {
+          saveDataLocally(state.email, state.userToken, state.objectId);
+          this.store.dispatch(emptyStateAction());
+          getCurrentUser(this.store);
+        }
+      });
 
     this.selectCurrentUserLoggedInUser = this.store
       .select(selectCurrentLoggedInUser)
       .subscribe((result) => {
         if (result && 'email' in result) {
-          console.log(result);
           this.router.navigate(['/']);
         }
       });
@@ -155,6 +159,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.selectLoginState?.unsubscribe();
     this.selectCurrentUserLoggedInUser?.unsubscribe();
     this.selectFoundUserByEmail?.unsubscribe();
   }
@@ -191,20 +196,6 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   makePasswordVisible() {
     this.isPasswordVisible = !this.isPasswordVisible;
-  }
-
-  private saveDataLocally(email: string, userToken: string, objectId: string) {
-    localStorage.setItem('email', email);
-    localStorage.setItem('userToken', userToken);
-    localStorage.setItem('objectId', objectId);
-
-    if (
-      localStorage.getItem('email') &&
-      localStorage.getItem('userToken') &&
-      localStorage.getItem('objectId')
-    ) {
-      this.router.navigate(['/']);
-    }
   }
 
   change() {

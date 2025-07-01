@@ -121,17 +121,21 @@ export class AuthEffects {
             firstName: string | undefined;
             lastName: string | undefined;
             email: string | undefined;
+            password: string | undefined;
+            provider: string;
           }) => {
             return this.authService
               .updateInfos(
                 value.objectId,
                 value.firstName,
                 value.lastName,
-                value.email
+                value.email,
+                value.password,
+                value.provider
               )
               .pipe(
                 map((data) => {
-                  return updatedInfosAction(data);
+                  return updatedInfosAction({ result: data });
                 })
               );
           }

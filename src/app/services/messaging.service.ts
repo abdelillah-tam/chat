@@ -22,7 +22,7 @@ export class MessagingService {
       this.channels[message.get('channel')!.toString()].on(
         'pusher:subscription_succeeded',
         () => {
-          this.listenForMessages(message.get('channel')!.toString(), true);
+         // this.listenForMessages(message.get('channel')!.toString(), true);
           this.httpClient.post(`${environment.API}/send`, message).subscribe();
         }
       );

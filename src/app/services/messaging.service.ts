@@ -5,9 +5,10 @@ import { newMessageAction } from '../state/messaging/messaging.actions';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
 
 export class MessagingService {
-  echo: Echo<'reverb'> | undefined;
+  echo: Echo<'pusher'> | undefined;
   channels: { [key: string]: any } = {};
 
   constructor(private store: Store, private httpClient: HttpClient) {}
@@ -18,7 +19,6 @@ export class MessagingService {
       this.channels[message.get('channel')!.toString()] = this.echo!.private(
         `channel.${message.get('channel')!.toString()}`
       );
-      console.log(this.channels[message.get('channel')!.toString()]);
       this.channels[message.get('channel')!.toString()].on(
         'pusher:subscription_succeeded',
         () => {
@@ -43,7 +43,6 @@ export class MessagingService {
     this.initializeEcho();
     if (firstMessage) {
       this.channels[channel].listen('.chat', (data: Message) => {
-        console.log('listen', data);
         this.store.dispatch(newMessageAction({ message: data }));
       });
     } else {
@@ -73,7 +72,7 @@ export class MessagingService {
 
   private initializeEcho() {
     if (!this.echo) {
-      this.echo = new Echo({
+      /*this.echo = new Echo({
         broadcaster: 'reverb',
         key: 'la1tngxd6dhbtrugv9ay',
         wsHost: window.location.hostname,
@@ -82,6 +81,21 @@ export class MessagingService {
         forceTLS: false,
         enabledTransports: ['ws', 'wss'],
         authEndpoint: 'http://localhost:8000/broadcasting/auth',
+        auth: {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('userToken')}`,
+          },
+        },
+      });*/
+      //@ts-ignore
+      window.Pusher = Pusher;
+
+      this.echo = new Echo({
+        broadcaster: 'pusher',
+        cluster: 'eu',
+        key: 'f98a33f83ca52a4ae1cd',
+        forceTLS: false,
+        authEndpoint: environment.AUTH_ENDPOINT,
         auth: {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('userToken')}`,

@@ -6,6 +6,13 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
+import {
+  handleUpload,
+  put,
+  upload,
+  type HandleUploadBody,
+} from '@vercel/blob/client';
+import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 
 export class MessagingService {
   echo: Echo<'pusher'> | undefined;
@@ -22,7 +29,7 @@ export class MessagingService {
       this.channels[message.get('channel')!.toString()].on(
         'pusher:subscription_succeeded',
         () => {
-         // this.listenForMessages(message.get('channel')!.toString(), true);
+          // this.listenForMessages(message.get('channel')!.toString(), true);
           this.httpClient.post(`${environment.API}/send`, message).subscribe();
         }
       );
@@ -105,16 +112,16 @@ export class MessagingService {
     }
   }
 
-  async uploadImageMsg(file: File, sender: string) {
-    /*const storage = getStorage();
+  private async uploadImageMsg(file: File, sender: string) {
+    const storage = getStorage();
     let downloadUrl: string;
 
-    const storageRef = stRef(storage, `chats/${sender}/${file.name}`);
+    const storageRef = ref(storage, `chats/${sender}/${file.name}`);
     await uploadBytes(storageRef, file);
     let url = await getDownloadURL(storageRef);
-    downloadUrl = url;*/
+    downloadUrl = url;
 
-    return 'downloadUrl';
+    return downloadUrl;
   }
 }
 

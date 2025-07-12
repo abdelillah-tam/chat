@@ -6,6 +6,7 @@ import {
 } from '@angular/common/http';
 import { User } from '../model/user';
 import { environment } from '../../environments/environment';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 export class AuthService {
   constructor(private http: HttpClient) {}
 
@@ -208,15 +209,22 @@ export class AuthService {
     });
   }
 
-  updateProfilePicture(file: File) {
-    let form = new FormData();
-
-    form.append('image', file);
-    return this.http.post<string>(`${environment.API}/profileImageLink`, form);
+  updateProfilePicture(link: string) {
+    return this.http.post<string>(
+      `${environment.API}/profileImageLink`,
+      {
+        link: link,
+      },
+      {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+      }
+    );
   }
 
   getProfilePictureLink(id: string) {
-    return this.http.get<{ link: string }>(
+    return this.http.get<string>(
       `${environment.API}/profileImageLink/${id}`,
       {
         headers: new HttpHeaders({
@@ -224,6 +232,18 @@ export class AuthService {
         }),
       }
     );
+  }
+
+  async uploadImage(file: File, sender: string) {
+    const storage = getStorage();
+    let downloadUrl: string;
+
+    const storageRef = ref(storage, `profilePicture/${sender}/${file.name}`);
+    await uploadBytes(storageRef, file);
+    let url = await getDownloadURL(storageRef);
+    downloadUrl = url;
+
+    return downloadUrl;
   }
 }
 

@@ -8,6 +8,7 @@ import {
   retrievedTokenCheckingAction,
   retrievedProfilePictureLinkAction,
   retrievedFoundUserByEmailAction,
+  retrievedProfilePictureAction,
 } from './auth.actions';
 import { AuthState } from './auth-state';
 
@@ -53,7 +54,7 @@ export const authReducer = createReducer(
   on(retrievedTokenCheckingAction, (state, data) => {
     return { ...state, tokenValidation: data.valid };
   }),
-  on(retrievedProfilePictureLinkAction, (state, data) => {
+  on(retrievedProfilePictureAction, (state, data) => {
     return { ...state, currentProfilePictureLink: new String(data.link) };
   }),
   on(retrievedFoundUserByEmailAction, (state, data) => {

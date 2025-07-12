@@ -36,6 +36,7 @@ import { Subscription } from 'rxjs';
 import { selectLoginState } from '../state/login/login.selector';
 import { loginAction } from '../state/login/login.actions';
 import { saveDataLocally } from '../model/save-user-locally';
+import { MessagingService } from '../services/messaging.service';
 
 @Component({
   selector: 'app-login',
@@ -52,6 +53,7 @@ import { saveDataLocally } from '../model/save-user-locally';
     MatInputModule,
     MatLabel,
     MatInput,
+
   ],
   providers: [
     {
@@ -78,7 +80,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   googleUser: (GoogleUser & jose.JWTPayload) | undefined;
 
-  constructor(private router: Router, private store: Store<AuthState>) {
+  constructor(private router: Router, private store: Store<AuthState>, private messagingService: MessagingService) {
     if (sessionStorage.getItem('credential') !== null) {
       this.handleCredential(sessionStorage.getItem('credential')!);
       sessionStorage.removeItem('credential');
@@ -205,4 +207,6 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.changed = 0;
     }
   }
+
+  
 }

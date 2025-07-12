@@ -144,6 +144,12 @@ export const retrievedProfilePictureLinkAction = createAction(
   props<{ link: string }>()
 );
 
+export const retrievedProfilePictureAction = createAction(
+  RETRIEVED_PROFILE_PICTURE,
+  props<{ link: string }>()
+);
+
+
 export const checkIfTokenIsValidAction = createAction(CHECK_TOKEN_IF_VALID);
 
 export const retrievedTokenCheckingAction = createAction(

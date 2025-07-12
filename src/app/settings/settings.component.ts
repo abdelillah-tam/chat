@@ -118,7 +118,6 @@ export class SettingsComponent implements OnInit, OnDestroy {
       .select(selectTokenValidation)
       .subscribe((result) => {
         if (result === false) {
-          console.log(result);
           localStorage.clear(); // delete any existing data
           this.router.navigate(['/login']);
         }

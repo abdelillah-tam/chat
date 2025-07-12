@@ -23,7 +23,6 @@ export class MessagingEffects {
   sendMessage$;
   listenForMessages$;
   createChannelIfNotExist$;
-  uploadImgMsg$;
   getChatChannel$;
   getAllChatChannels$;
   getAllMessages$;
@@ -79,17 +78,7 @@ export class MessagingEffects {
       )
     );
 
-    this.uploadImgMsg$ = createEffect(() =>
-      this.actions$.pipe(
-        ofType(UPLOAD_IMG_MSG),
-        exhaustMap((value: { file: File; sender: string }) =>
-          from(
-            this.messagingService.uploadImageMsg(value.file, value.sender)
-          ).pipe(map((result) => imageMsgUrlAction({ imageUrl: result })))
-        )
-      )
-    );
-
+   
     this.getChatChannel$ = createEffect(() =>
       this.actions$.pipe(
         ofType(GET_CHAT_CHANNEL),

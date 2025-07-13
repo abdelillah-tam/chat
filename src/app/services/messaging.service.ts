@@ -1,17 +1,10 @@
 import { Message } from '../model/message';
-import { from } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { newMessageAction } from '../state/messaging/messaging.actions';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
-import {
-  handleUpload,
-  put,
-  upload,
-  type HandleUploadBody,
-} from '@vercel/blob/client';
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 
 export class MessagingService {
@@ -29,12 +22,38 @@ export class MessagingService {
       this.channels[message.get('channel')!.toString()].on(
         'pusher:subscription_succeeded',
         () => {
-          // this.listenForMessages(message.get('channel')!.toString(), true);
-          this.httpClient.post(`${environment.API}/send`, message).subscribe();
+          this.listenForMessages(message.get('channel')!.toString(), true);
+          if (!message.get('image')) {
+            this.httpClient
+              .post(`${environment.API}/send`, message)
+              .subscribe();
+          } else {
+            this.uploadImageMsg(
+              message.get('image')!.valueOf() as File,
+              message.get('senderId')!.toString()
+            ).then((value) => {
+              message.set('image', value);
+              this.httpClient
+              .post(`${environment.API}/send`, message)
+              .subscribe();
+            });
+          }
         }
       );
     } else {
-      this.httpClient.post(`${environment.API}/send`, message).subscribe();
+      if (!message.get('image')) {
+        this.httpClient.post(`${environment.API}/send`, message).subscribe();
+      } else {
+        this.uploadImageMsg(
+          message.get('image')!.valueOf() as File,
+          message.get('senderId')!.toString()
+        ).then((value) => {
+          message.set('image', value);
+          this.httpClient
+              .post(`${environment.API}/send`, message)
+              .subscribe();
+        });
+      }
     }
   }
 
@@ -79,21 +98,6 @@ export class MessagingService {
 
   private initializeEcho() {
     if (!this.echo) {
-      /*this.echo = new Echo({
-        broadcaster: 'reverb',
-        key: 'la1tngxd6dhbtrugv9ay',
-        wsHost: window.location.hostname,
-        wsPort: 8080,
-        wssPort: 8080,
-        forceTLS: false,
-        enabledTransports: ['ws', 'wss'],
-        authEndpoint: 'http://localhost:8000/broadcasting/auth',
-        auth: {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('userToken')}`,
-          },
-        },
-      });*/
       //@ts-ignore
       window.Pusher = Pusher;
 
@@ -122,6 +126,14 @@ export class MessagingService {
     downloadUrl = url;
 
     return downloadUrl;
+  }
+
+  hasImage(image: File | null, sender: string) {
+    if (image) {
+      return this.uploadImageMsg(image, sender);
+    }
+
+    return false;
   }
 }
 

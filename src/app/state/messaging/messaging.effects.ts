@@ -78,7 +78,6 @@ export class MessagingEffects {
       )
     );
 
-   
     this.getChatChannel$ = createEffect(() =>
       this.actions$.pipe(
         ofType(GET_CHAT_CHANNEL),

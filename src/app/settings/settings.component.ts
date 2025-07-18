@@ -26,7 +26,6 @@ import {
 } from '../state/auth/auth.selectors';
 import {
   checkIfTokenIsValidAction,
-  emptyStateAction,
   getProfilePictureLinkAction,
   updateUserInfoAction,
   uploadProfilePicAction,
@@ -35,7 +34,6 @@ import { getCurrentUser } from '../model/get-current-user';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { isLoggedIn } from '../model/is-logged-in';
-import { selectLoginState } from '../state/login/login.selector';
 
 @Component({
   selector: 'app-settings',
@@ -149,6 +147,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
       .select(selectProfilePictureLink)
       .subscribe((result) => {
         if (result) {
+          this.loading = false;
           this.profileImageUrl = result.toString();
           this.file = undefined;
         }
@@ -216,6 +215,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   saveProfilePictureChange() {
     if (this.file && this.currentUser) {
+      this.loading = true;
       this.store.dispatch(
         uploadProfilePicAction({
           file: this.file,

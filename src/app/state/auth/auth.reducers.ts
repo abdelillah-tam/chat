@@ -6,7 +6,6 @@ import {
   retrievedUserAction,
   retrievedUsersAction,
   retrievedTokenCheckingAction,
-  retrievedProfilePictureLinkAction,
   retrievedFoundUserByEmailAction,
   retrievedProfilePictureAction,
 } from './auth.actions';

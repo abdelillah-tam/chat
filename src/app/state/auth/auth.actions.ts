@@ -3,8 +3,6 @@ import { User } from '../../model/user';
 
 export const SIGNUP = '[Signup Component] signup';
 
-export const AUTH_API_SIGNUP = '[Auth API] signup success';
-
 export const FULLNAME = '[Chat Component] get full name';
 
 export const GET_CURRENT_LOGGEDIN_USER =

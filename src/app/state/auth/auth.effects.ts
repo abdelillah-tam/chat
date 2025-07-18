@@ -120,8 +120,8 @@ export class AuthEffects {
         ofType(RETRIEVED_PROFILE_PICTURE_LINK),
         exhaustMap((value: { link: string }) => {
           return this.authService.updateProfilePicture(value.link).pipe(
-            map(() => {
-              return updatedInfosAction({ result: true });
+            map((data) => {
+              return retrievedProfilePictureAction({link: data});
             })
           );
         })

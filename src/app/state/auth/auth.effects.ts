@@ -22,7 +22,7 @@ import {
   RETRIEVED_PROFILE_PICTURE_LINK,
   retrievedProfilePictureAction,
 } from './auth.actions';
-import { catchError, debounceTime, exhaustMap, from, map, of } from 'rxjs';
+import { catchError, debounceTime, exhaustMap, from, map, of, switchAll, switchMap } from 'rxjs';
 
 @Injectable()
 export class AuthEffects {
@@ -56,13 +56,14 @@ export class AuthEffects {
     this.getUserByObjectId$ = createEffect(() =>
       this.action$.pipe(
         ofType(GET_USER_BY_OBJECT_ID),
-        exhaustMap((value: { objectId: string }) =>
+        map((value: { objectId: string }) =>
           this.authService.findUserById(value.objectId).pipe(
             map((data) => {
               return retrievedUserAction({ user: data });
             })
           )
-        )
+        ),
+        switchAll()
       )
     );
 

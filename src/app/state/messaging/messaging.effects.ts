@@ -15,7 +15,7 @@ import {
   CREATE_CHANNEL,
   listenForMessagesAction,
 } from './messaging.actions';
-import { concatMap, exhaustMap, from, map } from 'rxjs';
+import { concatMap, exhaustMap, from, map, switchAll, switchMap } from 'rxjs';
 import { Message } from '../../model/message';
 
 @Injectable()
@@ -81,13 +81,14 @@ export class MessagingEffects {
     this.getChatChannel$ = createEffect(() =>
       this.actions$.pipe(
         ofType(GET_CHAT_CHANNEL),
-        exhaustMap((value: { otherUserId: string }) =>
+        map((value: { otherUserId: string }) =>
           this.messagingService
             .getChatChannel(value.otherUserId)
             .pipe(
               map((data) => receivedChatChannelAction({ chatChannelId: data }))
             )
-        )
+        ),
+        switchAll()
       )
     );
 
@@ -107,7 +108,7 @@ export class MessagingEffects {
     this.getAllMessages$ = createEffect(() =>
       this.actions$.pipe(
         ofType(GET_ALL_MESSAGES),
-        exhaustMap((value: { channelId: string }) =>
+        map((value: { channelId: string }) =>
           this.messagingService.getAllMessages(value.channelId).pipe(
             map((data) => {
               return receivedAllMessagesAction({
@@ -115,7 +116,8 @@ export class MessagingEffects {
               });
             })
           )
-        )
+        ),
+        switchAll()
       )
     );
   }

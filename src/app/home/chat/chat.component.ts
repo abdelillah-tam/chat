@@ -93,14 +93,13 @@ export class ChatComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router
   ) {
-    this.route.paramMap.subscribe((data) => {
-    });
   }
   ngOnInit(): void {
     this.selectSender = this.store
       .select(selectCurrentLoggedInUser)
       .subscribe((result) => {
         if (result && 'firstName' in result) {
+          console.log(result);
           this.senderUser = result;
         }
       });
@@ -128,11 +127,9 @@ export class ChatComponent implements OnInit, OnDestroy {
       .select(selectMessages)
       .subscribe((result) => {
         if (result.length) {
-          console.log(result.length);
           this.messages = result.filter((item) => {
             return item.channel == this.channel;
           });
-          //this.loading = false;
         }
       });
   }
@@ -167,7 +164,6 @@ export class ChatComponent implements OnInit, OnDestroy {
           firstMessage: this.messages.length === 0 ? true : false,
         })
       );
-      //this.store.dispatch(createChannelAction({ message: message }));
       this.file = null;
       this.text = '';
     }

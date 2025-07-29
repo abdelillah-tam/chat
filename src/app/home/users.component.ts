@@ -69,18 +69,7 @@ export class UsersComponent implements OnInit, OnDestroy {
   loading = true;
 
   constructor(private store: Store, private router: Router) {
-    this.router.events.subscribe((event) => {
-      if (
-        event instanceof NavigationEnd &&
-        event.urlAfterRedirects.startsWith('/chat/')
-      ) {
-        let id = event.urlAfterRedirects.split('/chat/')[1];
-     //   this.store.dispatch(getUserByObjectIdAction({ objectId: id }));
-    //    this.openChatWindow(id, 0);
-
-      }
-      //    console.log('called', event);
-    });
+ 
   }
 
   ngOnInit(): void {

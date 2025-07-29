@@ -1,16 +1,13 @@
 import { createReducer, on } from '@ngrx/store';
 import { Message } from '../../model/message';
 import {
-  closeChatWindowAction,
-  emptyImageMsgAction,
-  imageMsgUrlAction,
-  openChatWindowAction,
   receivedChatChannelAction,
   newMessageAction,
   sendMessageAction,
   receivedAllMessagesAction,
   receivedAllChatChannelsAction,
 } from './messaging.actions';
+import { ErrorBack } from '../../model/error';
 
 export const initialSendMessageState: Message | undefined = undefined;
 
@@ -19,9 +16,9 @@ export const initialMessagesState:
   | undefined = { allMessages: [], lastMessage: undefined };
 
 export const initialChatChannelState: {
-  chatChannel: string;
+  chatChannel: string | ErrorBack | undefined;
   chatChannels: string[];
-} = { chatChannel: '', chatChannels: [] };
+} = { chatChannel: undefined, chatChannels: [] };
 
 export const sendMessageReducer = createReducer(initialSendMessageState);
 

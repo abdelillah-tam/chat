@@ -8,7 +8,7 @@ import { Store } from '@ngrx/store';
 import {
   findUsersAction,
   getAllUsersInContactAction,
-  getCurrentLoggedInUser,
+  getUserByObjectIdAction,
 } from '../state/auth/auth.actions';
 import {
   selectCurrentLoggedInUser,
@@ -30,6 +30,7 @@ import {
   selectLastMessage,
 } from '../state/messaging/messaging.selectors';
 import { UserItemComponent } from './user-item/user-item.component';
+import { ChatComponent } from './chat/chat.component';
 @Component({
   selector: 'app-users',
   standalone: true,
@@ -42,7 +43,7 @@ import { UserItemComponent } from './user-item/user-item.component';
     ReactiveFormsModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    UserItemComponent,
+    UserItemComponent
   ],
   templateUrl: './users.component.html',
   styleUrl: './users.component.scss',
@@ -63,10 +64,24 @@ export class UsersComponent implements OnInit, OnDestroy {
 
   selectCurrentUser: Subscription | undefined;
   selectFoundUsers: Subscription | undefined;
+  selectLastMessage: Subscription | undefined;
 
   loading = true;
 
-  constructor(private store: Store, private router: Router) {}
+  constructor(private store: Store, private router: Router) {
+    this.router.events.subscribe((event) => {
+      if (
+        event instanceof NavigationEnd &&
+        event.urlAfterRedirects.startsWith('/chat/')
+      ) {
+        let id = event.urlAfterRedirects.split('/chat/')[1];
+     //   this.store.dispatch(getUserByObjectIdAction({ objectId: id }));
+    //    this.openChatWindow(id, 0);
+
+      }
+      //    console.log('called', event);
+    });
+  }
 
   ngOnInit(): void {
     if (!isLoggedIn()) {
@@ -121,32 +136,35 @@ export class UsersComponent implements OnInit, OnDestroy {
         }
       });
 
-    this.store.select(selectLastMessage).subscribe((result) => {
-      if (result) {
-        let itemIndex = this.users.findIndex((user) => {
-          if ('channel' in user) {
-            return user.channel == result.channel;
-          }
+    this.selectLastMessage = this.store
+      .select(selectLastMessage)
+      .subscribe((result) => {
+        if (result) {
+          let itemIndex = this.users.findIndex((user) => {
+            if ('channel' in user) {
+              return user.channel == result.channel;
+            }
 
-          return null;
-        });
+            return null;
+          });
 
-        const newList = this.users.map((item, index) => {
-          return index == itemIndex
-            ? { ...item, lastMessageTimestamp: result.timestamp }
-            : item;
-        });
+          const newList = this.users.map((item, index) => {
+            return index == itemIndex
+              ? { ...item, lastMessageTimestamp: result.timestamp }
+              : item;
+          });
 
-        this.users = this.sortUsers(newList);
+          this.users = this.sortUsers(newList);
 
-        this.selectIndex();
-      }
-    });
+          this.selectIndex();
+        }
+      });
   }
 
   ngOnDestroy(): void {
     this.selectCurrentUser?.unsubscribe();
     this.selectFoundUsers?.unsubscribe();
+    this.selectLastMessage?.unsubscribe();
   }
 
   findUsers() {

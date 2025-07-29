@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import {
   NavigationEnd,
   NavigationStart,
@@ -20,6 +20,7 @@ import { sideNavStateSelector } from './state/app/app.selectors';
 
 import Pusher from 'pusher-js';
 import { logoutAction } from './state/login/login.actions';
+import { closeSidenaveAction } from './state/app/app.actions';
 
 @Component({
   selector: 'app-root',
@@ -45,7 +46,8 @@ export class AppComponent implements OnInit {
 
   constructor(
     private store: Store,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {
     (window as any).Pusher = Pusher;
 
@@ -107,5 +109,12 @@ export class AppComponent implements OnInit {
   select(index: number) {
     this.selectedSection = index;
     this.router.navigate([this.selectedSection === 0 ? '/' : '/settings']);
+
+  }
+
+  oo(data: boolean){
+    if(!data){
+      this.store.dispatch(closeSidenaveAction());
+    }
   }
 }

@@ -22,9 +22,13 @@
   </div>
 </header>
 <main class="h-[calc(100%-4.5rem)] w-full flex flex-col bg-light-gray">
-  @if(messages.length === 0){
+  @if(messages.length === 0 && !loading){
   <p class="w-full text-center bg-gray-500 text-white">No messages here</p>
-  }
+  @if(loading){
+  <div class="w-full flex justify-center pt-3 bg-white">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+  } }
 
   <div class="basis-full flex flex-col py-3 mb-4 bg-white overflow-y-auto">
     @for(msg of messages; track msg.timestamp){

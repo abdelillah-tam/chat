@@ -12,7 +12,7 @@ export const routes: Routes = [
     children: [
       {
         path: 'chat/:objectId',
-        component: ChatComponent,
+        component: ChatComponent
       },
       {
         path: 'chat',

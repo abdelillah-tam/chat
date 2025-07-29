@@ -68,8 +68,6 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   selectProfilePictureLinkState: Subscription | undefined;
 
-
-
   infoGroup = new FormGroup({
     firstName: new FormControl('', [Validators.required]),
     lastName: new FormControl('', [Validators.required]),
@@ -108,50 +106,9 @@ export class SettingsComponent implements OnInit, OnDestroy {
       })
     );
 
-    
-
     this.store.dispatch(checkIfTokenIsValidAction());
 
-    this.selectTokenValidation = this.store
-      .select(selectTokenValidation)
-      .subscribe((result) => {
-        if (result === false) {
-          localStorage.clear(); // delete any existing data
-          this.router.navigate(['/login']);
-        }
-      });
-
-    this.selectCurrentLoggedInUser = this.store
-      .select(selectCurrentLoggedInUser)
-      .subscribe((result) => {
-        if (result && 'firstName' in result) {
-          this.currentUser = result;
-          if (this.currentUser) {
-            this.infoGroup.controls.firstName.setValue(
-              this.currentUser.firstName
-            );
-            this.infoGroup.controls.lastName.setValue(
-              this.currentUser.lastName
-            );
-            this.infoGroup.controls.email.setValue(this.currentUser.email);
-
-            if (this.currentUser?.provider === 'google') {
-              this.infoGroup.controls.email.disable();
-              this.infoGroup.controls.password.disable();
-            }
-          }
-        }
-      });
-
-    this.selectProfilePictureLinkState = this.store
-      .select(selectProfilePictureLink)
-      .subscribe((result) => {
-        if (result) {
-          this.loading = false;
-          this.profileImageUrl = result.toString();
-          this.file = undefined;
-        }
-      });
+    this.subscribeToStoreSelectors();
   }
 
   ngOnDestroy(): void {
@@ -236,4 +193,46 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this.fileInput!.nativeElement.value = '';
   }
 
+  private subscribeToStoreSelectors() {
+    this.selectTokenValidation = this.store
+      .select(selectTokenValidation)
+      .subscribe((result) => {
+        if (result === false) {
+          localStorage.clear(); // delete any existing data
+          this.router.navigate(['/login']);
+        }
+      });
+
+    this.selectCurrentLoggedInUser = this.store
+      .select(selectCurrentLoggedInUser)
+      .subscribe((result) => {
+        if (result && 'firstName' in result) {
+          this.currentUser = result;
+          if (this.currentUser) {
+            this.infoGroup.controls.firstName.setValue(
+              this.currentUser.firstName
+            );
+            this.infoGroup.controls.lastName.setValue(
+              this.currentUser.lastName
+            );
+            this.infoGroup.controls.email.setValue(this.currentUser.email);
+
+            if (this.currentUser?.provider === 'google') {
+              this.infoGroup.controls.email.disable();
+              this.infoGroup.controls.password.disable();
+            }
+          }
+        }
+      });
+
+    this.selectProfilePictureLinkState = this.store
+      .select(selectProfilePictureLink)
+      .subscribe((result) => {
+        if (result) {
+          this.loading = false;
+          this.profileImageUrl = result.toString();
+          this.file = undefined;
+        }
+      });
+  }
 }

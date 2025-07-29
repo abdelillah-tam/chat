@@ -25,6 +25,8 @@ export const FIND_USERS = '[Users Component] find users';
 
 export const FIND_BY_EMAIL = '[Login Component] find user by email';
 
+export const FIND_BY_ID = '[Users Component] find user by id';
+
 export const ERROR_API = '[Auth API] error';
 
 export const UPLOAD_PROFILE_PICTURE =
@@ -147,7 +149,6 @@ export const retrievedProfilePictureAction = createAction(
   props<{ link: string }>()
 );
 
-
 export const checkIfTokenIsValidAction = createAction(CHECK_TOKEN_IF_VALID);
 
 export const retrievedTokenCheckingAction = createAction(
@@ -164,3 +165,4 @@ export const retrievedFoundUserByEmailAction = createAction(
   RETRIEVED_FOUND_USER,
   props<{ data: User | { code: number; error: string } }>()
 );
+

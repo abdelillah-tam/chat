@@ -1,5 +1,6 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { Message } from '../../model/message';
+import { ErrorBack } from '../../model/error';
 
 export const selectSendMessageFeature = createFeatureSelector('sendMessage');
 export const selectMessageFeature = createFeatureSelector<{
@@ -9,7 +10,7 @@ export const selectMessageFeature = createFeatureSelector<{
 
 
 export const selectChatChannelFeature = createFeatureSelector<{
-  chatChannel: string;
+  chatChannel: string | ErrorBack | undefined;
   chatChannels: string[];
 }>('chatChannel');
 

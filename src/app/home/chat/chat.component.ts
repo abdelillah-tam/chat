@@ -31,10 +31,16 @@ import {
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { Router, RouterLink } from '@angular/router';
+import {
+  ActivatedRoute,
+  NavigationEnd,
+  Router,
+  RouterLink,
+} from '@angular/router';
 import { Subscription } from 'rxjs';
 import { DatePipePipe } from '../../date-pipe.pipe';
-
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ErrorBack } from '../../model/error';
 @Component({
   selector: 'app-chat',
   standalone: true,
@@ -46,6 +52,7 @@ import { DatePipePipe } from '../../date-pipe.pipe';
     MatInputModule,
     RouterLink,
     DatePipePipe,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
@@ -79,7 +86,16 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   selectMessages: Subscription | undefined;
 
-  constructor(private store: Store, private router: Router) {}
+  loading: boolean = true;
+
+  constructor(
+    private store: Store,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
+    this.route.paramMap.subscribe((data) => {
+    });
+  }
   ngOnInit(): void {
     this.selectSender = this.store
       .select(selectCurrentLoggedInUser)
@@ -98,11 +114,13 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.selectChatChannel = this.store
       .select(selectChatChannel)
       .subscribe((result) => {
-        if (result.chatChannel.length) {
+        if (typeof result.chatChannel === 'string') {
           this.channel = result.chatChannel;
           this.store.dispatch(
             getAllMessagesAction({ channelId: result.chatChannel })
           );
+        } else if (typeof result.chatChannel === 'object') {
+          this.loading = false;
         }
       });
 
@@ -110,9 +128,11 @@ export class ChatComponent implements OnInit, OnDestroy {
       .select(selectMessages)
       .subscribe((result) => {
         if (result.length) {
+          console.log(result.length);
           this.messages = result.filter((item) => {
             return item.channel == this.channel;
           });
+          //this.loading = false;
         }
       });
   }

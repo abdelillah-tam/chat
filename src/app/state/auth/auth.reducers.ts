@@ -15,7 +15,7 @@ export const initialState: AuthState = {
   state: 'none',
   currentLoggedInUser: undefined,
   userInContact: undefined,
-  foundUsers: [],
+  foundUsers: undefined,
   tokenValidation: undefined,
   currentProfilePictureLink: undefined,
   foundUserByEmail: undefined,

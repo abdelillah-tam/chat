@@ -12,8 +12,8 @@ import { ErrorBack } from '../../model/error';
 export const initialSendMessageState: Message | undefined = undefined;
 
 export const initialMessagesState:
-  | { allMessages: Message[]; lastMessage: Message | undefined }
-  | undefined = { allMessages: [], lastMessage: undefined };
+  | { allMessages: Message[] | undefined; lastMessage: Message | undefined; }
+  | undefined = { allMessages: undefined, lastMessage: undefined };
 
 export const initialChatChannelState: {
   chatChannel: string | ErrorBack | undefined;
@@ -25,7 +25,7 @@ export const sendMessageReducer = createReducer(initialSendMessageState);
 export const messagesReducer = createReducer(
   initialMessagesState,
   on(newMessageAction, (state, data) => {
-    const newArray = Array.from(state.allMessages);
+    const newArray = Array.from(state.allMessages!);
     newArray.push(data.message);
     return {...state, lastMessage: data.message, allMessages: newArray}
   }),

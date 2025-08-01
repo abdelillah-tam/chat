@@ -4,7 +4,7 @@ import { ErrorBack } from '../../model/error';
 
 export const selectSendMessageFeature = createFeatureSelector('sendMessage');
 export const selectMessageFeature = createFeatureSelector<{
-  allMessages: Message[];
+  allMessages: Message[] | undefined;
   lastMessage: Message | undefined;
 }>('messages');
 

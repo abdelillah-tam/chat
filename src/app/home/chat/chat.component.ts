@@ -58,6 +58,8 @@ import { ErrorBack } from '../../model/error';
   styleUrl: './chat.component.scss',
 })
 export class ChatComponent implements OnInit, OnDestroy {
+  receiverUserLoading: boolean = true;
+
   messages: Message[] = [];
 
   another: Message[] = [];
@@ -92,14 +94,12 @@ export class ChatComponent implements OnInit, OnDestroy {
     private store: Store,
     private route: ActivatedRoute,
     private router: Router
-  ) {
-  }
+  ) {}
   ngOnInit(): void {
     this.selectSender = this.store
       .select(selectCurrentLoggedInUser)
       .subscribe((result) => {
         if (result && 'firstName' in result) {
-          console.log(result);
           this.senderUser = result;
         }
       });
@@ -107,6 +107,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.selectReceiver = this.store.select(selectUser).subscribe((result) => {
       if (result && 'firstName' in result) {
         this.receiverUser = result;
+        this.receiverUserLoading = false;
       }
     });
 
@@ -126,10 +127,14 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.selectMessages = this.store
       .select(selectMessages)
       .subscribe((result) => {
-        if (result.length) {
-          this.messages = result.filter((item) => {
-            return item.channel == this.channel;
-          });
+        if (result) {
+          if (result.length) {
+            this.messages = result.filter((item) => {
+              return item.channel == this.channel;
+            });
+          }
+
+          this.loading = false;
         }
       });
   }
@@ -194,6 +199,8 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   @Input()
   set objectId(objectId: string) {
+    this.loading = true;
+    this.receiverUserLoading = true;
     this.channel = undefined;
     this.messages = [];
     this.store.dispatch(

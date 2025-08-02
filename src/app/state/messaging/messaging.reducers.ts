@@ -25,7 +25,7 @@ export const sendMessageReducer = createReducer(initialSendMessageState);
 export const messagesReducer = createReducer(
   initialMessagesState,
   on(newMessageAction, (state, data) => {
-    const newArray = Array.from(state.allMessages!);
+    const newArray = Array.from(state.allMessages ?? []);
     newArray.push(data.message);
     return {...state, lastMessage: data.message, allMessages: newArray}
   }),

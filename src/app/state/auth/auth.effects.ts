@@ -22,7 +22,16 @@ import {
   RETRIEVED_PROFILE_PICTURE_LINK,
   retrievedProfilePictureAction,
 } from './auth.actions';
-import { catchError, debounceTime, exhaustMap, from, map, of, switchAll, switchMap } from 'rxjs';
+import {
+  catchError,
+  debounceTime,
+  exhaustMap,
+  from,
+  map,
+  of,
+  switchAll,
+  switchMap,
+} from 'rxjs';
 
 @Injectable()
 export class AuthEffects {
@@ -86,7 +95,7 @@ export class AuthEffects {
       this.action$.pipe(
         debounceTime(500),
         ofType(FIND_USERS),
-        exhaustMap((value: { name: string }) =>
+        map((value: { name: string }) =>
           this.authService.findUsersByName(value.name).pipe(
             map((data) => {
               if ('error' in data) {
@@ -99,7 +108,8 @@ export class AuthEffects {
               }
             })
           )
-        )
+        ),
+        switchAll()
       )
     );
 
@@ -122,7 +132,7 @@ export class AuthEffects {
         exhaustMap((value: { link: string }) => {
           return this.authService.updateProfilePicture(value.link).pipe(
             map((data) => {
-              return retrievedProfilePictureAction({link: data});
+              return retrievedProfilePictureAction({ link: data });
             })
           );
         })
@@ -179,7 +189,7 @@ export class AuthEffects {
         exhaustMap((value: { objectId: string }) =>
           this.authService.getProfilePictureLink(value.objectId).pipe(
             map((response) => {
-              return retrievedProfilePictureAction({ link: response});
+              return retrievedProfilePictureAction({ link: response });
             })
           )
         )

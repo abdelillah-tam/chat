@@ -44,15 +44,7 @@ import { closeSidenaveAction } from './state/app/app.actions';
 export class AppComponent implements OnInit {
   title = 'chat';
 
-  constructor(
-    private store: Store,
-    private router: Router,
-    private cdr: ChangeDetectorRef
-  ) {
-    (window as any).Pusher = Pusher;
-
-    Pusher.logToConsole;
-  }
+  constructor(private store: Store, private router: Router) {}
 
   openSide: boolean = false;
 
@@ -109,11 +101,10 @@ export class AppComponent implements OnInit {
   select(index: number) {
     this.selectedSection = index;
     this.router.navigate([this.selectedSection === 0 ? '/' : '/settings']);
-
   }
 
-  oo(data: boolean){
-    if(!data){
+  oo(data: boolean) {
+    if (!data) {
       this.store.dispatch(closeSidenaveAction());
     }
   }

@@ -31,6 +31,7 @@ import {
 } from '../state/messaging/messaging.selectors';
 import { UserItemComponent } from './user-item/user-item.component';
 import { ChatComponent } from './chat/chat.component';
+import { MessagingService } from '../services/messaging.service';
 @Component({
   selector: 'app-users',
   standalone: true,
@@ -43,7 +44,7 @@ import { ChatComponent } from './chat/chat.component';
     ReactiveFormsModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    UserItemComponent
+    UserItemComponent,
   ],
   templateUrl: './users.component.html',
   styleUrl: './users.component.scss',
@@ -68,11 +69,14 @@ export class UsersComponent implements OnInit, OnDestroy {
 
   loading = true;
 
-  constructor(private store: Store, private router: Router) {
- 
-  }
+  constructor(
+    private store: Store,
+    private router: Router,
+    private messagingService: MessagingService
+  ) {}
 
   ngOnInit(): void {
+    this.messagingService.listenForNewChat();
     if (!isLoggedIn()) {
       this.router.navigate(['/login']);
     } else {
@@ -113,8 +117,6 @@ export class UsersComponent implements OnInit, OnDestroy {
         }
       });
 
-    this.store.dispatch(getAllUsersInContactAction());
-
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((result) => {
@@ -148,6 +150,8 @@ export class UsersComponent implements OnInit, OnDestroy {
           this.selectIndex();
         }
       });
+
+    this.store.dispatch(getAllUsersInContactAction());
   }
 
   ngOnDestroy(): void {

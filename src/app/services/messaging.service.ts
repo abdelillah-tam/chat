@@ -6,6 +6,7 @@ import { environment } from '../../environments/environment';
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
+import { getAllUsersInContactAction } from '../state/auth/auth.actions';
 
 export class MessagingService {
   echo: Echo<'pusher'> | undefined;
@@ -34,8 +35,8 @@ export class MessagingService {
             ).then((value) => {
               message.set('image', value);
               this.httpClient
-              .post(`${environment.API}/send`, message)
-              .subscribe();
+                .post(`${environment.API}/send`, message)
+                .subscribe();
             });
           }
         }
@@ -49,9 +50,7 @@ export class MessagingService {
           message.get('senderId')!.toString()
         ).then((value) => {
           message.set('image', value);
-          this.httpClient
-              .post(`${environment.API}/send`, message)
-              .subscribe();
+          this.httpClient.post(`${environment.API}/send`, message).subscribe();
         });
       }
     }
@@ -80,6 +79,18 @@ export class MessagingService {
       }
     }
   }
+
+  listenForNewChat() {
+    this.initializeEcho();
+    let chats = this.echo!.private(
+      `user.${localStorage.getItem('objectId')!}`
+    );
+
+    chats.listen('.chats', () => {
+      this.store.dispatch(getAllUsersInContactAction());
+    });
+  }
+
   getAllMessages(chatChannel: string) {
     return this.httpClient.get<Message[]>(
       `${environment.API}/getMessages/${chatChannel}`
@@ -114,6 +125,10 @@ export class MessagingService {
         },
       });
     }
+  }
+
+  unsubscribeFromChannels(){
+    this.echo?.leaveAllChannels();
   }
 
   private async uploadImageMsg(file: File, sender: string) {

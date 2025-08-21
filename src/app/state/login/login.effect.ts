@@ -5,6 +5,7 @@ import { LOGIN, loginAction, loginResultAction, LOGOUT } from './login.actions';
 import { exhaustMap, map, catchError, of } from 'rxjs';
 import { errorAction, SIGNUP } from '../auth/auth.actions';
 import { User } from '../../model/user';
+import { MessagingService } from '../../services/messaging.service';
 
 @Injectable()
 export class LoginEffect {
@@ -12,7 +13,11 @@ export class LoginEffect {
   signup$;
   logout$;
 
-  constructor(private action$: Actions, private authService: AuthService) {
+  constructor(
+    private action$: Actions,
+    private authService: AuthService,
+    private messagingService: MessagingService
+  ) {
     this.login$ = createEffect(() =>
       this.action$.pipe(
         ofType(LOGIN),
@@ -61,7 +66,10 @@ export class LoginEffect {
       () =>
         this.action$.pipe(
           ofType(LOGOUT),
-          map(() => this.authService.logout())
+          map(() => {
+            this.messagingService.unsubscribeFromChannels();
+            this.authService.logout();
+          })
         ),
       {
         dispatch: false,

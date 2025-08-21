@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -53,7 +53,6 @@ import { MessagingService } from '../services/messaging.service';
     MatInputModule,
     MatLabel,
     MatInput,
-
   ],
   providers: [
     {
@@ -80,7 +79,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   googleUser: (GoogleUser & jose.JWTPayload) | undefined;
 
-  constructor(private router: Router, private store: Store<AuthState>, private messagingService: MessagingService) {
+  constructor(private router: Router, private store: Store<AuthState>) {
     if (sessionStorage.getItem('credential') !== null) {
       this.handleCredential(sessionStorage.getItem('credential')!);
       sessionStorage.removeItem('credential');
@@ -90,6 +89,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   changed = 0;
 
   ngOnInit(): void {
+    this.loadSigninButton();
     if (
       localStorage.getItem('email') &&
       localStorage.getItem('userToken') &&
@@ -208,5 +208,14 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
   }
 
-  
+  loadSigninButton() {
+    let body = <HTMLDivElement>document.body;
+    let script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    body.appendChild(script);
+
+    
+  }
 }

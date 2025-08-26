@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, viewChild } from '@angular/core';
 import {
   NavigationEnd,
   NavigationStart,
@@ -10,7 +10,7 @@ import {
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDrawerMode, MatSidenavModule } from '@angular/material/sidenav';
-import { MatListModule } from '@angular/material/list';
+import { MatListItem, MatListModule } from '@angular/material/list';
 import { Store } from '@ngrx/store';
 import { emptyStateAction } from './state/auth/auth.actions';
 import { AuthService } from './services/auth.service';
@@ -42,7 +42,6 @@ import { closeSidenaveAction } from './state/app/app.actions';
   },
 })
 export class AppComponent implements OnInit {
-  title = 'chat';
 
   constructor(private store: Store, private router: Router) {}
 
@@ -55,6 +54,7 @@ export class AppComponent implements OnInit {
   isLoginOrSignupRoute: boolean = false;
 
   ngOnInit(): void {
+    
     this.store.select(sideNavStateSelector).subscribe((result) => {
       this.openSide = result;
     });
@@ -92,6 +92,7 @@ export class AppComponent implements OnInit {
     localStorage.clear();
     this.store.dispatch(logoutAction());
     this.store.dispatch(emptyStateAction());
+    this.sidenavController(false);
     if (localStorage.length === 0) {
       this.router.navigate(['/login']);
       this.openSide = false;
@@ -103,7 +104,7 @@ export class AppComponent implements OnInit {
     this.router.navigate([this.selectedSection === 0 ? '/' : '/settings']);
   }
 
-  oo(data: boolean) {
+  sidenavController(data: boolean) {
     if (!data) {
       this.store.dispatch(closeSidenaveAction());
     }

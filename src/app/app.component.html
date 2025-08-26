@@ -1,5 +1,10 @@
 <mat-sidenav-container class="h-full w-full">
-  <mat-sidenav [opened]="openSide" (closed)="openSide" mode="over" (openedChange)="oo($event)">
+  <mat-sidenav
+    [opened]="openSide"
+    (closed)="(openSide)"
+    mode="over"
+    (openedChange)="sidenavController($event)"
+  >
     <div class="p-4 flex justify-center items-center mb:w-full">
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -20,7 +25,12 @@
       <p class="text-3xl ml-2 text-gray-950">Chat</p>
     </div>
     <mat-nav-list>
-      <button routerLink="/settings" routerLinkActive="active" mat-list-item>
+      <button
+        routerLink="/settings"
+        routerLinkActive="active"
+        mat-list-item
+        (click)="sidenavController(false)"
+      >
         <mat-icon matListItemIcon class="material-symbols-outlined"
           >settings</mat-icon
         >
@@ -30,7 +40,7 @@
         <mat-icon matListItemIcon class="material-symbols-outlined"
           >logout</mat-icon
         >
-        <p matListItemTitle (click)="(1 + 1)">Logout</p>
+        <p matListItemTitle>Logout</p>
       </button>
     </mat-nav-list>
   </mat-sidenav>

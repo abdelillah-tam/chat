@@ -1,5 +1,4 @@
 <div class="h-full w-screen select-none bg-white">
-
   <header class="header flex justify-between items-center p-6">
     <div class="flex items-center">
       <svg
@@ -54,6 +53,9 @@
         data-logo_alignment="left"
         data-width="384"
       ></div>
+      @if (tryEmail) {
+      <p class="text-red-600">Try login using Email, not Google</p>
+      }
     </div>
 
     <div class="flex justify-between items-center">
@@ -134,5 +136,13 @@
         Login
       </button>
     </form>
+
+    @if (loading) {
+    <div
+      class="absolute w-full bg-white h-full flex items-center justify-center bg-opacity-50"
+    >
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+    }
   </div>
 </div>

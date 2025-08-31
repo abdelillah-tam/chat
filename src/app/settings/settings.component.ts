@@ -115,6 +115,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this.selectCurrentLoggedInUser?.unsubscribe();
     this.selectNewProfilePictureState?.unsubscribe();
     this.selectProfilePictureLinkState?.unsubscribe();
+    this.selectTokenValidation?.unsubscribe();
   }
 
   updateInfos() {

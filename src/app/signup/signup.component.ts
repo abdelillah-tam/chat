@@ -8,7 +8,6 @@ import {
   ValidatorFn,
   Validators,
 } from '@angular/forms';
-import { User } from '../model/user';
 import { CommonModule } from '@angular/common';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Store } from '@ngrx/store';
@@ -19,7 +18,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { getCurrentUser } from '../model/get-current-user';
 import { saveDataLocally } from '../model/save-user-locally';
-import { selectCurrentLoggedInUser } from '../state/auth/auth.selectors';
 import { Subscription } from 'rxjs';
 import { selectLoginState } from '../state/login/login.selector';
 
@@ -77,13 +75,6 @@ export class SignupComponent implements OnInit, OnDestroy {
       getCurrentUser(this.store);
     }
 
-    this.selectCurrentLoggedInUser = this.store
-      .select(selectCurrentLoggedInUser)
-      .subscribe((result) => {
-        if (result) {
-          this.router.navigate(['/']);
-        }
-      });
 
     this.selectLoginState = this.store
       .select(selectLoginState)
@@ -96,7 +87,7 @@ export class SignupComponent implements OnInit, OnDestroy {
         ) {
           saveDataLocally(state.email, state.userToken, state.objectId);
           this.store.dispatch(emptyStateAction());
-          getCurrentUser(this.store);
+          this.router.navigate(['/']);
         }
       });
   }

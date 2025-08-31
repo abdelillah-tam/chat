@@ -31,14 +31,13 @@ export const authReducer = createReducer(
   }),
   on(emptyStateAction, (state) => {
     return {
-      ...state,
       state: 'none',
       userInContact: undefined,
-      newProfilePictureUrl: '',
       foundUsers: [],
-      validToken: undefined,
       currentLoggedInUser: undefined,
-      foundUserByEmail: undefined
+      foundUserByEmail: undefined,
+      tokenValidation: undefined,
+      currentProfilePictureLink: undefined,
     };
   }),
   on(retrievedCurrentLoggedInUserAction, (state, data) => {

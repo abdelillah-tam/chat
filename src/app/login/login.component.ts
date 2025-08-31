@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -6,7 +6,6 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { AuthService } from '../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { MatDividerModule } from '@angular/material/divider';
 import * as jose from 'jose';
@@ -19,7 +18,6 @@ import {
 } from '../state/auth/auth.actions';
 import { AuthState } from '../state/auth/auth-state';
 import {
-  selectCurrentLoggedInUser,
   selectFoundUserByEmail,
 } from '../state/auth/auth.selectors';
 import {
@@ -36,7 +34,9 @@ import { Subscription } from 'rxjs';
 import { selectLoginState } from '../state/login/login.selector';
 import { loginAction } from '../state/login/login.actions';
 import { saveDataLocally } from '../model/save-user-locally';
-import { MessagingService } from '../services/messaging.service';
+import {
+  MatProgressSpinnerModule,
+} from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-login',
@@ -53,6 +53,7 @@ import { MessagingService } from '../services/messaging.service';
     MatInputModule,
     MatLabel,
     MatInput,
+    MatProgressSpinnerModule,
   ],
   providers: [
     {
@@ -73,14 +74,18 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   selectLoginState: Subscription | undefined;
 
-  selectCurrentUserLoggedInUser: Subscription | undefined;
 
   selectFoundUserByEmail: Subscription | undefined;
 
   googleUser: (GoogleUser & jose.JWTPayload) | undefined;
 
+  loading: boolean = false;
+
+  tryEmail: boolean = false;
+
   constructor(private router: Router, private store: Store<AuthState>) {
     if (sessionStorage.getItem('credential') !== null) {
+      this.loading = true;
       this.handleCredential(sessionStorage.getItem('credential')!);
       sessionStorage.removeItem('credential');
     }
@@ -109,14 +114,6 @@ export class LoginComponent implements OnInit, OnDestroy {
         ) {
           saveDataLocally(state.email, state.userToken, state.objectId);
           this.store.dispatch(emptyStateAction());
-          getCurrentUser(this.store);
-        }
-      });
-
-    this.selectCurrentUserLoggedInUser = this.store
-      .select(selectCurrentLoggedInUser)
-      .subscribe((result) => {
-        if (result && 'email' in result) {
           this.router.navigate(['/']);
         }
       });
@@ -127,7 +124,8 @@ export class LoginComponent implements OnInit, OnDestroy {
         if (data) {
           if ('email' in data) {
             if (data.provider === 'user') {
-              alert('Try to login using email !');
+              this.loading = false;
+              this.tryEmail = true;
             } else if (data!.provider === 'google') {
               this.store.dispatch(
                 loginAction({
@@ -162,7 +160,6 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.selectLoginState?.unsubscribe();
-    this.selectCurrentUserLoggedInUser?.unsubscribe();
     this.selectFoundUserByEmail?.unsubscribe();
   }
 
@@ -215,7 +212,5 @@ export class LoginComponent implements OnInit, OnDestroy {
     script.async = true;
     script.defer = true;
     body.appendChild(script);
-
-    
   }
 }

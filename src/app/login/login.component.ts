@@ -9,7 +9,6 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatDividerModule } from '@angular/material/divider';
 import * as jose from 'jose';
-import { animate, style, transition, trigger } from '@angular/animations';
 import { Store } from '@ngrx/store';
 import {
   emptyStateAction,
@@ -63,11 +62,7 @@ import {
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
-  animations: [
-    trigger('appear', [
-      transition(':enter', [style({ opacity: 0 }), animate('500ms')]),
-    ]),
-  ],
+ 
 })
 export class LoginComponent implements OnInit, OnDestroy {
   public googleToken = environment.GOOGLE_TOKEN;

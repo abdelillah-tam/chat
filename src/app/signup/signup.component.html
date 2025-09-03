@@ -1,20 +1,31 @@
-<div class="h-full w-screen select-none bg-white" [@ani]>
-  <div
-    class="signup-div h-full flex flex-col justify-evenly items-center">
-    <div class="flex justify-center items-center w-full">
-      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#16a34a" height="72px"
-        width="72px" version="1.1" id="Capa_1" viewBox="0 0 60 60" xml:space="preserve">
+<div class="h-full w-screen select-none bg-white">
+  <div class="signup-div h-full flex flex-col justify-evenly items-center">
+    <div class="flex justify-center items-center w-full basis-[15%]">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        fill="#16a34a"
+        height="72px"
+        width="72px"
+        version="1.1"
+        id="Capa_1"
+        viewBox="0 0 60 60"
+        xml:space="preserve"
+      >
         <path
-          d="M30,1.5c-16.542,0-30,12.112-30,27c0,5.205,1.647,10.246,4.768,14.604c-0.591,6.537-2.175,11.39-4.475,13.689  c-0.304,0.304-0.38,0.769-0.188,1.153C0.276,58.289,0.625,58.5,1,58.5c0.046,0,0.093-0.003,0.14-0.01  c0.405-0.057,9.813-1.412,16.617-5.338C21.622,54.711,25.738,55.5,30,55.5c16.542,0,30-12.112,30-27S46.542,1.5,30,1.5z" />
+          d="M30,1.5c-16.542,0-30,12.112-30,27c0,5.205,1.647,10.246,4.768,14.604c-0.591,6.537-2.175,11.39-4.475,13.689  c-0.304,0.304-0.38,0.769-0.188,1.153C0.276,58.289,0.625,58.5,1,58.5c0.046,0,0.093-0.003,0.14-0.01  c0.405-0.057,9.813-1.412,16.617-5.338C21.622,54.711,25.738,55.5,30,55.5c16.542,0,30-12.112,30-27S46.542,1.5,30,1.5z"
+        />
       </svg>
       <p class="text-3xl ml-2">Chat</p>
     </div>
 
-    <p class="text-3xl">Create an account</p>
+    <p class="text-3xl basis-[10%]">Create an account</p>
 
-
-    <form class="flex w-1/2 flex-col" [formGroup]="signUpForm" (ngSubmit)="onSubmit()">
-
+    <form
+      class="flex w-1/2 flex-col relative basis-[75%]"
+      [formGroup]="signUpForm"
+      (ngSubmit)="onSubmit()"
+    >
       <div class="flex justify-between">
         <mat-form-field class="mr-1 basis-1/2" appearance="outline">
           <mat-label>First Name</mat-label>
@@ -26,12 +37,13 @@
           <input matInput formControlName="lastName" />
           <mat-error>Enter your last name</mat-error>
         </mat-form-field>
-
-
       </div>
 
-      <mat-form-field appearance="outline" class="w-full mt-4"
-        [style.--mdc-filled-text-field-container-color]="'#ffffff'">
+      <mat-form-field
+        appearance="outline"
+        class="w-full mt-4"
+        [style.--mdc-filled-text-field-container-color]="'#ffffff'"
+      >
         <mat-label>Sex</mat-label>
         <mat-select formControlName="sex">
           <mat-option value="male">Male</mat-option>
@@ -44,32 +56,44 @@
         <mat-label>Email</mat-label>
         <input matInput type="email" formControlName="email" />
         <mat-error>Enter a valid email !</mat-error>
-
       </mat-form-field>
-
 
       <mat-form-field class="mt-4" appearance="outline">
         <mat-label>Password</mat-label>
         <input matInput type="password" formControlName="password" />
         <mat-error>Password must be at least 8 characters !</mat-error>
-
       </mat-form-field>
 
       <mat-form-field class="mt-4" appearance="outline">
         <mat-label>Confirm Password</mat-label>
         <input matInput type="password" formControlName="confirmPassword" />
         <mat-error>Password must match</mat-error>
-
       </mat-form-field>
 
-      <button mat-flat-button class=" mt-8 text-white text-xl font-light rounded-md"
-        [style.--mdc-filled-button-container-shape]="'0.375rem'" [style.--mdc-filled-button-label-text-size]="'1.2rem'">
+      <button
+        mat-flat-button
+        class="mt-8 text-white text-xl font-light rounded-md"
+        [style.--mdc-filled-button-container-shape]="'0.375rem'"
+        [style.--mdc-filled-button-label-text-size]="'1.2rem'"
+      >
         Signup
       </button>
       <div class="flex mt-1">
         <p>Alreay have an account?</p>
-        <a class="ml-1 text-blue-600 underline" routerLink="/login" routerLinkActive="active">Login</a>
+        <a
+          class="ml-1 text-blue-600 underline"
+          routerLink="/login"
+          routerLinkActive="active"
+          >Login</a
+        >
       </div>
+      @if(loading){
+      <div
+        class="w-full h-full absolute bg-white bg-opacity-50 flex items-center justify-center"
+      >
+        <mat-spinner [diameter]="50"></mat-spinner>
+      </div>
+      }
     </form>
   </div>
 </div>

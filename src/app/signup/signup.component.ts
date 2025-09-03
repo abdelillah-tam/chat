@@ -9,7 +9,6 @@ import {
   Validators,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { animate, style, transition, trigger } from '@angular/animations';
 import { Store } from '@ngrx/store';
 import { emptyStateAction, signupAction } from '../state/auth/auth.actions';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -20,6 +19,7 @@ import { getCurrentUser } from '../model/get-current-user';
 import { saveDataLocally } from '../model/save-user-locally';
 import { Subscription } from 'rxjs';
 import { selectLoginState } from '../state/login/login.selector';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-signup',
@@ -33,15 +33,10 @@ import { selectLoginState } from '../state/login/login.selector';
     MatSelectModule,
     MatInputModule,
     MatButtonModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.scss',
-  animations: [
-    trigger('ani', [
-      transition(':enter', [style({ opacity: 0 }), animate('500ms')]),
-      transition(':leave', [style({ opacity: 1 }), animate('5000ms')]),
-    ]),
-  ],
 })
 export class SignupComponent implements OnInit, OnDestroy {
   constructor(private store: Store, private router: Router) {}
@@ -62,6 +57,8 @@ export class SignupComponent implements OnInit, OnDestroy {
 
   selectLoginState: Subscription | undefined;
 
+  loading: boolean = false;
+
   ngOnInit(): void {
     this.signUpForm.addValidators([
       this.comparePasswordValidator('password', 'confirmPassword'),
@@ -75,7 +72,6 @@ export class SignupComponent implements OnInit, OnDestroy {
       getCurrentUser(this.store);
     }
 
-
     this.selectLoginState = this.store
       .select(selectLoginState)
       .subscribe((state) => {
@@ -85,6 +81,7 @@ export class SignupComponent implements OnInit, OnDestroy {
           state.objectId &&
           state.state === 'success'
         ) {
+          
           saveDataLocally(state.email, state.userToken, state.objectId);
           this.store.dispatch(emptyStateAction());
           this.router.navigate(['/']);
@@ -100,7 +97,8 @@ export class SignupComponent implements OnInit, OnDestroy {
   show = true;
 
   onSubmit() {
-    if (this.signUpForm.valid) {
+    if (this.signUpForm.valid && !this.loading) {
+      this.loading = true;
       this.store.dispatch(
         signupAction({
           user: {

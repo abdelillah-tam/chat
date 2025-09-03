@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import {
   Component,
-  contentChild,
   ElementRef,
   Input,
   OnDestroy,
@@ -13,10 +12,8 @@ import { Message } from '../../model/message';
 import { User } from '../../model/user';
 import { Store } from '@ngrx/store';
 import {
-  createChannelAction,
   getAllMessagesAction,
   getChatChannelAction,
-  listenForMessagesAction,
   sendMessageAction,
 } from '../../state/messaging/messaging.actions';
 import {
@@ -33,14 +30,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import {
   ActivatedRoute,
-  NavigationEnd,
   Router,
   RouterLink,
 } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { DatePipePipe } from '../../date-pipe.pipe';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { ErrorBack } from '../../model/error';
+
 @Component({
   selector: 'app-chat',
   standalone: true,
@@ -90,9 +86,10 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   loading: boolean = true;
 
+  sending: boolean = false;
+
   constructor(
     private store: Store,
-    private route: ActivatedRoute,
     private router: Router
   ) {}
   ngOnInit(): void {
@@ -133,7 +130,7 @@ export class ChatComponent implements OnInit, OnDestroy {
               return item.channel == this.channel;
             });
           }
-
+          this.sending = false;
           this.loading = false;
         }
       });
@@ -149,6 +146,7 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   sendMessage() {
     if (this.file || this.text.length) {
+      this.sending = true;
       let message = new FormData();
       let channelUUID = crypto.randomUUID();
       message.append('messageText', this.text ?? '');

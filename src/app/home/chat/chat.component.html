@@ -131,6 +131,7 @@
       subscriptSizing="dynamic"
       appearance="outline"
       subscriptSizing="dynamic"
+      
     >
       <mat-label>Message</mat-label>
       <input
@@ -138,6 +139,7 @@
         placeholder="Type a message"
         [(ngModel)]="text"
         (keydown.enter)="sendMessage()"
+        [disabled]="sending"
       />
 
       <div
@@ -167,17 +169,25 @@
           #inputFile
           (change)="onImageAdded($event)"
           accept="image/*"
+          [disabled]="sending"
         />
-        <label class="right-0 flex items-center" for="inputFile"
+        <label
+          class="right-0 flex items-center"
+          [classList]="sending ? '' : 'cursor-pointer'"
+          for="inputFile"
           ><mat-icon
             class="material-symbols-outlined"
             fontIcon="attach_file"
           ></mat-icon
         ></label>
       </button>
-      <button class="basis-[5%] flex items-center p-2" (click)="sendMessage()">
+      <button
+        class="basis-[5%] flex items-center p-2 cursor-default"
+        (click)="sendMessage()"
+      >
         <mat-icon
-          class="cursor-pointer material-symbols-outlined"
+          class="material-symbols-outlined"
+          [ngClass]="sending ? '' : 'cursor-pointer'"
           color="#F6EFEE"
           >send</mat-icon
         >

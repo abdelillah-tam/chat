@@ -46,7 +46,7 @@
   </mat-sidenav>
 
   <mat-sidenav-content>
-    <div class="flex h-full w-full">
+    <div class="h-full w-full flex">
       @if (!isLoginOrSignupRoute) {
       <aside
         class="h-full basis-1/12 mb:hidden flex flex-col justify-around items-center bg-light-gray px-2"
@@ -115,7 +115,9 @@
         </a>
       </aside>
       }
-      <div class="basis-11/12 mb:basis-full">
+      <div class="mb:basis-full"
+      [ngClass]="isLoginOrSignupRoute ? 'basis-full' : 'basis-11/12'"
+      >
         <router-outlet />
       </div>
     </div>

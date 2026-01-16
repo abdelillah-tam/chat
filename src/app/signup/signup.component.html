@@ -1,5 +1,5 @@
-<div class="h-full w-screen select-none bg-white">
-  <div class="signup-div h-full flex flex-col justify-evenly items-center">
+<div class="h-full w-full select-none flex items-center justify-center overflow-hidden">
+  <div class="h-full basis-1/2 mb:basis-2/12 flex flex-col justify-evenly items-center">
     <div class="flex justify-center items-center w-full basis-[15%]">
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -22,7 +22,7 @@
     <p class="text-3xl basis-[10%]">Create an account</p>
 
     <form
-      class="flex w-1/2 flex-col relative basis-[75%]"
+      class="flex w-full flex-col relative basis-[75%]"
       [formGroup]="signUpForm"
       (ngSubmit)="onSubmit()"
     >
@@ -95,5 +95,8 @@
       </div>
       }
     </form>
+  </div>
+  <div class="mb:basis-8/12">
+    <p>A</p>
   </div>
 </div>

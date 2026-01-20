@@ -9,7 +9,7 @@ module.exports = {
     "./src/index.html",
     "./src/app/home/chat/chat.component.html",
     "./src/app/app.component.html",
-    "./src/app/home/user-item/user-item.component.html"
+    "./src/app/home/user-item/user-item.component.html",
   ],
   theme: {
     extend: {
@@ -27,8 +27,8 @@ module.exports = {
           900: "#14532b",
           950: "#052e14",
         },
-        "light-white": '#F5F5F5',
-        'light-gray': '#EEEEEE'
+        "light-white": "#F5F5F5",
+        "light-gray": "#EEEEEE",
       },
       screens: {
         mb: { max: "600px" },

@@ -29,7 +29,7 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.css"
             ],
             "scripts": [
               "src/assets/pusher.min.js"
@@ -94,7 +94,7 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.css"
             ],
             "scripts": [
               "src/assets/pusher.min.js"

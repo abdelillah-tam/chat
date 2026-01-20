@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+.mdc-notched-outline__notch {
+  border-left: none !important;
+  border-right: none !important;
+}
+
+
+:root {}
+
+
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+.mat-drawer {
+  --mat-sidenav-container-background-color: #fff;
+}
+
+.material-symbols-outlined {
+  font-variation-settings:
+    "FILL" 0,
+    "wght" 300,
+    "GRAD" 200,
+    "opsz" 48;
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+.mdc-text-field--outlined {
+  --mdc-outlined-text-field-container-shape: 0.75rem !important;
+}
+
+.btn {
+  height: 3rem;
+}

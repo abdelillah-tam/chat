@@ -40,7 +40,7 @@ body {
 }
 
 .mdc-text-field--outlined {
-  --mdc-outlined-text-field-container-shape: 0.75rem !important;
+  --mat-form-field-outlined-container-shape: 0.75rem !important;
 }
 
 .btn {

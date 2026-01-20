@@ -6,7 +6,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { MatDividerModule } from '@angular/material/divider';
 import * as jose from 'jose';
 import { Store } from '@ngrx/store';
@@ -40,14 +40,13 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     RouterLink,
     RouterLinkActive,
     ReactiveFormsModule,
-    CommonModule,
     MatButtonModule,
     MatIconModule,
     MatDividerModule,
     MatFormFieldModule,
     MatInputModule,
-    MatProgressSpinnerModule,
-  ],
+    MatProgressSpinnerModule
+],
   providers: [
     {
       provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,

@@ -8,7 +8,7 @@ import {
   ValidatorFn,
   Validators,
 } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 import { Store } from '@ngrx/store';
 import { emptyStateAction, signupAction } from '../state/auth/auth.actions';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -28,13 +28,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     RouterLink,
     RouterLinkActive,
     ReactiveFormsModule,
-    CommonModule,
     MatFormFieldModule,
     MatSelectModule,
     MatInputModule,
     MatButtonModule,
     MatProgressSpinnerModule
-  ],
+],
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.scss',
 })

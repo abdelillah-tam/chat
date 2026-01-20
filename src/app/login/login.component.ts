@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -16,9 +16,7 @@ import {
   signupAction,
 } from '../state/auth/auth.actions';
 import { AuthState } from '../state/auth/auth-state';
-import {
-  selectFoundUserByEmail,
-} from '../state/auth/auth.selectors';
+import { selectFoundUserByEmail } from '../state/auth/auth.selectors';
 import {
   MAT_FORM_FIELD_DEFAULT_OPTIONS,
   MatFormFieldModule,
@@ -33,9 +31,7 @@ import { Subscription } from 'rxjs';
 import { selectLoginState } from '../state/login/login.selector';
 import { loginAction } from '../state/login/login.actions';
 import { saveDataLocally } from '../model/save-user-locally';
-import {
-  MatProgressSpinnerModule,
-} from '@angular/material/progress-spinner';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-login',
@@ -62,13 +58,11 @@ import {
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
- 
 })
 export class LoginComponent implements OnInit, OnDestroy {
   public googleToken = environment.GOOGLE_TOKEN;
 
   selectLoginState: Subscription | undefined;
-
 
   selectFoundUserByEmail: Subscription | undefined;
 
@@ -78,7 +72,11 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   tryEmail: boolean = false;
 
-  constructor(private router: Router, private store: Store<AuthState>) {
+  constructor(
+    private router: Router,
+    private store: Store<AuthState>,
+    private renderer2: Renderer2,
+  ) {
     if (sessionStorage.getItem('credential') !== null) {
       this.loading = true;
       this.handleCredential(sessionStorage.getItem('credential')!);
@@ -89,6 +87,12 @@ export class LoginComponent implements OnInit, OnDestroy {
   changed = 0;
 
   ngOnInit(): void {
+    this.renderer2.listen(window, 'onload', (event) => {
+      //@ts-ignore
+      google.accounts.id.initialize({
+        client_id: environment.GOOGLE_TOKEN
+      });
+    });
     this.loadSigninButton();
     if (
       localStorage.getItem('email') &&
@@ -127,7 +131,7 @@ export class LoginComponent implements OnInit, OnDestroy {
                   email: this.googleUser?.email!,
                   password: '',
                   provider: 'google',
-                })
+                }),
               );
             }
           } else {
@@ -144,7 +148,7 @@ export class LoginComponent implements OnInit, OnDestroy {
                 },
                 password: undefined,
                 confirmationPassword: undefined,
-              })
+              }),
             );
           }
 
@@ -175,7 +179,7 @@ export class LoginComponent implements OnInit, OnDestroy {
           email: this.loginGroup.value.email!,
           password: this.loginGroup.value.password!,
           provider: 'user',
-        })
+        }),
       );
     }
   }
@@ -184,7 +188,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.googleUser = jose.decodeJwt<GoogleUser>(credential);
 
     this.store.dispatch(
-      findUserByEmailAction({ email: this.googleUser.email })
+      findUserByEmailAction({ email: this.googleUser.email }),
     );
   }
 

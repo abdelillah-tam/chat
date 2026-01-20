@@ -50,14 +50,18 @@ $chat-theme: mat.define-theme(
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  font-family: "Zain", "sans-serif";
+  font-family: "Poppins", sans-serif;
 }
 
 .mat-drawer {
   --mat-sidenav-container-background-color: #fff;
 }
 .material-symbols-outlined {
-  font-variation-settings: "FILL" 0, "wght" 300, "GRAD" 200, "opsz" 48;
+  font-variation-settings:
+    "FILL" 0,
+    "wght" 300,
+    "GRAD" 200,
+    "opsz" 48;
 }
 
 html,
@@ -68,8 +72,11 @@ body {
 
 body {
   margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 .mdc-text-field--outlined {
   --mdc-outlined-text-field-container-shape: 0.75rem !important;
+}
+
+.btn {
+  height: 3rem;
 }

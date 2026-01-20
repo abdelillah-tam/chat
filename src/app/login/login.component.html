@@ -4,7 +4,7 @@
       <svg
         xmlns="http://www.w3.org/2000/svg"
         xmlns:xlink="http://www.w3.org/1999/xlink"
-        fill="#16a34a"
+        fill="#facc15"
         height="72px"
         width="72px"
         version="1.1"
@@ -21,7 +21,7 @@
     <div class="create-account flex items-center">
       <p class="create-account-text mr-2">New to Chat?</p>
       <button
-        class="border border-gray-300 rounded-md px-2 py-1"
+        class="border border-gray-300 rounded-xl btn px-3 py-1 hover:bg-slate-100 hover:border-slate-300"
         routerLink="/signup"
         routerLinkActive="active"
       >
@@ -54,34 +54,37 @@
         data-width="384"
       ></div>
       @if (tryEmail) {
-      <p class="text-red-600">Try login using Email, not Google</p>
+        <p class="text-red-600">Try login using Email, not Google</p>
       }
     </div>
 
     <div class="flex justify-between items-center">
       <mat-divider class="w-[45%]"></mat-divider>
-      <p class="select-none">Or</p>
+      <p class="select-none">OR</p>
       <mat-divider class="w-[45%]"></mat-divider>
     </div>
-    <form class="h-3/6 flex flex-col justify-between" [formGroup]="loginGroup">
-      <mat-form-field class="flex flex-col">
-        <mat-label>Email</mat-label>
+    <form class="flex flex-col justify-between gap-4" [formGroup]="loginGroup">
+      <div class="grid grid-rows-[1fr_3rem,1fr]">
+        <label>Email</label>
         <input
-          matInput
-          class="text-xl font-light h-9 px-2 border border-gray-300 outline-none rounded-md focus:border-blue-600"
+          class="font-light h-12 px-2 py-2 border-2 border-gray-300 outline-none rounded-xl focus:border-yellow-400 w-full"
           formControlName="email"
           autocomplete="email"
+          placeholder="Enter an email"
         />
 
-        <mat-error>Enter a valid email !</mat-error>
-      </mat-form-field>
+        @if (
+          loginGroup.controls.email.invalid && loginGroup.controls.email.touched
+        ) {
+          <p class="text-xs text-red-600">Enter a valid email</p>
+        }
+      </div>
 
-      <mat-form-field>
-        <mat-label>Password</mat-label>
+      <div class="grid grid-rows-[1fr_3rem_1fr]">
+        <label>Password</label>
         <div class="relative">
           <input
-            matInput
-            class="w-full text-xl font-light h-9 px-2 border border-gray-300 outline-none rounded-md focus:border-blue-600"
+            class="w-full font-light h-12 px-2 py-2 border-2 border-gray-300 outline-none rounded-xl focus:border-yellow-400"
             [type]="isPasswordVisible ? 'text' : 'password'"
             placeholder="Password"
             formControlName="password"
@@ -98,8 +101,8 @@
               fill="#000000"
               version="1.1"
               id="Capa_1"
-              width="25px"
-              height="25px"
+              width="24px"
+              height="24px"
               viewBox="0 0 442.04 442.04"
               xml:space="preserve"
             >
@@ -124,13 +127,18 @@
           </button>
         </div>
 
-        <mat-error> Password must be at least 8 characters ! </mat-error>
-      </mat-form-field>
+        @if (
+          loginGroup.controls.password.invalid &&
+          loginGroup.controls.password.touched
+        ) {
+          <p class="text-xs text-red-600">
+            Password must be at least 8 characters !
+          </p>
+        }
+      </div>
 
       <button
-        mat-flat-button
-        [style.--mdc-filled-button-container-shape]="'0.375rem'"
-        [style.--mdc-filled-button-label-text-size]="'1.2rem'"
+        class="btn bg-slate-900 text-white rounded-xl hover:bg-slate-800"
         (click)="onSubmitLogin()"
       >
         Login
@@ -138,11 +146,11 @@
     </form>
 
     @if (loading) {
-    <div
-      class="absolute w-full bg-white h-full flex items-center justify-center bg-opacity-50"
-    >
-      <mat-spinner diameter="50"></mat-spinner>
-    </div>
+      <div
+        class="absolute w-full bg-white h-full flex items-center justify-center bg-opacity-50"
+      >
+        <mat-spinner diameter="50"></mat-spinner>
+      </div>
     }
   </div>
 </div>

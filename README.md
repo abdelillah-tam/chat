@@ -1,4 +1,4 @@
-Chat is a web application that you can send text messages to others.
+Chat is a realtime web application that you can send text messages & images to others.
 
 Live : [Chat](https://abdelillah-tam.github.io/chat/)
 

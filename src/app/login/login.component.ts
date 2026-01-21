@@ -1,11 +1,11 @@
-import { Component, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import {
   FormControl,
   FormGroup,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import { MatDividerModule } from '@angular/material/divider';
 import * as jose from 'jose';
@@ -21,7 +21,7 @@ import {
   MAT_FORM_FIELD_DEFAULT_OPTIONS,
   MatFormFieldModule,
 } from '@angular/material/form-field';
-import { MatInputModule, MatLabel, MatInput } from '@angular/material/input';
+import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { GoogleUser } from '../model/google-user.interface';
@@ -32,29 +32,30 @@ import { selectLoginState } from '../state/login/login.selector';
 import { loginAction } from '../state/login/login.actions';
 import { saveDataLocally } from '../model/save-user-locally';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { LogoComponent } from '../logo/logo.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [
     RouterLink,
-    RouterLinkActive,
     ReactiveFormsModule,
     MatButtonModule,
     MatIconModule,
     MatDividerModule,
     MatFormFieldModule,
     MatInputModule,
-    MatProgressSpinnerModule
-],
+    MatProgressSpinnerModule,
+    LogoComponent,
+  ],
   providers: [
     {
       provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
-      useValue: { appearance: 'outline' },
+      useValue: { appearance: 'outline-solid' },
     },
   ],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss',
+  styleUrl: './login.component.css',
 })
 export class LoginComponent implements OnInit, OnDestroy {
   public googleToken = environment.GOOGLE_TOKEN;
@@ -72,7 +73,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private store: Store<AuthState>,
-    private renderer2: Renderer2,
   ) {
     if (sessionStorage.getItem('credential') !== null) {
       this.loading = true;
@@ -84,13 +84,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   changed = 0;
 
   ngOnInit(): void {
-    this.renderer2.listen(window, 'onload', (event) => {
-      //@ts-ignore
-      google.accounts.id.initialize({
-        client_id: environment.GOOGLE_TOKEN
-      });
-    });
-    this.loadSigninButton();
     if (
       localStorage.getItem('email') &&
       localStorage.getItem('userToken') &&
@@ -199,14 +192,5 @@ export class LoginComponent implements OnInit, OnDestroy {
     } else {
       this.changed = 0;
     }
-  }
-
-  loadSigninButton() {
-    let body = <HTMLDivElement>document.body;
-    let script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    script.defer = true;
-    body.appendChild(script);
   }
 }

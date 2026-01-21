@@ -36,7 +36,7 @@ import { closeSidenaveAction } from './state/app/app.actions';
     CommonModule,
   ],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss',
+  styleUrl: './app.component.css',
   host: {
     '(window:resize)': 'onResize($event)',
   },

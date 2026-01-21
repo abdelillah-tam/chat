@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import {
   AbstractControl,
   FormControl,
@@ -20,25 +20,28 @@ import { saveDataLocally } from '../model/save-user-locally';
 import { Subscription } from 'rxjs';
 import { selectLoginState } from '../state/login/login.selector';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { LogoComponent } from '../logo/logo.component';
 
 @Component({
   selector: 'app-signup',
-  standalone: true,
   imports: [
     RouterLink,
-    RouterLinkActive,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatSelectModule,
     MatInputModule,
     MatButtonModule,
-    MatProgressSpinnerModule
-],
+    MatProgressSpinnerModule,
+    LogoComponent,
+  ],
   templateUrl: './signup.component.html',
-  styleUrl: './signup.component.scss',
+  styleUrl: './signup.component.css',
 })
 export class SignupComponent implements OnInit, OnDestroy {
-  constructor(private store: Store, private router: Router) {}
+  constructor(
+    private store: Store,
+    private router: Router,
+  ) {}
 
   signUpForm = new FormGroup({
     firstName: new FormControl('', [Validators.required]),
@@ -49,7 +52,7 @@ export class SignupComponent implements OnInit, OnDestroy {
       Validators.required,
       Validators.minLength(8),
     ]),
-    confirmPassword: new FormControl('', [Validators.required]),
+    password_confirmation: new FormControl('', [Validators.required]),
   });
 
   selectCurrentLoggedInUser: Subscription | undefined;
@@ -60,7 +63,7 @@ export class SignupComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.signUpForm.addValidators([
-      this.comparePasswordValidator('password', 'confirmPassword'),
+      this.comparePasswordValidator('password', 'password_confirmation'),
     ]);
 
     if (
@@ -80,7 +83,6 @@ export class SignupComponent implements OnInit, OnDestroy {
           state.objectId &&
           state.state === 'success'
         ) {
-          
           saveDataLocally(state.email, state.userToken, state.objectId);
           this.store.dispatch(emptyStateAction());
           this.router.navigate(['/']);
@@ -110,15 +112,15 @@ export class SignupComponent implements OnInit, OnDestroy {
             profilePictureLink: '',
           },
           password: this.signUpForm.value.password!,
-          confirmationPassword: this.signUpForm.value.confirmPassword!,
-        })
+          confirmationPassword: this.signUpForm.value.password_confirmation!,
+        }),
       );
     }
   }
 
   comparePasswordValidator(
     controlName: string,
-    matchingControlName: string
+    matchingControlName: string,
   ): ValidatorFn {
     return (abstractControl: AbstractControl) => {
       const control = abstractControl.get(controlName);

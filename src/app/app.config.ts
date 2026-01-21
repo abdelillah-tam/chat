@@ -7,7 +7,6 @@ import {
   provideHttpClient,
   withInterceptors,
 } from '@angular/common/http';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideState, provideStore, Store } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
 import { authReducer } from './state/auth/auth.reducers';
@@ -29,7 +28,6 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes, withComponentInputBinding()),
-    provideAnimationsAsync(),
     provideHttpClient(withInterceptors([interceptor])),
     provideStore(),
     provideState('login', loginReducer),

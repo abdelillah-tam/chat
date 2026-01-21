@@ -51,7 +51,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatProgressSpinnerModule,
   ],
   templateUrl: './chat.component.html',
-  styleUrl: './chat.component.scss',
+  styleUrl: './chat.component.css',
 })
 export class ChatComponent implements OnInit, OnDestroy {
   receiverUserLoading: boolean = true;

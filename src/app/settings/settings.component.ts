@@ -47,7 +47,7 @@ import { isLoggedIn } from '../model/is-logged-in';
     CommonModule,
   ],
   templateUrl: './settings.component.html',
-  styleUrl: './settings.component.scss',
+  styleUrl: './settings.component.css',
 })
 export class SettingsComponent implements OnInit, OnDestroy {
   @ViewChild('fileInput') fileInput: ElementRef | undefined;

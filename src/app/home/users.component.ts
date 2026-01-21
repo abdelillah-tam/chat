@@ -8,7 +8,6 @@ import { Store } from '@ngrx/store';
 import {
   findUsersAction,
   getAllUsersInContactAction,
-  getUserByObjectIdAction,
 } from '../state/auth/auth.actions';
 import {
   selectCurrentLoggedInUser,
@@ -22,15 +21,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { getCurrentUser } from '../model/get-current-user';
 import { isLoggedIn } from '../model/is-logged-in';
 import {
-  getAllMessagesAction,
   listenForMessagesAction,
 } from '../state/messaging/messaging.actions';
 import {
-  selectChatChannel,
   selectLastMessage,
 } from '../state/messaging/messaging.selectors';
 import { UserItemComponent } from './user-item/user-item.component';
-import { ChatComponent } from './chat/chat.component';
 import { MessagingService } from '../services/messaging.service';
 @Component({
   selector: 'app-users',
@@ -47,7 +43,7 @@ import { MessagingService } from '../services/messaging.service';
     UserItemComponent,
   ],
   templateUrl: './users.component.html',
-  styleUrl: './users.component.scss',
+  styleUrl: './users.component.css',
 })
 export class UsersComponent implements OnInit, OnDestroy {
   searchInput: string = '';

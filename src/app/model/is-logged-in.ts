@@ -1,9 +1,5 @@
 export function isLoggedIn() {
-  if (
-    !localStorage.getItem('email') ||
-    !localStorage.getItem('userToken') ||
-    !localStorage.getItem('objectId')
-  ) {
+  if (!localStorage.getItem('email') || !localStorage.getItem('id')) {
     return false;
   }
 

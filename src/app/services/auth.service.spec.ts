@@ -58,7 +58,7 @@ describe('AuthService', () => {
   });
 
   it('should post request with mock user', () => {
-    service.signUp(mockUser, 'password', 'google').subscribe((result) => {
+    service.signup(mockUser, 'password', 'google').subscribe((result) => {
       expect(result).toEqual(mockUser);
     });
 

@@ -11,6 +11,7 @@
 @import "tailwindcss";
 
 @layer base {
+
   *,
   ::after,
   ::before,
@@ -26,7 +27,7 @@
 }
 
 * {
-  box-sizing: border-box;
+  box-sizing:border-box;
   font-family: "Poppins", sans-serif;
 }
 
@@ -58,4 +59,52 @@ body {
 
 .btn {
   height: 3rem;
+}
+
+.input-style {
+  font-weight: var(--font-weight-light);
+  height: calc(var(--spacing) * 12);
+  width: 100%;
+  padding: calc(var(--spacing) * 2);
+  border-style: var(--tw-border-style);
+  border-width: 2px;
+  border-color: var(--color-gray-300);
+  border-radius: var(--radius-xl);
+  outline-style: none;
+
+  &:focus {
+    border-color: var(--color-yellow-400);
+  }
+
+  @media (forced-colors: active) {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+  }
+
+
+}
+
+.mat-mdc-snackbar-surface {
+    background-color: transparent !important;
+    border-radius: var(--radius-xl) !important;
+}
+
+.snack-success {
+    background-color: var(--color-green-200) !important;
+    border-radius: var(--radius-xl) !important;
+
+    & .mdc-snackbar__label {
+        color: var(--color-green-950) !important;
+    }
+}
+
+
+.snack-error {
+    background-color: var(--color-red-200) !important;
+    border-radius: var(--radius-xl) !important;
+    color: var(--color-red-900) !important;
+
+    & .mdc-snackbar__label {
+        color: var(--color-red-950) !important;
+    }
 }

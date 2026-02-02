@@ -3,49 +3,45 @@
     class="h-full pt-3 bg-light-gray mb:basis-full"
     [ngClass]="closedChat ? 'basis-full mb:w-full' : 'basis-1/3 mb:hidden'"
   >
-    <div class="w-full flex justify-center px-2">
-      <button
-        class="mb:basis-[10%] mb:flex items-center justify-evenly hidden cursor-pointer"
-        (click)="openSidenav()"
-      >
-        <mat-icon fontIcon="menu" class="material-symbols-outlined"></mat-icon>
-      </button>
-      <div class="basis-full mb:basis-[90%] bg-white rounded-xl">
-        <mat-form-field
-          class="w-full"
-          appearance="outline"
-          subscriptSizing="dynamic"
+    <div class="w-full flex justify-center px-2 gap-2">
+      @if (isSmallScreen) {
+        <button
+          class="flex items-center cursor-pointer"
+          (click)="openSidenav()"
         >
-          <mat-label>Search for a user</mat-label>
-          <input
-            matInput
-            [(ngModel)]="searchInput"
-            (ngModelChange)="findUsers()"
-          />
-        </mat-form-field>
+          <mat-icon fontIcon="menu" class="material-symbols-rounded"></mat-icon>
+        </button>
+      }
+      <div class="bg-white rounded-xl grow">
+        <input
+          class="input-style"
+          [formControl]="searchFormControl"
+          placeholder="Search for a user"
+        />
       </div>
     </div>
     <ul class="basis-full w-full flex flex-col">
       @if (loading) {
-      <div class="h-full w-full flex justify-center mt-3">
-        <mat-spinner diameter="50"></mat-spinner>
-      </div>
-      } @else { @for(user of users; track trackByFn(user)){
-      <app-user-item
-        (click)="openChatWindow(passUser(user).id, $index)"
-        [user]="passUser(user)"
-        [index]="$index"
-        [selectedUserIndex]="selectedUserIndex"
-      ></app-user-item>
-
-      } @empty{
-      <p class="w-full text-center">No users</p>
-      } }
+        <div class="h-full w-full flex justify-center mt-3">
+          <mat-spinner diameter="50"></mat-spinner>
+        </div>
+      } @else {
+        @for (user of users; track trackByFn(user)) {
+          <app-user-item
+            (click)="openChatWindow(passUser(user).id, $index)"
+            [user]="passUser(user)"
+            [index]="$index"
+            [selectedUserIndex]="selectedUserIndex"
+          ></app-user-item>
+        } @empty {
+          <p class="w-full text-center">No users</p>
+        }
+      }
     </ul>
   </div>
   @if (!closedChat) {
-  <section class="chat-section basis-2/3 mb:basis-full mb:w-full">
-    <router-outlet />
-  </section>
+    <section class="chat-section basis-2/3 mb:basis-full mb:w-full">
+      <router-outlet />
+    </section>
   }
 </aside>

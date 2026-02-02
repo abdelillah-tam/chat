@@ -1,94 +1,63 @@
 import {
   HttpClient,
-  HttpHandlerFn,
   HttpHeaders,
-  HttpRequest,
 } from '@angular/common/http';
 import { User } from '../model/user';
 import { environment } from '../../environments/environment';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 export class AuthService {
-  constructor(private http: HttpClient) {}
+  constructor(private httpClient: HttpClient) {}
 
-  signUp(user: User, password: string, confirmationPassword: string) {
-    if (user.provider === 'google') {
-      return this.http.post<User>(
-        `${environment.API}/register/google`,
-        {
-          email: user.email,
-          first_name: user.firstName,
-          last_name: user.lastName,
-          sex: user.sex,
-          provider: user.provider,
-        },
-        {
-          headers: new HttpHeaders({
-            'Content-Type': 'application/json',
-          }),
-        }
-      );
-    } else {
-      return this.http.post<User>(
-        `${environment.API}/register/traditional`,
-        {
-          email: user.email,
-          password: password,
-          first_name: user.firstName,
-          last_name: user.lastName,
-          sex: user.sex,
-          provider: user.provider,
-          confirmationPassword: confirmationPassword,
-        },
-        {
-          headers: new HttpHeaders({
-            'Content-Type': 'application/json',
-          }),
-        }
-      );
-    }
+  requestCsrfToken() {
+    return this.httpClient.get(`${environment.API_CSRF}/sanctum/csrf-cookie`);
+  }
+
+  signup(user: User, password: string, confirmationPassword: string) {
+    return this.httpClient.post<User>(
+      `${environment.API}/signup`,
+      {
+        email: user.email,
+        password: password,
+        first_name: user.firstName,
+        last_name: user.lastName,
+        provider: user.provider,
+        confirmationPassword: confirmationPassword,
+      },
+      {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+        withCredentials: true,
+      },
+    );
   }
 
   login(email: string, password: string, provider: string) {
-    if (provider === 'google') {
-      return this.http.post<{
-        email: string;
-        id: string;
-        token: string;
-      }>(
-        `${environment.API}/login/google`,
-        {
-          email: email,
-          provider: provider,
-        },
-        {
-          headers: new HttpHeaders({
-            'Content-Type': 'application/json',
-          }),
+    return this.httpClient.post<
+      | {
+          success: true;
+          email: string;
+          id: number;
         }
-      );
-    } else {
-      return this.http.post<{
-        email: string;
-        id: string;
-        token: string;
-      }>(
-        `${environment.API}/login/traditional`,
-        {
-          email: email,
-          password: password,
-          provider: provider,
-        },
-        {
-          headers: new HttpHeaders({
-            'Content-Type': 'application/json',
-          }),
-        }
-      );
-    }
+      | { success: false; message: string }
+    >(
+      `${environment.API}/login`,
+      {
+        email: email,
+        password: password,
+        provider: provider,
+      },
+      {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+        withCredentials: true,
+      },
+    );
   }
 
   logout() {
-    this.http.delete(`${environment.API}/api/logout`, {
+    this.httpClient.delete(`${environment.API}/logout`, {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
       }),
@@ -96,7 +65,7 @@ export class AuthService {
   }
 
   findUsersByName(name: string) {
-    return this.http.post<Array<any> | { code: number; error: string }>(
+    return this.httpClient.post<Array<any> | { code: number; error: string }>(
       `${environment.API}/findByName`,
       {
         name: name,
@@ -105,12 +74,12 @@ export class AuthService {
         headers: new HttpHeaders({
           'Content-Type': 'application/json',
         }),
-      }
+      },
     );
   }
 
   findUserByEmail(email: string) {
-    return this.http.post<
+    return this.httpClient.post<
       | User
       | {
           code: number;
@@ -125,22 +94,26 @@ export class AuthService {
         headers: new HttpHeaders({
           'Content-Type': 'application/json',
         }),
-      }
+        withCredentials: true,
+      },
     );
   }
   findUserById(id: string) {
-    return this.http.get<User | { code: number; error: string }>(
+    return this.httpClient.get<User | { code: number; error: string }>(
       `${environment.API}/find/${id}`,
       {
         headers: new HttpHeaders({
           'Content-Type': 'application/json',
         }),
-      }
+        withCredentials: true,
+      },
     );
   }
 
   findUsersByIds(ids: number[]) {
-    return this.http.post<{ user: User; profilePictureLink: string | null }[]>(
+    return this.httpClient.post<
+      { user: User; profilePictureLink: string | null }[]
+    >(
       `${environment.API}/findUsersByIds`,
       {
         ids: ids,
@@ -149,12 +122,12 @@ export class AuthService {
         headers: new HttpHeaders({
           'Content-Type': 'application/json',
         }),
-      }
+      },
     );
   }
 
   getUsersInContact() {
-    return this.http.get<
+    return this.httpClient.get<
       { user: User; channel: string; lastMessageTimestamp: number }[]
     >(`${environment.API}/getInContact`, {
       headers: new HttpHeaders({
@@ -168,10 +141,10 @@ export class AuthService {
     lastName: string | undefined,
     email: string | undefined,
     password: string | undefined,
-    provider: string
+    provider: string,
   ) {
     if (provider !== 'google') {
-      return this.http.patch<boolean>(
+      return this.httpClient.patch<boolean>(
         `${environment.API}/update/${objectId}`,
         {
           first_name: firstName,
@@ -183,10 +156,10 @@ export class AuthService {
           headers: new HttpHeaders({
             'Content-Type': 'application/json',
           }),
-        }
+        },
       );
     } else {
-      return this.http.patch<boolean>(
+      return this.httpClient.patch<boolean>(
         `${environment.API}/updateGoogle/${objectId}`,
         {
           first_name: firstName,
@@ -196,13 +169,13 @@ export class AuthService {
           headers: new HttpHeaders({
             'Content-Type': 'application/json',
           }),
-        }
+        },
       );
     }
   }
 
   validateToken() {
-    return this.http.get<boolean>(`${environment.API}/validate`, {
+    return this.httpClient.get<boolean>(`${environment.API}/validate`, {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
       }),
@@ -210,7 +183,7 @@ export class AuthService {
   }
 
   updateProfilePicture(link: string) {
-    return this.http.post<string>(
+    return this.httpClient.post<string>(
       `${environment.API}/profileImageLink`,
       {
         link: link,
@@ -219,18 +192,18 @@ export class AuthService {
         headers: new HttpHeaders({
           'Content-Type': 'application/json',
         }),
-      }
+      },
     );
   }
 
   getProfilePictureLink(id: string) {
-    return this.http.get<string>(
+    return this.httpClient.get<string>(
       `${environment.API}/profileImageLink/${id}`,
       {
         headers: new HttpHeaders({
           'Content-Type': 'application/json',
         }),
-      }
+      },
     );
   }
 
@@ -247,16 +220,4 @@ export class AuthService {
   }
 }
 
-export function interceptor(req: HttpRequest<unknown>, next: HttpHandlerFn) {
-  let token = localStorage.getItem('userToken');
-  let newReq: HttpRequest<unknown>;
-  if (token) {
-    newReq = req.clone({
-      headers: req.headers.append('Authorization', `Bearer ${token}`),
-    });
-  } else {
-    newReq = req.clone();
-  }
-  return next(newReq);
-}
 export class MockAuthService {}

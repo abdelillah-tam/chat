@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { User } from '../model/user';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { Store } from '@ngrx/store';
@@ -14,20 +14,17 @@ import {
   selectFoundUsers,
 } from '../state/auth/auth.selectors';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { filter, Subscription } from 'rxjs';
+import { debounceTime, filter, Subscription } from 'rxjs';
 import { MatIconModule } from '@angular/material/icon';
 import { openSidenavAction } from '../state/app/app.actions';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { getCurrentUser } from '../model/get-current-user';
 import { isLoggedIn } from '../model/is-logged-in';
-import {
-  listenForMessagesAction,
-} from '../state/messaging/messaging.actions';
-import {
-  selectLastMessage,
-} from '../state/messaging/messaging.selectors';
+import { listenForMessagesAction } from '../state/messaging/messaging.actions';
+import { selectLastMessage } from '../state/messaging/messaging.selectors';
 import { UserItemComponent } from './user-item/user-item.component';
 import { MessagingService } from '../services/messaging.service';
+import { BreakpointObserver } from '@angular/cdk/layout';
 @Component({
   selector: 'app-users',
   standalone: true,
@@ -46,7 +43,9 @@ import { MessagingService } from '../services/messaging.service';
   styleUrl: './users.component.css',
 })
 export class UsersComponent implements OnInit, OnDestroy {
-  searchInput: string = '';
+  breakPointObserver = inject(BreakpointObserver);
+
+  searchFormControl = new FormControl('');
 
   users: (
     | { user: User; channel: string; lastMessageTimestamp: number }
@@ -65,28 +64,32 @@ export class UsersComponent implements OnInit, OnDestroy {
 
   loading = true;
 
+  isSmallScreen = false;
   constructor(
     private store: Store,
     private router: Router,
-    private messagingService: MessagingService
+    private messagingService: MessagingService,
   ) {}
 
   ngOnInit(): void {
+    this.breakPointObserver.observe(['(width<40rem)']).subscribe((result) => {
+      this.isSmallScreen = result.matches;
+    });
     this.messagingService.listenForNewChat();
     if (!isLoggedIn()) {
       this.router.navigate(['/login']);
-    } else {
-      getCurrentUser(this.store);
     }
 
-    this.selectCurrentUser = this.store
-      .select(selectCurrentLoggedInUser)
-      .subscribe((result) => {
-        if (result && 'code' in result) {
-          localStorage.clear();
-          this.router.navigate(['/login']);
+    this.searchFormControl.valueChanges
+      .pipe(debounceTime(500))
+      .subscribe((value) => {
+        if (value?.length) {
+          this.store.dispatch(findUsersAction({ name: value }));
+        } else {
+          this.store.dispatch(getAllUsersInContactAction());
         }
       });
+
     this.selectFoundUsers = this.store
       .select(selectFoundUsers)
       .subscribe((result) => {
@@ -99,7 +102,7 @@ export class UsersComponent implements OnInit, OnDestroy {
                 listenForMessagesAction({
                   channelId: item.channel,
                   firstMessage: false,
-                })
+                }),
               );
             }
           });
@@ -156,17 +159,7 @@ export class UsersComponent implements OnInit, OnDestroy {
     this.selectLastMessage?.unsubscribe();
   }
 
-  findUsers() {
-    if (this.searchInput.length !== 0) {
-      this.loading = true;
-      this.store.dispatch(findUsersAction({ name: this.searchInput }));
-    } else {
-      setTimeout(() => {
-        this.loading = true;
-        this.store.dispatch(getAllUsersInContactAction());
-      }, 50);
-    }
-  }
+  findUsers() {}
 
   openChatWindow(objectId: string, index: number) {
     this.closedChat = false;

@@ -1,6 +1,7 @@
 import {
   Component,
   ElementRef,
+  inject,
   OnDestroy,
   OnInit,
   ViewChild,
@@ -34,6 +35,7 @@ import { getCurrentUser } from '../model/get-current-user';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { isLoggedIn } from '../model/is-logged-in';
+import { BreakpointObserver } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-settings',
@@ -51,6 +53,10 @@ import { isLoggedIn } from '../model/is-logged-in';
 })
 export class SettingsComponent implements OnInit, OnDestroy {
   @ViewChild('fileInput') fileInput: ElementRef | undefined;
+
+  breakPointObserver = inject(BreakpointObserver);
+
+  isSmallScreen = false;
 
   currentUser: User | undefined;
 
@@ -75,7 +81,10 @@ export class SettingsComponent implements OnInit, OnDestroy {
     password: new FormControl(''),
   });
 
-  constructor(private store: Store, private router: Router) {
+  constructor(
+    private store: Store,
+    private router: Router,
+  ) {
     let validator: ValidatorFn = (formGroup) => {
       if (!this.infoGroup.controls.email.disabled) {
         return formGroup.get('firstName')?.valid &&
@@ -94,6 +103,10 @@ export class SettingsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.breakPointObserver.observe(['(width<40rem)']).subscribe((result) => {
+      this.isSmallScreen = result.matches;
+    });
+
     if (!isLoggedIn()) {
       this.router.navigate(['/login']);
     } else {
@@ -103,7 +116,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       getProfilePictureLinkAction({
         objectId: localStorage.getItem('objectId')!,
-      })
+      }),
     );
 
     this.store.dispatch(checkIfTokenIsValidAction());
@@ -137,7 +150,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
             email: this.infoGroup.value.email!,
             password: undefined,
             provider: this.currentUser.provider,
-          })
+          }),
         );
       } else {
         this.store.dispatch(
@@ -148,7 +161,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
             email: this.infoGroup.value.email!,
             password: this.infoGroup.value.password!,
             provider: this.currentUser!.provider,
-          })
+          }),
         );
       }
     }
@@ -178,7 +191,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
         uploadProfilePicAction({
           file: this.file,
           userId: this.currentUser.id,
-        })
+        }),
       );
     }
   }
@@ -211,10 +224,10 @@ export class SettingsComponent implements OnInit, OnDestroy {
           this.currentUser = result;
           if (this.currentUser) {
             this.infoGroup.controls.firstName.setValue(
-              this.currentUser.firstName
+              this.currentUser.firstName,
             );
             this.infoGroup.controls.lastName.setValue(
-              this.currentUser.lastName
+              this.currentUser.lastName,
             );
             this.infoGroup.controls.email.setValue(this.currentUser.email);
 

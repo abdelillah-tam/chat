@@ -21,6 +21,8 @@ import {
   retrievedFoundUserByEmailAction,
   RETRIEVED_PROFILE_PICTURE_LINK,
   retrievedProfilePictureAction,
+  REQUEST_CSRF_TOKEN,
+  finishedCsrfTokenRequestAction,
 } from './auth.actions';
 import {
   catchError,
@@ -45,21 +47,25 @@ export class AuthEffects {
   tokenValidation$;
   getProfilePictureLink$;
   findUserByEmail$;
+  requestCsrfToken$;
 
-  constructor(private action$: Actions, private authService: AuthService) {
+  constructor(
+    private action$: Actions,
+    private authService: AuthService,
+  ) {
     this.getCurrentLoggedInUser$ = createEffect(() =>
       this.action$.pipe(
         ofType(GET_CURRENT_LOGGEDIN_USER),
-        exhaustMap((value: { objectId: string }) =>
-          this.authService.findUserById(value.objectId).pipe(
+        exhaustMap((value: { objectId: string }) => {
+          return this.authService.findUserById(value.objectId).pipe(
             map((data) => {
               return retrievedCurrentLoggedInUserAction({
                 currentUserLoggedInOrError: data,
               });
-            })
-          )
-        )
-      )
+            }),
+          );
+        }),
+      ),
     );
 
     this.getUserByObjectId$ = createEffect(() =>
@@ -69,11 +75,11 @@ export class AuthEffects {
           this.authService.findUserById(value.objectId).pipe(
             map((data) => {
               return retrievedUserAction({ user: data });
-            })
-          )
+            }),
+          ),
         ),
-        switchAll()
-      )
+        switchAll(),
+      ),
     );
 
     this.getAllUsers$ = createEffect(() =>
@@ -85,18 +91,18 @@ export class AuthEffects {
               return retrievedUsersAction({
                 users: data,
               });
-            })
-          )
-        )
-      )
+            }),
+          ),
+        ),
+      ),
     );
 
     this.findUsers$ = createEffect(() =>
       this.action$.pipe(
         debounceTime(500),
         ofType(FIND_USERS),
-        map((value: { name: string }) =>
-          this.authService.findUsersByName(value.name).pipe(
+        map((value: { name: string }) => {
+          return this.authService.findUsersByName(value.name).pipe(
             map((data) => {
               if ('error' in data) {
                 return errorAction({
@@ -106,11 +112,11 @@ export class AuthEffects {
               } else {
                 return retrievedUsersAction({ users: data });
               }
-            })
-          )
-        ),
-        switchAll()
-      )
+            }),
+          );
+        }),
+        switchAll(),
+      ),
     );
 
     this.uploadProfilePicture$ = createEffect(() =>
@@ -120,10 +126,10 @@ export class AuthEffects {
           from(this.authService.uploadImage(value.file, value.userId)).pipe(
             map((data) => {
               return retrievedProfilePictureLinkAction({ link: data });
-            })
-          )
-        )
-      )
+            }),
+          ),
+        ),
+      ),
     );
 
     this.updateProfilePictureLink$ = createEffect(() =>
@@ -133,10 +139,10 @@ export class AuthEffects {
           return this.authService.updateProfilePicture(value.link).pipe(
             map((data) => {
               return retrievedProfilePictureAction({ link: data });
-            })
+            }),
           );
-        })
-      )
+        }),
+      ),
     );
 
     this.updateUserInfo$ = createEffect(() =>
@@ -158,16 +164,16 @@ export class AuthEffects {
                 value.lastName,
                 value.email,
                 value.password,
-                value.provider
+                value.provider,
               )
               .pipe(
                 map((data) => {
                   return updatedInfosAction({ result: data });
-                })
+                }),
               );
-          }
-        )
-      )
+          },
+        ),
+      ),
     );
 
     this.tokenValidation$ = createEffect(() =>
@@ -177,10 +183,10 @@ export class AuthEffects {
           this.authService.validateToken().pipe(
             map((data) => {
               return retrievedTokenCheckingAction({ valid: data });
-            })
-          )
-        )
-      )
+            }),
+          ),
+        ),
+      ),
     );
 
     this.getProfilePictureLink$ = createEffect(() =>
@@ -190,10 +196,10 @@ export class AuthEffects {
           this.authService.getProfilePictureLink(value.objectId).pipe(
             map((response) => {
               return retrievedProfilePictureAction({ link: response });
-            })
-          )
-        )
-      )
+            }),
+          ),
+        ),
+      ),
     );
 
     this.findUserByEmail$ = createEffect(() =>
@@ -203,10 +209,23 @@ export class AuthEffects {
           this.authService
             .findUserByEmail(value.email)
             .pipe(
-              map((data) => retrievedFoundUserByEmailAction({ data: data }))
-            )
-        )
-      )
+              map((data) => retrievedFoundUserByEmailAction({ data: data })),
+            ),
+        ),
+      ),
+    );
+
+    this.requestCsrfToken$ = createEffect(() =>
+      this.action$.pipe(
+        ofType(REQUEST_CSRF_TOKEN),
+        exhaustMap(() => {
+          return this.authService.requestCsrfToken().pipe(
+            map((data) => {
+              return finishedCsrfTokenRequestAction();
+            }),
+          );
+        }),
+      ),
     );
   }
 }

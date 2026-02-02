@@ -7,9 +7,16 @@
   /*@apply border-2 rounded-3xl from-red-500 to-yellow-500 bg-linear-to-t;*/
   border-style: var(--tw-border-style);
   border-width: 2px;
-  border-radius: var(--radius-3xl);
+  border-radius: var(--radius-xl);
+  background-color: white;
 
-  .icon-div {
-    background-color: var(--color-gray-300);
+  & mat-icon {
+    color: var(--color-slate-900);
   }
+}
+
+mat-icon {
+  align-content: center;
+  text-align: center;
+  font-weight: var(--font-weight-extralight);
 }

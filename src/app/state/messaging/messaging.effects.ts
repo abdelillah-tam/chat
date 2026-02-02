@@ -4,19 +4,16 @@ import { MessagingService } from '../../services/messaging.service';
 import {
   GET_ALL_MESSAGES,
   GET_CHAT_CHANNEL,
-  imageMsgUrlAction,
   LISTEN,
   receivedAllMessagesAction,
   receivedChatChannelAction,
   SEND_MESSAGE,
-  UPLOAD_IMG_MSG,
   GET_ALL_CHAT_CHANNELS,
   receivedAllChatChannelsAction,
   CREATE_CHANNEL,
   listenForMessagesAction,
 } from './messaging.actions';
-import { concatMap, exhaustMap, from, map, switchAll, switchMap } from 'rxjs';
-import { Message } from '../../model/message';
+import { exhaustMap, map, switchAll } from 'rxjs';
 
 @Injectable()
 export class MessagingEffects {
@@ -29,17 +26,20 @@ export class MessagingEffects {
 
   constructor(
     private actions$: Actions,
-    private messagingService: MessagingService
+    private messagingService: MessagingService,
   ) {
     this.sendMessage$ = createEffect(
       () =>
         this.actions$.pipe(
           ofType(SEND_MESSAGE),
           map((value: { message: FormData; firstMessage: boolean }) =>
-            this.messagingService.sendMessage(value.message, value.firstMessage)
-          )
+            this.messagingService.sendMessage(
+              value.message,
+              value.firstMessage,
+            ),
+          ),
         ),
-      { dispatch: false }
+      { dispatch: false },
     );
 
     this.listenForMessages$ = createEffect(
@@ -49,11 +49,11 @@ export class MessagingEffects {
           map((value: { channelId: string; firstMessage: boolean }) =>
             this.messagingService.listenForMessages(
               value.channelId,
-              value.firstMessage
-            )
-          )
+              value.firstMessage,
+            ),
+          ),
         ),
-      { dispatch: false }
+      { dispatch: false },
     );
 
     this.createChannelIfNotExist$ = createEffect(() =>
@@ -64,18 +64,18 @@ export class MessagingEffects {
             .createChannel(
               value.message.get('channel')!.toString(),
               value.message.get('senderId')!.toString(),
-              value.message.get('receiverId')!.toString()
+              value.message.get('receiverId')!.toString(),
             )
             .pipe(
               map((data) =>
                 listenForMessagesAction({
                   channelId: data,
                   firstMessage: true,
-                })
-              )
-            )
-        )
-      )
+                }),
+              ),
+            ),
+        ),
+      ),
     );
 
     this.getChatChannel$ = createEffect(() =>
@@ -85,11 +85,11 @@ export class MessagingEffects {
           this.messagingService
             .getChatChannel(value.otherUserId)
             .pipe(
-              map((data) => receivedChatChannelAction({ chatChannelId: data }))
-            )
+              map((data) => receivedChatChannelAction({ chatChannelId: data })),
+            ),
         ),
-        switchAll()
-      )
+        switchAll(),
+      ),
     );
 
     this.getAllChatChannels$ = createEffect(() =>
@@ -99,10 +99,10 @@ export class MessagingEffects {
           this.messagingService
             .getAllChatChannels()
             .pipe(
-              map((data) => receivedAllChatChannelsAction({ channels: data }))
-            )
-        )
-      )
+              map((data) => receivedAllChatChannelsAction({ channels: data })),
+            ),
+        ),
+      ),
     );
 
     this.getAllMessages$ = createEffect(() =>
@@ -114,11 +114,11 @@ export class MessagingEffects {
               return receivedAllMessagesAction({
                 messages: data,
               });
-            })
-          )
+            }),
+          ),
         ),
-        switchAll()
-      )
+        switchAll(),
+      ),
     );
   }
 }

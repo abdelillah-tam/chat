@@ -1,7 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { AuthService } from '../../services/auth.service';
-import { LOGIN, loginAction, loginResultAction, LOGOUT } from './login.actions';
+import {
+  LOGIN,
+  loginAction,
+  successLoginAction,
+  LOGOUT,
+  failedLoginAction,
+} from './login.actions';
 import { exhaustMap, map, catchError, of } from 'rxjs';
 import { errorAction, SIGNUP } from '../auth/auth.actions';
 import { User } from '../../model/user';
@@ -16,7 +22,7 @@ export class LoginEffect {
   constructor(
     private action$: Actions,
     private authService: AuthService,
-    private messagingService: MessagingService
+    private messagingService: MessagingService,
   ) {
     this.login$ = createEffect(() =>
       this.action$.pipe(
@@ -27,15 +33,18 @@ export class LoginEffect {
               .login(value.email, value.password, value.provider)
               .pipe(
                 map((data) => {
-                  return loginResultAction({
-                    email: data.email,
-                    objectId: data.id,
-                    userToken: data.token,
-                  });
-                })
-              )
-        )
-      )
+                  if (data.success) {
+                    return successLoginAction({
+                      email: data.email,
+                      id: data.id,
+                    });
+                  } else {
+                    return failedLoginAction({ message: data.message });
+                  }
+                }),
+              ),
+        ),
+      ),
     );
 
     this.signup$ = createEffect(() =>
@@ -48,18 +57,18 @@ export class LoginEffect {
             confirmationPassword: string;
           }) =>
             this.authService
-              .signUp(value.user, value.password, value.confirmationPassword)
+              .signup(value.user, value.password, value.confirmationPassword)
               .pipe(
                 map(() =>
                   loginAction({
                     email: value.user.email,
                     password: value.password ?? '',
                     provider: value.user.provider,
-                  })
-                )
-              )
-        )
-      )
+                  }),
+                ),
+              ),
+        ),
+      ),
     );
 
     this.logout$ = createEffect(
@@ -69,11 +78,11 @@ export class LoginEffect {
           map(() => {
             this.messagingService.unsubscribeFromChannels();
             this.authService.logout();
-          })
+          }),
         ),
       {
         dispatch: false,
-      }
+      },
     );
   }
 }

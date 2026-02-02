@@ -1,4 +1,8 @@
-import { ApplicationConfig, provideZoneChangeDetection, isDevMode } from '@angular/core';
+import {
+  ApplicationConfig,
+  provideZoneChangeDetection,
+  isDevMode,
+} from '@angular/core';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -6,6 +10,7 @@ import {
   HttpClient,
   provideHttpClient,
   withInterceptors,
+  withXsrfConfiguration,
 } from '@angular/common/http';
 import { provideState, provideStore, Store } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
@@ -17,7 +22,7 @@ import {
   sendMessageReducer,
 } from './state/messaging/messaging.reducers';
 import { MessagingEffects } from './state/messaging/messaging.effects';
-import { AuthService, interceptor } from './services/auth.service';
+import { AuthService } from './services/auth.service';
 import { MessagingService } from './services/messaging.service';
 import { appReducer } from './state/app/app.reducers';
 import { loginReducer } from './state/login/login.reducer';
@@ -28,7 +33,12 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes, withComponentInputBinding()),
-    provideHttpClient(withInterceptors([interceptor])),
+    provideHttpClient(
+      withXsrfConfiguration({
+        cookieName: 'XSRF-TOKEN',
+        headerName: 'X-XSRF-TOKEN',
+      }),
+    ),
     provideStore(),
     provideState('login', loginReducer),
     provideState('auth', authReducer),
@@ -38,14 +48,15 @@ export const appConfig: ApplicationConfig = {
     provideState('appState', appReducer),
     provideEffects(AuthEffects, LoginEffect, MessagingEffects),
     {
-        provide: AuthService,
-        useFactory: (httpClient: HttpClient) => new AuthService(httpClient),
-        deps: [HttpClient],
+      provide: AuthService,
+      useFactory: (httpClient: HttpClient) => new AuthService(httpClient),
+      deps: [HttpClient],
     },
     {
-        provide: MessagingService,
-        useFactory: (store: Store, httpClient: HttpClient) => new MessagingService(store, httpClient),
-        deps: [Store, HttpClient],
-    }
-],
+      provide: MessagingService,
+      useFactory: (store: Store, httpClient: HttpClient) =>
+        new MessagingService(store, httpClient),
+      deps: [Store, HttpClient],
+    },
+  ],
 };

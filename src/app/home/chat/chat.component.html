@@ -139,7 +139,6 @@
         placeholder="Type a message"
         [(ngModel)]="text"
         (keydown.enter)="sendMessage()"
-        [disabled]="sending"
       />
 
       <div
@@ -152,7 +151,7 @@
           type="button"
         >
           <mat-icon
-            class="material-symbols-outlined"
+            class="material-symbols-rounded"
             fontIcon="close"
           ></mat-icon>
         </button>
@@ -176,7 +175,7 @@
           [classList]="sending ? '' : 'cursor-pointer'"
           for="inputFile"
           ><mat-icon
-            class="material-symbols-outlined"
+            class="material-symbols-rounded"
             fontIcon="attach_file"
           ></mat-icon
         ></label>
@@ -186,7 +185,7 @@
         (click)="sendMessage()"
       >
         <mat-icon
-          class="material-symbols-outlined"
+          class="material-symbols-rounded"
           [class.cursor-poiner]="sending"
           color="#F6EFEE"
           >send</mat-icon

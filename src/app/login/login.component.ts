@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -13,6 +13,7 @@ import { Store } from '@ngrx/store';
 import {
   emptyStateAction,
   findUserByEmailAction,
+  requestCsrfTokenAction,
   signupAction,
 } from '../state/auth/auth.actions';
 import { AuthState } from '../state/auth/auth-state';
@@ -33,7 +34,7 @@ import { loginAction } from '../state/login/login.actions';
 import { saveDataLocally } from '../model/save-user-locally';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LogoComponent } from '../logo/logo.component';
-
+import { MatSnackBar } from '@angular/material/snack-bar';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -70,10 +71,13 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   tryEmail: boolean = false;
 
+  snackBar = inject(MatSnackBar);
+
   constructor(
     private router: Router,
     private store: Store<AuthState>,
   ) {
+    this.store.dispatch(requestCsrfTokenAction());
     if (sessionStorage.getItem('credential') !== null) {
       this.loading = true;
       this.handleCredential(sessionStorage.getItem('credential')!);
@@ -84,26 +88,16 @@ export class LoginComponent implements OnInit, OnDestroy {
   changed = 0;
 
   ngOnInit(): void {
-    if (
-      localStorage.getItem('email') &&
-      localStorage.getItem('userToken') &&
-      localStorage.getItem('objectId')
-    ) {
-      getCurrentUser(this.store);
-    }
-
     this.selectLoginState = this.store
       .select(selectLoginState)
       .subscribe((state) => {
-        if (
-          state.email &&
-          state.userToken &&
-          state.objectId &&
-          state.state === 'success'
-        ) {
-          saveDataLocally(state.email, state.userToken, state.objectId);
+        if (state.state === 'success') {
+          saveDataLocally(state.email!, state.id!);
+          this.showSnack('Login Was Successful', 'success');
           this.store.dispatch(emptyStateAction());
           this.router.navigate(['/']);
+        } else if (state.state === 'failed') {
+          this.showSnack('Login Failed', 'error');
         }
       });
 
@@ -131,7 +125,6 @@ export class LoginComponent implements OnInit, OnDestroy {
                   firstName: this.googleUser!.given_name,
                   lastName: this.googleUser!.family_name,
                   email: this.googleUser!.email,
-                  sex: '',
                   id: '',
                   provider: 'google',
                   profilePictureLink: '',
@@ -192,5 +185,12 @@ export class LoginComponent implements OnInit, OnDestroy {
     } else {
       this.changed = 0;
     }
+  }
+
+  showSnack(value: string, type: 'success' | 'error') {
+    this.snackBar.open(value, '', {
+      panelClass: [`snack-${type}`],
+      duration: 3000,
+    });
   }
 }

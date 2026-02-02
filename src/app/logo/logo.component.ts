@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
 
 @Component({
   selector: 'app-logo',
@@ -6,5 +6,5 @@ import { Component } from '@angular/core';
   styleUrl: './logo.component.css',
 })
 export class LogoComponent {
-
+  color = input();
 }

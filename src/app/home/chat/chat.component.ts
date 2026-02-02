@@ -28,11 +28,7 @@ import {
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import {
-  ActivatedRoute,
-  Router,
-  RouterLink,
-} from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { DatePipePipe } from '../../date-pipe.pipe';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -90,9 +86,10 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store,
-    private router: Router
+    private router: Router,
   ) {}
   ngOnInit(): void {
+    
     this.selectSender = this.store
       .select(selectCurrentLoggedInUser)
       .subscribe((result) => {
@@ -114,7 +111,7 @@ export class ChatComponent implements OnInit, OnDestroy {
         if (typeof result.chatChannel === 'string') {
           this.channel = result.chatChannel;
           this.store.dispatch(
-            getAllMessagesAction({ channelId: result.chatChannel })
+            getAllMessagesAction({ channelId: result.chatChannel }),
           );
         } else if (typeof result.chatChannel === 'object') {
           this.loading = false;
@@ -150,7 +147,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       let message = new FormData();
       let channelUUID = crypto.randomUUID();
       message.append('messageText', this.text ?? '');
-      message.append('senderId', localStorage.getItem('objectId')!);
+      message.append('senderId', localStorage.getItem('id')!);
       message.append('receiverId', this.receiverUser!.id);
       message.append('channel', channelUUID);
       if (this.file) {
@@ -161,11 +158,12 @@ export class ChatComponent implements OnInit, OnDestroy {
         this.channel = channelUUID;
       }
 
+      
       this.store.dispatch(
         sendMessageAction({
           message: message,
           firstMessage: this.messages.length === 0 ? true : false,
-        })
+        }),
       );
       this.file = null;
       this.text = '';
@@ -173,7 +171,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   getCurrentObjectId() {
-    return localStorage.getItem('objectId');
+    return localStorage.getItem('id');
   }
 
   onImageAdded(e: any) {
@@ -204,7 +202,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       getUserByObjectIdAction({
         objectId: objectId,
-      })
+      }),
     );
 
     this.store.dispatch(getChatChannelAction({ otherUserId: objectId }));
@@ -253,7 +251,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     // We divide by oneDay and round to handle potential minor time differences
     // that don't affect the day itself.
     const diffDays = Math.round(
-      (now.getTime() - timestampDate.getTime()) / oneDay
+      (now.getTime() - timestampDate.getTime()) / oneDay,
     );
 
     if (diffDays === 0) {

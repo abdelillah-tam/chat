@@ -1,9 +1,4 @@
-export function saveDataLocally(
-  email: string,
-  userToken: string,
-  objectId: string
-) {
+export function saveDataLocally(email: string, id: string) {
   localStorage.setItem('email', email);
-  localStorage.setItem('userToken', userToken);
-  localStorage.setItem('objectId', objectId);
+  localStorage.setItem('id', id);
 }

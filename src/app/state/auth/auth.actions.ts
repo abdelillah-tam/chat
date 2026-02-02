@@ -48,13 +48,17 @@ export const RETRIEVED_PROFILE_PICTURE_LINK =
 
 export const RETRIEVED_FOUND_USER = '[Effect] retrieved found user';
 
+export const REQUEST_CSRF_TOKEN = '[Login / Signup] request csrf token';
+
+export const FINISHED_CSRF_REQUEST = '[Effect] finished csrf request';
+
 export const signupAction = createAction(
   SIGNUP,
   props<{
     user: User;
     password: string | undefined;
     confirmationPassword: string | undefined;
-  }>()
+  }>(),
 );
 
 export const errorAction = createAction(
@@ -62,59 +66,59 @@ export const errorAction = createAction(
   props<{
     code: number;
     error: string;
-  }>()
+  }>(),
 );
 
 export const emptyStateAction = createAction('[Login Component] empty state');
 
 export const getFullNameAction = createAction(
   FULLNAME,
-  props<{ objectId: string }>()
+  props<{ objectId: string }>(),
 );
 
 export const getCurrentLoggedInUser = createAction(
   GET_CURRENT_LOGGEDIN_USER,
-  props<{ objectId: string }>()
+  props<{ objectId: string }>(),
 );
 
 export const retrievedCurrentLoggedInUserAction = createAction(
   RETRIEVED_CURRENT_LOGGEDIN_USER,
   props<{
     currentUserLoggedInOrError: User | { code: number; error: string };
-  }>()
+  }>(),
 );
 
 export const getUserByObjectIdAction = createAction(
   GET_USER_BY_OBJECT_ID,
-  props<{ objectId: string }>()
+  props<{ objectId: string }>(),
 );
 
 export const getAllUsersInContactAction = createAction(
-  GET_ALL_USERS_IN_CONTACT
+  GET_ALL_USERS_IN_CONTACT,
 );
 
 export const retrievedUserAction = createAction(
   RETRIEVED_USER,
   props<{
     user: User | { code: number; error: string };
-  }>()
+  }>(),
 );
 
 export const retrievedUsersAction = createAction(
   RETRIEVED_USERS,
   props<{
     users: { user: User; channel: string; lastMessageTimestamp: number }[];
-  }>()
+  }>(),
 );
 
 export const findUsersAction = createAction(
   FIND_USERS,
-  props<{ name: string }>()
+  props<{ name: string }>(),
 );
 
 export const uploadProfilePicAction = createAction(
   UPLOAD_PROFILE_PICTURE,
-  props<{ file: File; userId: string }>()
+  props<{ file: File; userId: string }>(),
 );
 
 export const updateUserInfoAction = createAction(
@@ -126,43 +130,48 @@ export const updateUserInfoAction = createAction(
     email: string | undefined;
     password: string | undefined;
     provider: string;
-  }>()
+  }>(),
 );
 
 export const updatedInfosAction = createAction(
   UPDATED_USER_INFO,
-  props<{ result: boolean }>()
+  props<{ result: boolean }>(),
 );
 
 export const getProfilePictureLinkAction = createAction(
   GET_PROFILE_PICTURE_LINK,
-  props<{ objectId: string }>()
+  props<{ objectId: string }>(),
 );
 
 export const retrievedProfilePictureLinkAction = createAction(
   RETRIEVED_PROFILE_PICTURE_LINK,
-  props<{ link: string }>()
+  props<{ link: string }>(),
 );
 
 export const retrievedProfilePictureAction = createAction(
   RETRIEVED_PROFILE_PICTURE,
-  props<{ link: string }>()
+  props<{ link: string }>(),
 );
 
 export const checkIfTokenIsValidAction = createAction(CHECK_TOKEN_IF_VALID);
 
 export const retrievedTokenCheckingAction = createAction(
   RETRIEVED_TOCKEN_CHECK,
-  props<{ valid: boolean }>()
+  props<{ valid: boolean }>(),
 );
 
 export const findUserByEmailAction = createAction(
   FIND_BY_EMAIL,
-  props<{ email: string }>()
+  props<{ email: string }>(),
 );
 
 export const retrievedFoundUserByEmailAction = createAction(
   RETRIEVED_FOUND_USER,
-  props<{ data: User | { code: number; error: string } }>()
+  props<{ data: User | { code: number; error: string } }>(),
 );
 
+export const requestCsrfTokenAction = createAction(REQUEST_CSRF_TOKEN);
+
+export const finishedCsrfTokenRequestAction = createAction(
+  FINISHED_CSRF_REQUEST,
+);

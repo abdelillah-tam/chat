@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, OnInit, viewChild } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import {
   NavigationEnd,
   NavigationStart,
@@ -10,17 +10,16 @@ import {
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDrawerMode, MatSidenavModule } from '@angular/material/sidenav';
-import { MatListItem, MatListModule } from '@angular/material/list';
+import { MatListModule } from '@angular/material/list';
 import { Store } from '@ngrx/store';
 import { emptyStateAction } from './state/auth/auth.actions';
-import { AuthService } from './services/auth.service';
 import { CommonModule } from '@angular/common';
 import { filter } from 'rxjs';
 import { sideNavStateSelector } from './state/app/app.selectors';
-
-import Pusher from 'pusher-js';
 import { logoutAction } from './state/login/login.actions';
 import { closeSidenaveAction } from './state/app/app.actions';
+import { LogoComponent } from './logo/logo.component';
+import { BreakpointObserver } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-root',
@@ -34,6 +33,7 @@ import { closeSidenaveAction } from './state/app/app.actions';
     RouterLink,
     RouterLinkActive,
     CommonModule,
+    LogoComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
@@ -42,8 +42,10 @@ import { closeSidenaveAction } from './state/app/app.actions';
   },
 })
 export class AppComponent implements OnInit {
-
-  constructor(private store: Store, private router: Router) {}
+  constructor(
+    private store: Store,
+    private router: Router,
+  ) {}
 
   openSide: boolean = false;
 
@@ -53,8 +55,17 @@ export class AppComponent implements OnInit {
 
   isLoginOrSignupRoute: boolean = false;
 
+  selectedClasses = signal(['text-slate-900!']);
+
+  breakPointObserver = inject(BreakpointObserver);
+
+  isSmallScreen = false;
+
   ngOnInit(): void {
-    
+    this.breakPointObserver.observe(['(width<40rem)']).subscribe((result) => {
+      this.isSmallScreen = result.matches;
+    });
+
     this.store.select(sideNavStateSelector).subscribe((result) => {
       this.openSide = result;
     });

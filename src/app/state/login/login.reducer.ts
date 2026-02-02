@@ -1,26 +1,33 @@
 import { createReducer, on } from '@ngrx/store';
-import { loginResultAction, logoutAction } from './login.actions';
+import {
+  successLoginAction,
+  logoutAction,
+  failedLoginAction,
+} from './login.actions';
 import { LoginState } from './login-state';
 
 const initialState: LoginState = {
   email: '',
-  objectId: '',
-  userToken: '',
+  id: '',
   state: 'none',
+  message: '',
 };
 
 export const loginReducer = createReducer(
   initialState,
-  on(loginResultAction, (state, data) => {
+  on(successLoginAction, (state, data) => {
     return {
       ...state,
       state: 'success',
       email: data.email,
-      userToken: data.userToken,
-      objectId: data.objectId,
+      id: String(data.id),
     };
+  }),
+  on(failedLoginAction, (state, data) => {
+    console.log(data);
+    return { ...state, state: 'failed', message: data.message };
   }),
   on(logoutAction, (state, data) => {
     return { ...state, email: '', objectId: '', userToken: '', state: 'none' };
-  })
+  }),
 );

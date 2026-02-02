@@ -10,7 +10,11 @@ import {
 } from '@angular/forms';
 
 import { Store } from '@ngrx/store';
-import { emptyStateAction, signupAction } from '../state/auth/auth.actions';
+import {
+  emptyStateAction,
+  requestCsrfTokenAction,
+  signupAction,
+} from '../state/auth/auth.actions';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
@@ -41,12 +45,13 @@ export class SignupComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store,
     private router: Router,
-  ) {}
+  ) {
+    this.store.dispatch(requestCsrfTokenAction());
+  }
 
-  signUpForm = new FormGroup({
+  signUpFormGroup = new FormGroup({
     firstName: new FormControl('', [Validators.required]),
     lastName: new FormControl('', [Validators.required]),
-    sex: new FormControl('', [Validators.required]),
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [
       Validators.required,
@@ -59,10 +64,8 @@ export class SignupComponent implements OnInit, OnDestroy {
 
   selectLoginState: Subscription | undefined;
 
-  loading: boolean = false;
-
   ngOnInit(): void {
-    this.signUpForm.addValidators([
+    this.signUpFormGroup.addValidators([
       this.comparePasswordValidator('password', 'password_confirmation'),
     ]);
 
@@ -79,11 +82,10 @@ export class SignupComponent implements OnInit, OnDestroy {
       .subscribe((state) => {
         if (
           state.email &&
-          state.userToken &&
-          state.objectId &&
+          state.id &&
           state.state === 'success'
         ) {
-          saveDataLocally(state.email, state.userToken, state.objectId);
+          saveDataLocally(state.email, state.id);
           this.store.dispatch(emptyStateAction());
           this.router.navigate(['/']);
         }
@@ -98,21 +100,24 @@ export class SignupComponent implements OnInit, OnDestroy {
   show = true;
 
   onSubmit() {
-    if (this.signUpForm.valid && !this.loading) {
-      this.loading = true;
+    console.log(this.signUpFormGroup.valid);
+    console.log(this.signUpFormGroup.controls);
+    if (this.signUpFormGroup.valid) {
+      //this.signUpFormGroup.disable();
+
       this.store.dispatch(
         signupAction({
           user: {
-            firstName: this.signUpForm.value.firstName!,
-            lastName: this.signUpForm.value.lastName!,
-            email: this.signUpForm.value.email!,
-            sex: this.signUpForm.value.sex!,
+            firstName: this.signUpFormGroup.value.firstName!,
+            lastName: this.signUpFormGroup.value.lastName!,
+            email: this.signUpFormGroup.value.email!,
             id: '',
             provider: 'user',
             profilePictureLink: '',
           },
-          password: this.signUpForm.value.password!,
-          confirmationPassword: this.signUpForm.value.password_confirmation!,
+          password: this.signUpFormGroup.value.password!,
+          confirmationPassword:
+            this.signUpFormGroup.value.password_confirmation!,
         }),
       );
     }

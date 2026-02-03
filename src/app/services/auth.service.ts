@@ -1,7 +1,4 @@
-import {
-  HttpClient,
-  HttpHeaders,
-} from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { User } from '../model/user';
 import { environment } from '../../environments/environment';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -9,7 +6,9 @@ export class AuthService {
   constructor(private httpClient: HttpClient) {}
 
   requestCsrfToken() {
-    return this.httpClient.get(`${environment.API_CSRF}/sanctum/csrf-cookie`);
+    return this.httpClient.get(`${environment.API_CSRF}/sanctum/csrf-cookie`, {
+      withCredentials: true,
+    });
   }
 
   signup(user: User, password: string, confirmationPassword: string) {

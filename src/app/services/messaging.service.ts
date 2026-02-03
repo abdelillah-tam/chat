@@ -20,7 +20,9 @@ export class MessagingService {
   }
 
   requestCsrfToken() {
-    return this.httpClient.get(`${environment.API_CSRF}/sanctum/csrf-cookie`);
+    return this.httpClient.get(`${environment.API_CSRF}/sanctum/csrf-cookie`, {
+      withCredentials: true
+    });
   }
 
   async sendMessage(message: FormData, firstMessage: boolean) {

@@ -6,9 +6,7 @@ export class AuthService {
   constructor(private httpClient: HttpClient) {}
 
   requestCsrfToken() {
-    return this.httpClient.get(`${environment.API_CSRF}/sanctum/csrf-cookie`, {
-      withCredentials: true,
-    });
+    return this.httpClient.get(`${environment.API_CSRF}/sanctum/csrf-cookie`);
   }
 
   signup(user: User, password: string, confirmationPassword: string) {

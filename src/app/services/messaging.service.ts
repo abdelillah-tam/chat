@@ -15,21 +15,21 @@ export class MessagingService {
   constructor(
     private store: Store,
     private httpClient: HttpClient,
-  ) {
-  }
+  ) {}
 
   requestCsrfToken() {
-    return this.httpClient.get(`${environment.API_CSRF}/sanctum/csrf-cookie`);
+    return this.httpClient.get(`${environment.API_CSRF}/sanctum/csrf-cookie`, {
+      withCredentials: true,
+    });
   }
 
   async sendMessage(message: FormData, firstMessage: boolean) {
     await this.initializeEcho();
-    
+
     if (firstMessage) {
       this.channels[message.get('channel')!.toString()] = this.echo!.private(
         `channel.${message.get('channel')!.toString()}`,
       );
-
 
       /*this.channels[message.get('channel')!.toString()].on(
         'pusher:subscription_succeeded',
@@ -56,7 +56,6 @@ export class MessagingService {
           }
         },
       );*/
-
     } else {
       if (!message.get('image')) {
         this.httpClient
@@ -172,56 +171,58 @@ export class MessagingService {
   }*/
 
   private initializeEcho(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (this.echo) {
-      resolve();
-      return;
-    }
-
-    //@ts-ignore
-    window.Pusher = Pusher;
-    
-    this.echo = new Echo({
-      broadcaster: 'pusher',
-      cluster: 'eu',
-      key: 'f98a33f83ca52a4ae1cd',
-      forceTLS: false,
-      authEndpoint: environment.AUTH_ENDPOINT,
-      authorizer: (channel: any) => {
-        return {
-          authorize: (socketId: string, callback: Function) => {
-            this.httpClient.post(
-              environment.AUTH_ENDPOINT,
-              {
-                socket_id: socketId,
-                channel_name: channel.name
-              },
-              {
-                withCredentials: true,
-                headers: {
-                  'Accept': 'application/json',
-                  'X-Requested-With': 'XMLHttpRequest'
-                }
-              }
-            ).subscribe({
-              next: (response: any) => callback(null, response),
-              error: (error: any) => callback(error, null)
-            });
-          }
-        };
+    return new Promise((resolve, reject) => {
+      if (this.echo) {
+        resolve();
+        return;
       }
-    });
 
-    // Wait for Pusher connection
-    this.echo.connector.pusher.connection.bind('connected', () => {
-      resolve();
-    });
+      //@ts-ignore
+      window.Pusher = Pusher;
 
-    this.echo.connector.pusher.connection.bind('error', (error: any) => {
-      reject(error);
+      this.echo = new Echo({
+        broadcaster: 'pusher',
+        cluster: 'eu',
+        key: 'f98a33f83ca52a4ae1cd',
+        forceTLS: false,
+        authEndpoint: environment.AUTH_ENDPOINT,
+        authorizer: (channel: any) => {
+          return {
+            authorize: (socketId: string, callback: Function) => {
+              this.httpClient
+                .post(
+                  environment.AUTH_ENDPOINT,
+                  {
+                    socket_id: socketId,
+                    channel_name: channel.name,
+                  },
+                  {
+                    withCredentials: true,
+                    headers: {
+                      Accept: 'application/json',
+                      'X-Requested-With': 'XMLHttpRequest',
+                    },
+                  },
+                )
+                .subscribe({
+                  next: (response: any) => callback(null, response),
+                  error: (error: any) => callback(error, null),
+                });
+            },
+          };
+        },
+      });
+
+      // Wait for Pusher connection
+      this.echo.connector.pusher.connection.bind('connected', () => {
+        resolve();
+      });
+
+      this.echo.connector.pusher.connection.bind('error', (error: any) => {
+        reject(error);
+      });
     });
-  });
-}
+  }
   getXsrfToken(): string {
     const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
     return match ? decodeURIComponent(match[1]) : '';

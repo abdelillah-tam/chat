@@ -1,7 +1,6 @@
 import {
   ApplicationConfig,
   provideZoneChangeDetection,
-  isDevMode,
 } from '@angular/core';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 
@@ -9,7 +8,6 @@ import { routes } from './app.routes';
 import {
   HttpClient,
   provideHttpClient,
-  withInterceptors,
   withXsrfConfiguration,
 } from '@angular/common/http';
 import { provideState, provideStore, Store } from '@ngrx/store';
@@ -27,7 +25,6 @@ import { MessagingService } from './services/messaging.service';
 import { appReducer } from './state/app/app.reducers';
 import { loginReducer } from './state/login/login.reducer';
 import { LoginEffect } from './state/login/login.effect';
-import { provideStoreDevtools } from '@ngrx/store-devtools';
 
 export const appConfig: ApplicationConfig = {
   providers: [

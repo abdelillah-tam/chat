@@ -35,6 +35,7 @@ import { saveDataLocally } from '../model/save-user-locally';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LogoComponent } from '../logo/logo.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { AuthService } from '../services/auth.service';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -76,8 +77,9 @@ export class LoginComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private store: Store<AuthState>,
+    private authService: AuthService,
   ) {
-    this.store.dispatch(requestCsrfTokenAction());
+    //this.store.dispatch(requestCsrfTokenAction());
     if (sessionStorage.getItem('credential') !== null) {
       this.loading = true;
       this.handleCredential(sessionStorage.getItem('credential')!);
@@ -156,6 +158,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   });
 
   onSubmitLogin() {
+    this.authService.requestCsrfToken().subscribe();
     if (this.loginGroup.valid) {
       this.store.dispatch(
         loginAction({

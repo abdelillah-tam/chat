@@ -16,7 +16,6 @@ export class MessagingService {
     private store: Store,
     private httpClient: HttpClient,
   ) {
-    this.requestCsrfToken().subscribe();
   }
 
   requestCsrfToken() {

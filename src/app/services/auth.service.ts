@@ -23,10 +23,8 @@ export class AuthService {
         confirmationPassword: confirmationPassword,
       },
       {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
-        withCredentials: true,
+       withCredentials: true
+        
       },
     );
   }
@@ -47,9 +45,6 @@ export class AuthService {
         provider: provider,
       },
       {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
         withCredentials: true,
       },
     );

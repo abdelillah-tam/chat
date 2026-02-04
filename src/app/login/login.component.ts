@@ -79,7 +79,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     private store: Store<AuthState>,
     private authService: AuthService,
   ) {
-    //this.store.dispatch(requestCsrfTokenAction());
+    this.store.dispatch(requestCsrfTokenAction());
     if (sessionStorage.getItem('credential') !== null) {
       this.loading = true;
       this.handleCredential(sessionStorage.getItem('credential')!);
@@ -158,7 +158,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   });
 
   onSubmitLogin() {
-    this.authService.requestCsrfToken().subscribe();
     if (this.loginGroup.valid) {
       this.store.dispatch(
         loginAction({

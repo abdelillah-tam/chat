@@ -1,6 +1,6 @@
 Chat is a realtime web application that you can send text messages & images to others.
 
-Live : [Chat](https://abdelillah-tam.github.io/chat/)
+Live : [Chat](https://chat.tamoussat.com)
 
 ## Technologies:
   - Angular:

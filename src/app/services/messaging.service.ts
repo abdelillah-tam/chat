@@ -31,7 +31,7 @@ export class MessagingService {
         `channel.${message.get('channel')!.toString()}`,
       );
 
-      /*this.channels[message.get('channel')!.toString()].on(
+      this.channels[message.get('channel')!.toString()].on(
         'pusher:subscription_succeeded',
         () => {
           this.listenForMessages(message.get('channel')!.toString(), true);
@@ -55,7 +55,7 @@ export class MessagingService {
             });
           }
         },
-      );*/
+      );
     } else {
       if (!message.get('image')) {
         this.httpClient
@@ -126,7 +126,9 @@ export class MessagingService {
   }
 
   getAllChatChannels() {
-    return this.httpClient.get<string[]>(`${environment.API}/getAllChannels`);
+    return this.httpClient.get<string[]>(`${environment.API}/getAllChannels`, {
+      withCredentials: true,
+    });
   }
 
   getChatChannel(otherUserId: string) {
@@ -223,7 +225,7 @@ export class MessagingService {
       });
     });
   }
- 
+
   unsubscribeFromChannels() {
     this.echo?.leaveAllChannels();
   }

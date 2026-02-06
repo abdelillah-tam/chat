@@ -24,7 +24,6 @@ export class AuthService {
       },
       {
        withCredentials: true
-        
       },
     );
   }
@@ -68,6 +67,7 @@ export class AuthService {
         headers: new HttpHeaders({
           'Content-Type': 'application/json',
         }),
+        withCredentials: true
       },
     );
   }
@@ -116,6 +116,7 @@ export class AuthService {
         headers: new HttpHeaders({
           'Content-Type': 'application/json',
         }),
+        withCredentials: true
       },
     );
   }
@@ -127,6 +128,7 @@ export class AuthService {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
       }),
+      withCredentials: true
     });
   }
   updateInfos(
@@ -150,6 +152,7 @@ export class AuthService {
           headers: new HttpHeaders({
             'Content-Type': 'application/json',
           }),
+          withCredentials: true
         },
       );
     } else {
@@ -163,6 +166,7 @@ export class AuthService {
           headers: new HttpHeaders({
             'Content-Type': 'application/json',
           }),
+          withCredentials: true
         },
       );
     }
@@ -186,6 +190,7 @@ export class AuthService {
         headers: new HttpHeaders({
           'Content-Type': 'application/json',
         }),
+        withCredentials: true
       },
     );
   }

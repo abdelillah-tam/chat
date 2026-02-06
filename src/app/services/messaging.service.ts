@@ -223,10 +223,7 @@ export class MessagingService {
       });
     });
   }
-  getXsrfToken(): string {
-    const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
-    return match ? decodeURIComponent(match[1]) : '';
-  }
+ 
   unsubscribeFromChannels() {
     this.echo?.leaveAllChannels();
   }

@@ -134,6 +134,9 @@ export class MessagingService {
   getChatChannel(otherUserId: string) {
     return this.httpClient.get<string>(
       `${environment.API}/chatchannel/${otherUserId}`,
+     {
+      withCredentials: true
+     }
     );
   }
 

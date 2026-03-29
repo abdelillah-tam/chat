@@ -42,7 +42,7 @@
         <mat-spinner class="loading" [diameter]="50"></mat-spinner>
       </div>
     } @else {
-      <div class="basis-full flex flex-col py-3 bg-slate-100">
+      <div class="basis-full flex flex-col py-3 bg-slate-100 gap-2">
         @for (msg of messages; track msg.timestamp) {
           <ul class="flex flex-col px-5">
             @if (

@@ -24,7 +24,6 @@ export const loginReducer = createReducer(
     };
   }),
   on(failedLoginAction, (state, data) => {
-    console.log(data);
     return { ...state, state: 'failed', message: data.message };
   }),
   on(logoutAction, (state, data) => {

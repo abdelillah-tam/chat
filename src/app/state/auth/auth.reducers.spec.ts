@@ -3,7 +3,7 @@ import {
   emptyStateAction,
   errorAction,
   loginResultAction,
-  retrievedCurrentLoggedInUserAction,
+  loadLoggedInUserSuccess,
   retrievedProfilePictureAction,
 } from './auth.actions';
 import * as fromReducer from './auth.reducers';
@@ -72,7 +72,7 @@ describe('AuthReducer', () => {
 
     const state = fromReducer.authReducer(
       initialState,
-      retrievedCurrentLoggedInUserAction({ currentUserLoggedIn: mockUser })
+      loadLoggedInUserSuccess({ currentUserLoggedIn: mockUser })
     );
 
     expect(state).not.toEqual(initialState);

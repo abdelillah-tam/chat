@@ -1,6 +1,6 @@
 <li
-  class="user-item flex p-5 mt-5 cursor-pointer"
-  [ngClass]="index() === selectedUserIndex() ? 'selected-user' : ''"
+  class="user-item flex p-5 cursor-pointer"
+  [class.bg-slate-100]="index() == selectedUserIndex()"
 >
   <div class="flex items-center">
     <div class="h-12 w-12 rounded-xl bg-white">

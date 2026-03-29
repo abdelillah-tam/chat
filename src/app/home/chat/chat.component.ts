@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import {
   Component,
   ElementRef,
+  inject,
   Input,
   OnDestroy,
   OnInit,
@@ -20,7 +21,7 @@ import {
   selectChatChannel,
   selectMessages,
 } from '../../state/messaging/messaging.selectors';
-import { getUserByObjectIdAction } from '../../state/auth/auth.actions';
+import { loadUserById } from '../../state/auth/auth.actions';
 import {
   selectCurrentLoggedInUser,
   selectUser,
@@ -32,6 +33,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { DatePipePipe } from '../../date-pipe.pipe';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { BreakpointObserver } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-chat',
@@ -70,6 +72,8 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   inputFile = viewChild<ElementRef<HTMLInputElement>>('inputFile');
 
+  mainElement = viewChild<ElementRef>('main');
+
   imageUrl: string = '';
 
   selectSender: Subscription | undefined;
@@ -84,12 +88,18 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   sending: boolean = false;
 
+  isSmallScreen: boolean = false;
+
+  breakpoinObserver = inject(BreakpointObserver);
+
   constructor(
     private store: Store,
     private router: Router,
   ) {}
   ngOnInit(): void {
-    
+    this.breakpoinObserver.observe(['(width<40rem)']).subscribe((result) => {
+      this.isSmallScreen = result.matches;
+    });
     this.selectSender = this.store
       .select(selectCurrentLoggedInUser)
       .subscribe((result) => {
@@ -129,6 +139,11 @@ export class ChatComponent implements OnInit, OnDestroy {
           }
           this.sending = false;
           this.loading = false;
+
+          setTimeout(() => {
+            this.mainElement()!.nativeElement.scrollTop =
+              this.mainElement()!.nativeElement.scrollHeight;
+          }, 100);
         }
       });
   }
@@ -142,6 +157,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   sendMessage() {
+    console.log('called');
     if (this.file || this.text.length) {
       this.sending = true;
       let message = new FormData();
@@ -158,7 +174,6 @@ export class ChatComponent implements OnInit, OnDestroy {
         this.channel = channelUUID;
       }
 
-      
       this.store.dispatch(
         sendMessageAction({
           message: message,
@@ -200,8 +215,8 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.channel = undefined;
     this.messages = [];
     this.store.dispatch(
-      getUserByObjectIdAction({
-        objectId: objectId,
+      loadUserById({
+        id: objectId,
       }),
     );
 

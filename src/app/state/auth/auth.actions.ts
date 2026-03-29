@@ -1,68 +1,17 @@
 import { createAction, props } from '@ngrx/store';
 import { User } from '../../model/user';
 
-export const SIGNUP = '[Signup Component] signup';
-
-export const FULLNAME = '[Chat Component] get full name';
-
-export const GET_CURRENT_LOGGEDIN_USER =
-  '[Chat Component] get current full name';
-
-export const RETRIEVED_CURRENT_LOGGEDIN_USER =
-  '[Auth API] gotten current logged in user full name';
-
-export const GET_USER_BY_OBJECT_ID = '[Chat Component] get user';
-
-export const RETRIEVED_USER = '[Auth API] retrieved user';
-
-export const GET_ALL_USERS_IN_CONTACT = '[Auth API] get all users in contact';
-
-export const RETRIEVED_USERS = '[Auth API] retrieved users';
-
-export const RETRIEVED_TOCKEN_CHECK = '[Auth API] result of token check';
-
-export const FIND_USERS = '[Users Component] find users';
-
-export const FIND_BY_EMAIL = '[Login Component] find user by email';
-
-export const FIND_BY_ID = '[Users Component] find user by id';
-
-export const ERROR_API = '[Auth API] error';
-
-export const UPLOAD_PROFILE_PICTURE =
-  '[Settings Component] upload profile picture';
-
-export const RETRIEVED_PROFILE_PICTURE = '[Effect] gotten profile picture url';
-
-export const UPDATE_USER_INFO = '[Settings Component] update user information';
-
-export const UPDATED_USER_INFO = '[Effect] updated';
-
-export const CHECK_TOKEN_IF_VALID = '[Home Component] check if token is valid';
-
-export const GET_PROFILE_PICTURE_LINK =
-  '[Settings Or Users Component] get profile picture link';
-
-export const RETRIEVED_PROFILE_PICTURE_LINK =
-  '[Effect] retrieved profile picture link';
-
-export const RETRIEVED_FOUND_USER = '[Effect] retrieved found user';
-
-export const REQUEST_CSRF_TOKEN = '[Login / Signup] request csrf token';
-
-export const FINISHED_CSRF_REQUEST = '[Effect] finished csrf request';
-
 export const signupAction = createAction(
-  SIGNUP,
+  '[Signup Component] signup',
   props<{
     user: User;
     password: string | undefined;
-    confirmationPassword: string | undefined;
+    passwordConfirmation: string | undefined;
   }>(),
 );
 
 export const errorAction = createAction(
-  ERROR_API,
+  '[Auth API] error',
   props<{
     code: number;
     error: string;
@@ -71,107 +20,89 @@ export const errorAction = createAction(
 
 export const emptyStateAction = createAction('[Login Component] empty state');
 
-export const getFullNameAction = createAction(
-  FULLNAME,
+export const loadLoggedInUser = createAction(
+  '[Chat Component] get current full name',
   props<{ objectId: string }>(),
 );
 
-export const getCurrentLoggedInUser = createAction(
-  GET_CURRENT_LOGGEDIN_USER,
-  props<{ objectId: string }>(),
-);
-
-export const retrievedCurrentLoggedInUserAction = createAction(
-  RETRIEVED_CURRENT_LOGGEDIN_USER,
+export const loadLoggedInUserSuccess = createAction(
+  '[Auth API] logged in user loaded successfully',
   props<{
     currentUserLoggedInOrError: User | { code: number; error: string };
   }>(),
 );
 
-export const getUserByObjectIdAction = createAction(
-  GET_USER_BY_OBJECT_ID,
-  props<{ objectId: string }>(),
+export const loadUserById = createAction(
+  '[Chat Component] load user by id',
+  props<{ id: string }>(),
 );
 
-export const getAllUsersInContactAction = createAction(
-  GET_ALL_USERS_IN_CONTACT,
-);
-
-export const retrievedUserAction = createAction(
-  RETRIEVED_USER,
+export const loadUserSuccess = createAction(
+  '[Auth API] loaded user by id successfully',
   props<{
     user: User | { code: number; error: string };
   }>(),
 );
 
-export const retrievedUsersAction = createAction(
-  RETRIEVED_USERS,
+export const loadUserFailure = createAction(
+  '[Auth API] loaded user by id failed',
+  props<{ code: number; error: string }>(),
+);
+
+export const loadUsersInContact = createAction(
+  '[Auth API] get all users in contact',
+);
+
+export const loadUsersInContactSuccess = createAction(
+  '[Auth API] retrieved users',
   props<{
     users: { user: User; channel: string; lastMessageTimestamp: number }[];
   }>(),
 );
 
-export const findUsersAction = createAction(
-  FIND_USERS,
+export const findUsers = createAction(
+  '[Users Component] find users',
   props<{ name: string }>(),
 );
 
 export const uploadProfilePicAction = createAction(
-  UPLOAD_PROFILE_PICTURE,
-  props<{ file: File; userId: string }>(),
+  '[Settings Component] upload profile picture',
+  props<{ formData: FormData }>(),
 );
 
-export const updateUserInfoAction = createAction(
-  UPDATE_USER_INFO,
+export const updateUserInfo = createAction(
+  '[Settings Component] update user information',
   props<{
-    objectId: string;
     firstName: string | undefined;
     lastName: string | undefined;
     email: string | undefined;
-    password: string | undefined;
-    provider: string;
   }>(),
 );
 
-export const updatedInfosAction = createAction(
-  UPDATED_USER_INFO,
+export const updateUserInfoSuccess = createAction(
+  '[Effect] User Info has been updated',
   props<{ result: boolean }>(),
 );
 
-export const getProfilePictureLinkAction = createAction(
-  GET_PROFILE_PICTURE_LINK,
-  props<{ objectId: string }>(),
+
+export const updatePassword = createAction(
+  '[Settings Component] update user password',
+  props<{
+    currentPassword: string;
+    newPassword: string;
+    passwordConfirmation: string;
+  }>(),
 );
 
-export const retrievedProfilePictureLinkAction = createAction(
-  RETRIEVED_PROFILE_PICTURE_LINK,
-  props<{ link: string }>(),
+export const updatePasswordSuccess = createAction(
+  '[Effect] User password has been updated',
+  props<{ result: boolean }>(),
 );
 
-export const retrievedProfilePictureAction = createAction(
-  RETRIEVED_PROFILE_PICTURE,
-  props<{ link: string }>(),
+export const requestCsrfTokenAction = createAction(
+  '[Login / Signup] request csrf token',
 );
 
-export const checkIfTokenIsValidAction = createAction(CHECK_TOKEN_IF_VALID);
-
-export const retrievedTokenCheckingAction = createAction(
-  RETRIEVED_TOCKEN_CHECK,
-  props<{ valid: boolean }>(),
-);
-
-export const findUserByEmailAction = createAction(
-  FIND_BY_EMAIL,
-  props<{ email: string }>(),
-);
-
-export const retrievedFoundUserByEmailAction = createAction(
-  RETRIEVED_FOUND_USER,
-  props<{ data: User | { code: number; error: string } }>(),
-);
-
-export const requestCsrfTokenAction = createAction(REQUEST_CSRF_TOKEN);
-
-export const finishedCsrfTokenRequestAction = createAction(
-  FINISHED_CSRF_REQUEST,
+export const requestCsrfTokenSuccess = createAction(
+  '[Effect] csrf requested successfully',
 );

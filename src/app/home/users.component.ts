@@ -6,8 +6,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { Store } from '@ngrx/store';
 import {
-  findUsersAction,
-  getAllUsersInContactAction,
+  findUsers,
+  loadUsersInContact,
 } from '../state/auth/auth.actions';
 import {
   selectCurrentLoggedInUser,
@@ -25,6 +25,7 @@ import { selectLastMessage } from '../state/messaging/messaging.selectors';
 import { UserItemComponent } from './user-item/user-item.component';
 import { MessagingService } from '../services/messaging.service';
 import { BreakpointObserver } from '@angular/cdk/layout';
+import { LogoComponent } from "../logo/logo.component";
 @Component({
   selector: 'app-users',
   standalone: true,
@@ -38,7 +39,8 @@ import { BreakpointObserver } from '@angular/cdk/layout';
     MatIconModule,
     MatProgressSpinnerModule,
     UserItemComponent,
-  ],
+    LogoComponent
+],
   templateUrl: './users.component.html',
   styleUrl: './users.component.css',
 })
@@ -72,6 +74,7 @@ export class UsersComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    getCurrentUser(this.store);
     this.breakPointObserver.observe(['(width<40rem)']).subscribe((result) => {
       this.isSmallScreen = result.matches;
     });
@@ -84,9 +87,9 @@ export class UsersComponent implements OnInit, OnDestroy {
       .pipe(debounceTime(500))
       .subscribe((value) => {
         if (value?.length) {
-          this.store.dispatch(findUsersAction({ name: value }));
+          this.store.dispatch(findUsers({ name: value }));
         } else {
-          this.store.dispatch(getAllUsersInContactAction());
+          this.store.dispatch(loadUsersInContact());
         }
       });
 
@@ -150,7 +153,7 @@ export class UsersComponent implements OnInit, OnDestroy {
         }
       });
 
-    this.store.dispatch(getAllUsersInContactAction());
+    this.store.dispatch(loadUsersInContact());
   }
 
   ngOnDestroy(): void {

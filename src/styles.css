@@ -27,7 +27,7 @@
 }
 
 * {
-  box-sizing:border-box;
+  box-sizing: border-box;
   font-family: "Poppins", sans-serif;
 }
 
@@ -61,6 +61,10 @@ body {
   height: 3rem;
 }
 
+:root {
+  --mat-dialog-container-shape: var(--radius-xl) !important;
+}
+
 .input-style {
   font-weight: var(--font-weight-light);
   height: calc(var(--spacing) * 12);
@@ -85,26 +89,29 @@ body {
 }
 
 .mat-mdc-snackbar-surface {
-    background-color: transparent !important;
-    border-radius: var(--radius-xl) !important;
+  background-color: transparent !important;
+  border-radius: var(--radius-xl) !important;
 }
 
 .snack-success {
-    background-color: var(--color-green-200) !important;
-    border-radius: var(--radius-xl) !important;
+  background-color: var(--color-green-200) !important;
+  border-radius: var(--radius-xl) !important;
 
-    & .mdc-snackbar__label {
-        color: var(--color-green-950) !important;
-    }
+  & .mdc-snackbar__label {
+    color: var(--color-green-950) !important;
+  }
 }
 
+.loading {
+  --mat-progress-spinner-active-indicator-color: var(--color-yellow-400);
+}
 
 .snack-error {
-    background-color: var(--color-red-200) !important;
-    border-radius: var(--radius-xl) !important;
-    color: var(--color-red-900) !important;
+  background-color: var(--color-red-200) !important;
+  border-radius: var(--radius-xl) !important;
+  color: var(--color-red-900) !important;
 
-    & .mdc-snackbar__label {
-        color: var(--color-red-950) !important;
-    }
+  & .mdc-snackbar__label {
+    color: var(--color-red-950) !important;
+  }
 }

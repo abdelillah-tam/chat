@@ -5,6 +5,7 @@ import {
   FormControl,
   FormGroup,
   ReactiveFormsModule,
+  ValidationErrors,
   ValidatorFn,
   Validators,
 } from '@angular/forms';
@@ -25,6 +26,7 @@ import { Subscription } from 'rxjs';
 import { selectLoginState } from '../state/login/login.selector';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LogoComponent } from '../logo/logo.component';
+import { comparePasswordValidator } from '../model/passwordValidator';
 
 @Component({
   selector: 'app-signup',
@@ -53,7 +55,7 @@ export class SignupComponent implements OnInit, OnDestroy {
     firstName: new FormControl('', [Validators.required]),
     lastName: new FormControl('', [Validators.required]),
     email: new FormControl('', [Validators.required, Validators.email]),
-    password: new FormControl('', [
+    new_password: new FormControl('', [
       Validators.required,
       Validators.minLength(8),
     ]),
@@ -65,14 +67,11 @@ export class SignupComponent implements OnInit, OnDestroy {
   selectLoginState: Subscription | undefined;
 
   ngOnInit(): void {
-    this.signUpFormGroup.addValidators([
-      this.comparePasswordValidator('password', 'password_confirmation'),
-    ]);
-
+    this.signUpFormGroup.addValidators([comparePasswordValidator]);
+    
     if (
-      localStorage.getItem('objectId') &&
-      localStorage.getItem('email') &&
-      localStorage.getItem('userToken')
+      localStorage.getItem('id') &&
+      localStorage.getItem('email')
     ) {
       getCurrentUser(this.store);
     }
@@ -80,11 +79,7 @@ export class SignupComponent implements OnInit, OnDestroy {
     this.selectLoginState = this.store
       .select(selectLoginState)
       .subscribe((state) => {
-        if (
-          state.email &&
-          state.id &&
-          state.state === 'success'
-        ) {
+        if (state.email && state.id && state.state === 'success') {
           saveDataLocally(state.email, state.id);
           this.store.dispatch(emptyStateAction());
           this.router.navigate(['/']);
@@ -100,10 +95,8 @@ export class SignupComponent implements OnInit, OnDestroy {
   show = true;
 
   onSubmit() {
-    console.log(this.signUpFormGroup.valid);
-    console.log(this.signUpFormGroup.controls);
     if (this.signUpFormGroup.valid) {
-      //this.signUpFormGroup.disable();
+      this.signUpFormGroup.disable();
 
       this.store.dispatch(
         signupAction({
@@ -115,30 +108,12 @@ export class SignupComponent implements OnInit, OnDestroy {
             provider: 'user',
             profilePictureLink: '',
           },
-          password: this.signUpFormGroup.value.password!,
-          confirmationPassword:
+          password: this.signUpFormGroup.value.new_password!,
+          passwordConfirmation:
             this.signUpFormGroup.value.password_confirmation!,
         }),
       );
     }
   }
 
-  comparePasswordValidator(
-    controlName: string,
-    matchingControlName: string,
-  ): ValidatorFn {
-    return (abstractControl: AbstractControl) => {
-      const control = abstractControl.get(controlName);
-      const matchingControl = abstractControl.get(matchingControlName);
-
-      if (control!.value !== matchingControl!.value) {
-        const error = { confirmedValidator: 'Password do not match' };
-        matchingControl!.setErrors(error);
-        return error;
-      } else {
-        matchingControl!.setErrors(null);
-        return null;
-      }
-    };
-  }
 }

@@ -10,6 +10,4 @@ export interface AuthState {
   foundUsers:
     | ({ user: User; channel: string; lastMessageTimestamp: number } | User)[]
     | undefined;
-  tokenValidation: boolean | undefined;
-  foundUserByEmail: User | { code: number; error: string } | undefined;
 }

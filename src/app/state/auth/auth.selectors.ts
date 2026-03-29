@@ -20,17 +20,7 @@ export const selectFoundUsers = createSelector(
   (state) => state.foundUsers
 );
 
-export const selectTokenValidation = createSelector(
-  selectFeature,
-  (state) => state.tokenValidation
-);
-
 export const selectProfilePictureLink = createSelector(
   selectFeature,
   (state) => state.currentProfilePictureLink
-);
-
-export const selectFoundUserByEmail = createSelector(
-  selectFeature,
-  (state) => state.foundUserByEmail
 );

@@ -9,7 +9,7 @@ import {
   failedLoginAction,
 } from './login.actions';
 import { exhaustMap, map, catchError, of } from 'rxjs';
-import { errorAction, SIGNUP } from '../auth/auth.actions';
+import { errorAction, signupAction } from '../auth/auth.actions';
 import { User } from '../../model/user';
 import { MessagingService } from '../../services/messaging.service';
 
@@ -49,15 +49,15 @@ export class LoginEffect {
 
     this.signup$ = createEffect(() =>
       this.action$.pipe(
-        ofType(SIGNUP),
+        ofType(signupAction),
         exhaustMap(
           (value: {
             user: User;
-            password: string;
-            confirmationPassword: string;
+            password: string | undefined;
+            passwordConfirmation: string | undefined;
           }) =>
             this.authService
-              .signup(value.user, value.password, value.confirmationPassword)
+              .signup(value.user, value.password!, value.passwordConfirmation!)
               .pipe(
                 map(() =>
                   loginAction({

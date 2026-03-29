@@ -1,10 +1,10 @@
 import { Store } from '@ngrx/store';
-import { getCurrentLoggedInUser } from '../state/auth/auth.actions';
+import { loadLoggedInUser } from '../state/auth/auth.actions';
 
 export function getCurrentUser(store: Store) {
   
   store.dispatch(
-    getCurrentLoggedInUser({
+    loadLoggedInUser({
       objectId: localStorage.getItem('id')!
     })
   );

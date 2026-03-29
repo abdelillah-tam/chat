@@ -1,165 +1,142 @@
-<header class="bg-light-gray py-2">
-  <div class="w-full h-14 flex items-center rounded-full overflow-hidden pl-2">
-    <a class="hidden mb:flex mb:items-center" routerLink="/"
-      ><mat-icon
-        fontIcon="arrow_back"
-        class="material-symbols-outlined"
-      ></mat-icon
-    ></a>
-
-    @if (receiverUserLoading) {
-    <div class="w-11 h-11 flex justify-center items-center">
-      <mat-spinner diameter="40"></mat-spinner>
-    </div>
-    }@else {
-    <div class="w-11 h-11 rounded-full overflow-hidden">
-      <img
-        [src]="
-          receiverUser?.profilePictureLink
-            ? receiverUser?.profilePictureLink
-            : './assets/user.png'
-        "
-        class="h-full w-full object-cover"
-      />
-    </div>
-    <p class="ml-2 text-xl">
-      {{ receiverUser?.firstName }} {{ receiverUser?.lastName }}
-    </p>
-    }
-  </div>
-</header>
-<main class="h-[calc(100%-4.5rem)] w-full flex flex-col bg-light-gray">
-  @if(messages.length === 0 && !loading){
-  <p class="w-full text-center bg-gray-500 text-white">No messages here</p>
-  } @if(loading){
-  <div class="w-full flex justify-center pt-3 bg-white">
-    <mat-spinner diameter="50"></mat-spinner>
-  </div>
-  }
-
-  <div class="basis-full flex flex-col py-3 mb-4 bg-white overflow-y-auto">
-    @for(msg of messages; track msg.timestamp){
-    <ul
-      class="flex flex-col px-5"
-      [ngClass]="
-        msg.senderId == getCurrentObjectId()
-          ? 'justify-end flex-row-reverse'
-          : 'justify-start flex-row'
-      "
+<div class="flex flex-col h-screen">
+  <header class="py-2 bg-slate-900">
+    <div
+      class="w-full h-14 flex items-center rounded-full overflow-hidden px-4 gap-2"
     >
-      @if($first || calculateOneDay(msg.timestamp, messages[$index -
-      1].timestamp)){
-      <li class="m-4 flex justify-center">
-        <p class="rounded-2xl bg-gray-200 w-fit py-1 px-2">
-          {{ whichDay(msg.timestamp) | datePipe }}
+      @if (isSmallScreen) {
+        <a class="flex items-center" routerLink="/"
+          ><mat-icon
+            fontIcon="arrow_back"
+            class="material-symbols-rounded text-white!"
+          ></mat-icon
+        ></a>
+      }
+
+      @if (receiverUserLoading) {
+        <div class="w-11 h-11 flex justify-center items-center">
+          <mat-spinner class="loading" [diameter]="40"></mat-spinner>
+        </div>
+      } @else {
+        <div class="w-11 h-11 rounded-full overflow-hidden bg-white">
+          <img
+            [src]="
+              receiverUser?.profilePictureLink
+                ? receiverUser?.profilePictureLink
+                : './assets/user.png'
+            "
+            class="h-full w-full object-cover"
+          />
+        </div>
+        <p class="ml-2 text-xl text-white">
+          {{ receiverUser?.firstName }} {{ receiverUser?.lastName }}
         </p>
-      </li>
-      } @if($first || messages[$index].senderId !==
-      messages[$index-1].senderId){ }
+      }
+    </div>
+  </header>
+  <main #main class="w-full flex flex-col grow overflow-y-auto">
+    @if (messages.length === 0 && !loading) {
+      <p class="w-full text-center bg-gray-500 text-white">No messages here</p>
+    }
+    @if (loading) {
+      <div class="w-full flex justify-center grow items-center">
+        <mat-spinner class="loading" [diameter]="50"></mat-spinner>
+      </div>
+    } @else {
+      <div class="basis-full flex flex-col py-3 bg-slate-100">
+        @for (msg of messages; track msg.timestamp) {
+          <ul class="flex flex-col px-5">
+            @if (
+              $first ||
+              calculateOneDay(msg.timestamp, messages[$index - 1].timestamp)
+            ) {
+              <li class="flex justify-center">
+                <p class="rounded-2xl bg-white border px-4 py-2 my-2">
+                  {{ whichDay(msg.timestamp) | datePipe }}
+                </p>
+              </li>
+            }
+            <li
+              class="w-full flex flex-col"
+              [class]="
+                msg.senderId == getCurrentObjectId()
+                  ? 'items-end'
+                  : 'items-start'
+              "
+            >
+              <div
+                class="flex flex-col gap-2 select-text rounded-xl shadow-xs border border-gray-200 shadow-gray-200 py-2 px-4"
+                [class]="
+                  msg.senderId == getCurrentObjectId()
+                    ? 'bg-slate-900'
+                    : 'bg-white'
+                "
+              >
+                @if (msg.messageText.length) {
+                  <p
+                    class="text-lg font-light"
+                    [class.text-white]="msg.senderId == getCurrentObjectId()"
+                  >
+                    {{ msg.messageText }}
+                  </p>
+                }
+                @if (msg.imageUrl && msg.imageUrl.length) {
+                  <div
+                    class="flex max-w-100 max-h-100"
+                    [class]="
+                      msg.senderId == getCurrentObjectId()
+                        ? ['justify-end']
+                        : ['justify-start']
+                    "
+                  >
+                    <img
+                      class="h-full w-full object-cover"
+                      [src]="msg.imageUrl"
+                    />
+                  </div>
+                }
+                <p
+                  class="font-light text-xs"
+                  [class]="
+                    msg.senderId == getCurrentObjectId()
+                      ? 'text-gray-300'
+                      : 'text-gray-600'
+                  "
+                >
+                  {{ msg.timestamp * 1000 | date: "hh:mm aa" }}
+                </p>
+              </div>
+            </li>
+          </ul>
+        } @empty {}
+      </div>
+    }
+  </main>
 
-      <li class="w-full flex flex-col">
-        <div
-          class="w-full flex text-lg items-center"
-          [ngClass]="
-            msg.senderId == getCurrentObjectId()
-              ? 'flex-row-reverse pr-2'
-              : 'justify-start pl-2'
-          "
-        >
-          @if(showSenderInfo(msg, $index)){
-          <div class="w-11 h-11 rounded-xl overflow-hidden">
-            <img
-              [src]="profileImageSetter($index)"
-              class="w-full h-full object-cover"
-            />
-          </div>
-          <p class="mx-2">
-            {{
-              msg.senderId == senderUser?.id
-                ? senderUser?.firstName
-                : receiverUser?.firstName
-            }}
-            {{
-              msg.senderId == senderUser?.id
-                ? senderUser?.lastName
-                : receiverUser?.lastName
-            }}
-          </p>
-          }
-        </div>
-        <div
-          class="flex items-center select-text"
-          [ngClass]="
-            msg.senderId == getCurrentObjectId()
-              ? 'pr-15 flex-row-reverse'
-              : 'flex-row pl-15'
-          "
-        >
-          @if(msg.messageText.length){
-          <p class="text-lg font-light">
-            {{ msg.messageText }}
-          </p>
-          }
-          <p
-            class="ml-2 font-light text-xs"
-            [ngClass]="msg.messageText.length ? 'px-2' : 'px-0'"
-          >
-            {{ msg.timestamp * 1000 | date : "hh:mm aa" }}
-          </p>
-        </div>
-        @if (msg.imageUrl && msg.imageUrl.length) {
-        <div
-          class="w-full flex"
-          [ngClass]="
-            msg.senderId == getCurrentObjectId()
-              ? 'justify-end pr-14'
-              : 'justify-start pl-14'
-          "
-        >
-          <img class="w-1/2 h-full object-contain" [src]="msg.imageUrl" />
-        </div>
-        }
-      </li>
-    </ul>
-    } @empty{ }
-  </div>
-  <div
-    class="relative basis-[3%] flex items-center bg-white rounded-xl mx-4 mb-4"
-  >
-    <mat-form-field
-      class="basis-full h-full"
-      subscriptSizing="dynamic"
-      appearance="outline"
-      subscriptSizing="dynamic"
-      
-    >
-      <mat-label>Message</mat-label>
+  <footer class="flex relative p-2 gap-2">
+    <div class="grow">
       <input
-        matInput
         placeholder="Type a message"
+        class="input-style"
         [(ngModel)]="text"
         (keydown.enter)="sendMessage()"
       />
-
-      <div
-        class="relative w-[20%] h-[20%]"
-        [ngClass]="file === null ? 'hidden' : 'block'"
-      >
-        <button
-          class="absolute right-0 mt-1 mr-1 w-7 h-7 cursor-pointer border border-gray-500 rounded-full border-solid overflow-hidden"
-          (click)="removeImage()"
-          type="button"
-        >
-          <mat-icon
-            class="material-symbols-rounded"
-            fontIcon="close"
-          ></mat-icon>
-        </button>
-        <img class="w-full h-full object-contain" [src]="imageUrl" />
-      </div>
-    </mat-form-field>
-
-    <div class="absolute flex right-0">
+      @if (file) {
+        <div class="relative w-[20%] h-[20%]">
+          <button
+            class="absolute right-0 mt-1 mr-1 w-7 h-7 cursor-pointer border border-gray-500 rounded-full border-solid overflow-hidden"
+            (click)="removeImage()"
+            type="button"
+          >
+            <mat-icon
+              class="material-symbols-rounded"
+              fontIcon="close"
+            ></mat-icon>
+          </button>
+          <img class="w-full h-full object-contain" [src]="imageUrl" />
+        </div>
+      }
+    </div>
+    <div class="flex gap-2 justify-between">
       <button>
         <input
           class="hidden"
@@ -172,7 +149,8 @@
         />
         <label
           class="right-0 flex items-center"
-          [classList]="sending ? '' : 'cursor-pointer'"
+          [class.cursor-pointer]="!sending"
+          [class.cursor-not-allowed]="sending"
           for="inputFile"
           ><mat-icon
             class="material-symbols-rounded"
@@ -181,8 +159,9 @@
         ></label>
       </button>
       <button
-        class="basis-[5%] flex items-center p-2 cursor-default"
+        class="flex items-center cursor-pointer disabled:cursor-not-allowed"
         (click)="sendMessage()"
+        [disabled]="sending"
       >
         <mat-icon
           class="material-symbols-rounded"
@@ -192,5 +171,5 @@
         >
       </button>
     </div>
-  </div>
-</main>
+  </footer>
+</div>

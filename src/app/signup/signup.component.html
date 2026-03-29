@@ -63,14 +63,15 @@
           <input
             class="input-style"
             placeholder="Password"
-            formControlName="password"
+            formControlName="new_password"
             autocomplete="current-password"
+            type="password"
           />
         </div>
 
         @if (
-          signUpFormGroup.controls.password.invalid &&
-          signUpFormGroup.controls.password.touched
+          signUpFormGroup.controls.new_password.invalid &&
+          signUpFormGroup.controls.new_password.touched
         ) {
           <p class="text-xs text-red-600">
             Password must be at least 8 characters !
@@ -85,14 +86,10 @@
             placeholder="Password Confirmation"
             formControlName="password_confirmation"
             autocomplete="current-password"
+            type="password"
           />
         </div>
-
-        @if (
-          signUpFormGroup.controls.password_confirmation.invalid &&
-          signUpFormGroup.controls.password_confirmation.touched &&
-          signUpFormGroup.errors?.["confirmedValidator"]
-        ) {
+        @if (signUpFormGroup.errors?.["passwordMismatch"]) {
           <p class="text-xs text-red-600">Password doesn't match</p>
         }
       </div>

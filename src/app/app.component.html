@@ -46,53 +46,53 @@
   </mat-sidenav>
 
   <mat-sidenav-content>
-    <div class="h-full w-full flex">
+    <div class="min-h-full w-full flex">
       @if (!isLoginOrSignupRoute && !isSmallScreen) {
-        <aside
-          class="h-full basis-1/12 flex flex-col justify-around items-center bg-light-gray px-2 bg-slate-900"
-        >
-          <div class="flex items-center">
-            <app-logo [color]="'text-white'"></app-logo>
-          </div>
-
-          <a
-            class="flex justify-center items-center cursor-pointer p-2"
-            [class.selected-section]="selectedSection == 0"
-            (click)="select(0)"
-          >
-            <div class="flex justify-center items-center text-white">
-              <mat-icon
-                class="material-symbols-rounded text-[2rem]!"
-                fontIcon="chat"
-              ></mat-icon>
+        <aside class="basis-1/12 bg-light-gray px-2 bg-slate-900">
+          <div class="h-screen flex flex-col items-center justify-center gap-24">
+            <div class="flex items-center">
+              <app-logo [color]="'text-white'"></app-logo>
             </div>
-          </a>
 
-          <a
-            class="flex justify-center items-center cursor-pointer text-white p-2"
-            [ngClass]="selectedSection === 1 ? 'selected-section' : ''"
-            (click)="select(1)"
-          >
-            <div class="flex justify-center items-center">
-              <mat-icon
-                class="material-symbols-rounded text-[2rem]!"
-                fontIcon="settings"
-              ></mat-icon>
-            </div>
-          </a>
-          <a
-            class="icon-div flex justify-center items-center w-16 h-16 cursor-pointer text-white p-2"
-            (click)="logout()"
-          >
-            <div
-              class="icon-div h-[90%] w-[90%] bg-light-gray flex justify-center items-center rounded-[1.25rem]"
+            <a
+              class="flex justify-center items-center cursor-pointer p-2"
+              [class.selected-section]="selectedSection == 0"
+              (click)="select(0)"
             >
-              <mat-icon
-                class="material-symbols-rounded text-gray-950 text-center text-[2rem]!"
-                fontIcon="logout"
-              ></mat-icon>
-            </div>
-          </a>
+              <div class="flex justify-center items-center text-white">
+                <mat-icon
+                  class="material-symbols-rounded text-[2rem]!"
+                  fontIcon="chat"
+                ></mat-icon>
+              </div>
+            </a>
+
+            <a
+              class="flex justify-center items-center cursor-pointer text-white p-2"
+              [ngClass]="selectedSection === 1 ? 'selected-section' : ''"
+              (click)="select(1)"
+            >
+              <div class="flex justify-center items-center">
+                <mat-icon
+                  class="material-symbols-rounded text-[2rem]!"
+                  fontIcon="settings"
+                ></mat-icon>
+              </div>
+            </a>
+            <a
+              class="icon-div flex justify-center items-center w-16 h-16 cursor-pointer text-white p-2"
+              (click)="logout()"
+            >
+              <div
+                class="icon-div h-[90%] w-[90%] bg-light-gray flex justify-center items-center rounded-[1.25rem]"
+              >
+                <mat-icon
+                  class="material-symbols-rounded text-gray-950 text-center text-[2rem]!"
+                  fontIcon="logout"
+                ></mat-icon>
+              </div>
+            </a>
+          </div>
         </aside>
       }
       <div class="grow">

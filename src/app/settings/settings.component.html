@@ -2,95 +2,113 @@
   @if (isSmallScreen) {
     <header class="w-full bg-light-gray p-4">
       <div class="flex items-center cursor-pointer" (click)="hideSettings()">
-        <div class="h-8 w-8">
-          <img src="./assets/back.png" />
+        <div class="flex items-center">
+          <mat-icon
+            class="material-symbols-rounded"
+            fontIcon="arrow_back"
+          ></mat-icon>
         </div>
         <p class="ml-2 font-bold">Back</p>
       </div>
     </header>
   }
 
-  <main
-    class="bg-light-gray relative p-8 sm:p-24 grow flex flex-col gap-4"
-  >
+  <main class="relative p-8 sm:p-24 grow flex flex-col gap-4">
+    @let firstNameControl = infoFormGroup.controls.firstName;
+    @let lastNameControl = infoFormGroup.controls.lastName;
+    @let emailControl = infoFormGroup.controls.email;
+
     <ul class="flex flex-col gap-2">
       <li class="font-bold text-xl">Account Settings</li>
       <li>Manage your profile information</li>
     </ul>
     <form
-      class="items-stretch flex flex-col justify-between grow rounded-xl w-full p-8 bg-white shadow-2xl"
-      [formGroup]="infoGroup"
+      class="flex flex-col justify-between grow rounded-xl w-full p-8 bg-white shadow-2xl gap-4"
+      [formGroup]="infoFormGroup"
     >
-      <div class="w-28 h-28 rounded-full overflow-hidden">
-        <img
-          class="h-full w-full object-cover"
-          [src]="profileImageUrl !== '' ? profileImageUrl : './assets/user.png'"
-        />
+      <div class="flex flex-col gap-4">
+        <div class="w-28 h-28 rounded-full overflow-hidden self-center">
+          <img
+            class="h-full w-full object-cover"
+            [src]="
+              profileImageUrl !== '' ? profileImageUrl : './assets/user.png'
+            "
+          />
+        </div>
+
+        @if (!file) {
+          <label
+            for="profile-picture"
+            class="cursor-pointer border rounded-xl border-slate-900 py-2 px-4 self-center"
+            >Change Profile Picture</label
+          >
+          <input
+            class="bg-light-white w-full hidden"
+            id="profile-picture"
+            type="file"
+            (change)="onImageAdded($event)"
+            #fileInput
+          />
+        }
+
+        @if (file) {
+          <div class="flex md:justify-start justify-between gap-4 self-center">
+            <button
+              class="text-white font-light rounded-xl bg-slate-900 hover:bg-slate-800 cursor-pointer px-4 py-2 grow md:grow-0"
+              type="button"
+              (click)="saveProfilePictureChange()"
+            >
+              Update Picture
+            </button>
+            <button
+              class="font-light rounded-xl border border-slate-900 px-4 py-2 cursor-pointer"
+              type="button"
+              (click)="cancel()"
+            >
+              Cancel
+            </button>
+          </div>
+        }
       </div>
 
-      <label for="profile-picture">Change Profile Picture</label>
-      <input
-        class="bg-light-white w-full"
-        id="profile-picture"
-        type="file"
-        (change)="onImageAdded($event)"
-        #fileInput
-      />
-
-      @if (file) {
-        <div class="flex w-1/3 mb:w-1/2 justify-around">
-          <button
-            mat-flat-button
-            class="text-white h-9 text-xl font-light rounded-md"
-            type="button"
-            (click)="saveProfilePictureChange()"
-          >
-            Update
-          </button>
-          <button
-            mat-stroked-button
-            class="h-9 font-light"
-            type="button"
-            (click)="cancel()"
-          >
-            Cancel
-          </button>
-        </div>
-      }
-
-      <div>
+      <div class="grid grid-rows-[1fr_calc(var(--spacing)*12)_1fr] mt-4">
+        <label for="first-name">First Name</label>
         <input
           id="first-name"
           class="input-style"
           placeholder="First name"
           formControlName="firstName"
         />
+        @if (firstNameControl.touched && firstNameControl.invalid) {
+          <p class="text-red-600">First Name is required</p>
+        }
       </div>
 
-      <div>
+      <div class="grid grid-rows-[1fr_calc(var(--spacing)*12)_1fr]">
+        <label for="last-name">Last Name</label>
         <input
+          id="last-name"
           class="input-style"
           placeholder="Last name"
           formControlName="lastName"
         />
+        @if (lastNameControl.touched && lastNameControl.invalid) {
+          <p class="text-red-600">Last Name is required</p>
+        }
       </div>
 
-      <div>
+      <div class="grid grid-rows-[1fr_calc(var(--spacing)*12)_1fr]">
+        <label for="email">Email</label>
         <input
+          id="email"
           class="input-style"
           type="email"
           placeholder="email"
           formControlName="email"
         />
-      </div>
-
-      <div>
-        <input
-          type="password"
-          class="input-style"
-          formControlName="password"
-          placeholder="Change your password"
-        />
+        @if (emailControl.touched && emailControl.invalid) {
+          <p class="text-red-600">Please enter a valid email</p>
+        }
       </div>
 
       <button
@@ -99,6 +117,76 @@
       >
         Save
       </button>
+
+      @if (changePassword) {
+        <form [formGroup]="passwordFormGroup">
+          <div class="grid grid-rows-[1fr_calc(var(--spacing)*12)_1fr]">
+            <label for="password">Current Password</label>
+            <input
+              id="password"
+              type="password"
+              class="input-style"
+              formControlName="current_password"
+              placeholder="Change your password"
+            />
+            @if (
+              passwordFormGroup.controls.current_password.invalid &&
+              passwordFormGroup.controls.current_password.touched &&
+              passwordFormGroup.controls.current_password.errors?.["required"]
+            ) {
+              <p class="text-red-600">This filed is required</p>
+            }
+          </div>
+          <div class="grid grid-rows-[1fr_calc(var(--spacing)*12)_1fr]">
+            <label for="password">New Password</label>
+            <input
+              id="password"
+              type="password"
+              class="input-style"
+              formControlName="new_password"
+              placeholder="Change your password"
+            />
+              @if (
+              passwordFormGroup.controls.new_password.invalid &&
+              passwordFormGroup.controls.new_password.touched &&
+              passwordFormGroup.controls.new_password.errors?.["required"]
+            ) {
+              <p class="text-red-600">This filed is required</p>
+            }
+          </div>
+
+          <div class="grid grid-rows-[1fr_calc(var(--spacing)*12)_1fr]">
+            <label>Password Confirmation</label>
+            <input
+              id="password-confirmation"
+              type="password"
+              class="input-style"
+              formControlName="password_confirmation"
+              placeholder="Confirm your password"
+            />
+            @if (passwordFormGroup.errors?.["passwordMismatch"]) {
+              <p class="text-red-600">Passwords Do Not Match</p>
+            }
+          </div>
+        </form>
+      }
+
+      <div class="flex gap-4 flex-col md:flex-row">
+        @if (changePassword) {
+          <button
+            class="btn bg-slate-900 text-white rounded-xl hover:bg-slate-800 cursor-pointer md:basis-1/2"
+            (click)="savePasswordChange()"
+          >
+            Save Password
+          </button>
+        }
+        <button
+          class="btn bg-white text-slate-900 border border-slate-900 rounded-xl hover:bg-slate-200 cursor-pointer grow md:basis-1/2"
+          (click)="showPasswordFields()"
+        >
+          {{ changePassword ? "Cancel Password Change" : "Change Password" }}
+        </button>
+      </div>
     </form>
   </main>
 </div>

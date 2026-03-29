@@ -5,8 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
-import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
-import { getAllUsersInContactAction } from '../state/auth/auth.actions';
+import { loadUsersInContact } from '../state/auth/auth.actions';
 
 export class MessagingService {
   echo: Echo<'pusher'> | undefined;
@@ -31,47 +30,17 @@ export class MessagingService {
         `channel.${message.get('channel')!.toString()}`,
       );
 
-      this.channels[message.get('channel')!.toString()].on(
-        'pusher:subscription_succeeded',
-        () => {
-          this.listenForMessages(message.get('channel')!.toString(), true);
-          if (!message.get('image')) {
-            this.httpClient
-              .post(`${environment.API}/send`, message, {
-                withCredentials: true,
-              })
-              .subscribe();
-          } else {
-            this.uploadImageMsg(
-              message.get('image')!.valueOf() as File,
-              message.get('senderId')!.toString(),
-            ).then((value) => {
-              message.set('image', value);
-              this.httpClient
-                .post(`${environment.API}/send`, message, {
-                  withCredentials: true,
-                })
-                .subscribe();
-            });
-          }
-        },
-      );
+      await this.listenForMessages(message.get('channel')!.toString(), true);
+
+      this.httpClient
+        .post(`${environment.API}/send`, message, {
+          withCredentials: true,
+        })
+        .subscribe();
     } else {
-      if (!message.get('image')) {
-        this.httpClient
-          .post(`${environment.API}/send`, message, { withCredentials: true })
-          .subscribe();
-      } else {
-        this.uploadImageMsg(
-          message.get('image')!.valueOf() as File,
-          message.get('senderId')!.toString(),
-        ).then((value) => {
-          message.set('image', value);
-          this.httpClient
-            .post(`${environment.API}/send`, message, { withCredentials: true })
-            .subscribe();
-        });
-      }
+      this.httpClient
+        .post(`${environment.API}/send`, message, { withCredentials: true })
+        .subscribe();
     }
   }
 
@@ -89,8 +58,8 @@ export class MessagingService {
     ); // if channel already exist it won't create a new one, instead it will return the existing channel
   }
 
-  listenForMessages(channel: string, firstMessage: boolean) {
-    this.initializeEcho();
+  async listenForMessages(channel: string, firstMessage: boolean) {
+    await this.initializeEcho();
     if (firstMessage) {
       this.channels[channel].listen('.chat', (data: Message) => {
         this.store.dispatch(newMessageAction({ message: data }));
@@ -99,7 +68,6 @@ export class MessagingService {
       if (!this.channels[channel]) {
         this.channels[channel] = this.echo!.private(`channel.${channel}`);
         this.channels[channel].listen('.chat', (data: Message) => {
-          console.log(data);
           this.store.dispatch(newMessageAction({ message: data }));
         });
       }
@@ -112,7 +80,7 @@ export class MessagingService {
       let chats = this.echo!.private(`user.${localStorage.getItem('id')!}`);
 
       chats.listen('.chats', () => {
-        this.store.dispatch(getAllUsersInContactAction());
+        this.store.dispatch(loadUsersInContact());
       });
     }
   }
@@ -134,9 +102,9 @@ export class MessagingService {
   getChatChannel(otherUserId: string) {
     return this.httpClient.get<string>(
       `${environment.API}/chatchannel/${otherUserId}`,
-     {
-      withCredentials: true
-     }
+      {
+        withCredentials: true,
+      },
     );
   }
 
@@ -231,26 +199,6 @@ export class MessagingService {
 
   unsubscribeFromChannels() {
     this.echo?.leaveAllChannels();
-  }
-
-  private async uploadImageMsg(file: File, sender: string) {
-    const storage = getStorage();
-    let downloadUrl: string;
-
-    const storageRef = ref(storage, `chats/${sender}/${file.name}`);
-    await uploadBytes(storageRef, file);
-    let url = await getDownloadURL(storageRef);
-    downloadUrl = url;
-
-    return downloadUrl;
-  }
-
-  hasImage(image: File | null, sender: string) {
-    if (image) {
-      return this.uploadImageMsg(image, sender);
-    }
-
-    return false;
   }
 }
 

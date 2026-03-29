@@ -12,12 +12,9 @@ import * as jose from 'jose';
 import { Store } from '@ngrx/store';
 import {
   emptyStateAction,
-  findUserByEmailAction,
   requestCsrfTokenAction,
-  signupAction,
 } from '../state/auth/auth.actions';
 import { AuthState } from '../state/auth/auth-state';
-import { selectFoundUserByEmail } from '../state/auth/auth.selectors';
 import {
   MAT_FORM_FIELD_DEFAULT_OPTIONS,
   MatFormFieldModule,
@@ -27,7 +24,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { GoogleUser } from '../model/google-user.interface';
 import { environment } from '../../environments/environment';
-import { getCurrentUser } from '../model/get-current-user';
 import { Subscription } from 'rxjs';
 import { selectLoginState } from '../state/login/login.selector';
 import { loginAction } from '../state/login/login.actions';
@@ -35,7 +31,8 @@ import { saveDataLocally } from '../model/save-user-locally';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LogoComponent } from '../logo/logo.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { AuthService } from '../services/auth.service';
+import { LoadingComponent } from '../loading/loading.component';
+import { MatDialog } from '@angular/material/dialog';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -60,8 +57,6 @@ import { AuthService } from '../services/auth.service';
   styleUrl: './login.component.css',
 })
 export class LoginComponent implements OnInit, OnDestroy {
-  public googleToken = environment.GOOGLE_TOKEN;
-
   selectLoginState: Subscription | undefined;
 
   selectFoundUserByEmail: Subscription | undefined;
@@ -74,17 +69,13 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   snackBar = inject(MatSnackBar);
 
+  matDialog = inject(MatDialog);
+
   constructor(
     private router: Router,
     private store: Store<AuthState>,
-    private authService: AuthService,
   ) {
     this.store.dispatch(requestCsrfTokenAction());
-    if (sessionStorage.getItem('credential') !== null) {
-      this.loading = true;
-      this.handleCredential(sessionStorage.getItem('credential')!);
-      sessionStorage.removeItem('credential');
-    }
   }
 
   changed = 0;
@@ -101,44 +92,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         } else if (state.state === 'failed') {
           this.showSnack('Login Failed', 'error');
         }
-      });
-
-    this.selectFoundUserByEmail = this.store
-      .select(selectFoundUserByEmail)
-      .subscribe((data) => {
-        if (data) {
-          if ('email' in data) {
-            if (data.provider === 'user') {
-              this.loading = false;
-              this.tryEmail = true;
-            } else if (data!.provider === 'google') {
-              this.store.dispatch(
-                loginAction({
-                  email: this.googleUser?.email!,
-                  password: '',
-                  provider: 'google',
-                }),
-              );
-            }
-          } else {
-            this.store.dispatch(
-              signupAction({
-                user: {
-                  firstName: this.googleUser!.given_name,
-                  lastName: this.googleUser!.family_name,
-                  email: this.googleUser!.email,
-                  id: '',
-                  provider: 'google',
-                  profilePictureLink: '',
-                },
-                password: undefined,
-                confirmationPassword: undefined,
-              }),
-            );
-          }
-
-          this.store.dispatch(emptyStateAction());
-        }
+        this.matDialog.closeAll();
       });
   }
 
@@ -159,6 +113,11 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   onSubmitLogin() {
     if (this.loginGroup.valid) {
+      this.matDialog.open(LoadingComponent, {
+        width: '400px',
+        height: '200px',
+        disableClose: true,
+      });
       this.store.dispatch(
         loginAction({
           email: this.loginGroup.value.email!,
@@ -167,14 +126,6 @@ export class LoginComponent implements OnInit, OnDestroy {
         }),
       );
     }
-  }
-
-  handleCredential(credential: string) {
-    this.googleUser = jose.decodeJwt<GoogleUser>(credential);
-
-    this.store.dispatch(
-      findUserByEmailAction({ email: this.googleUser.email }),
-    );
   }
 
   makePasswordVisible() {

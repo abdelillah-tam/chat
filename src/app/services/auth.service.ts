@@ -1,7 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { User } from '../model/user';
 import { environment } from '../../environments/environment';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 export class AuthService {
   constructor(private httpClient: HttpClient) {}
 
@@ -23,7 +22,7 @@ export class AuthService {
         confirmationPassword: confirmationPassword,
       },
       {
-       withCredentials: true
+        withCredentials: true,
       },
     );
   }
@@ -58,7 +57,7 @@ export class AuthService {
   }
 
   findUsersByName(name: string) {
-    return this.httpClient.post<Array<any> | { code: number; error: string }>(
+    return this.httpClient.post<Array<any>>(
       `${environment.API}/findByName`,
       {
         name: name,
@@ -67,7 +66,7 @@ export class AuthService {
         headers: new HttpHeaders({
           'Content-Type': 'application/json',
         }),
-        withCredentials: true
+        withCredentials: true,
       },
     );
   }
@@ -116,7 +115,7 @@ export class AuthService {
         headers: new HttpHeaders({
           'Content-Type': 'application/json',
         }),
-        withCredentials: true
+        withCredentials: true,
       },
     );
   }
@@ -128,48 +127,51 @@ export class AuthService {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
       }),
-      withCredentials: true
+      withCredentials: true,
     });
   }
   updateInfos(
-    objectId: string,
     firstName: string | undefined,
     lastName: string | undefined,
     email: string | undefined,
-    password: string | undefined,
-    provider: string,
   ) {
-    if (provider !== 'google') {
+   
       return this.httpClient.patch<boolean>(
-        `${environment.API}/update/${objectId}`,
+        `${environment.API}/update`,
         {
           first_name: firstName,
           last_name: lastName,
           email: email,
-          password: password,
         },
         {
           headers: new HttpHeaders({
             'Content-Type': 'application/json',
           }),
-          withCredentials: true
+          withCredentials: true,
         },
       );
-    } else {
+    
+  }
+
+  updatePassword(
+    currentPassword: string,
+    newPassword: string,
+    passwordConfirmation: string,
+  ){
       return this.httpClient.patch<boolean>(
-        `${environment.API}/updateGoogle/${objectId}`,
+        `${environment.API}/updatePassword`,
         {
-          first_name: firstName,
-          last_name: lastName,
+          current_password: currentPassword,
+          new_password: newPassword,
+          password_confirmation: passwordConfirmation,
         },
         {
           headers: new HttpHeaders({
             'Content-Type': 'application/json',
           }),
-          withCredentials: true
+          withCredentials: true,
         },
       );
-    }
   }
 
   validateToken() {
@@ -180,17 +182,12 @@ export class AuthService {
     });
   }
 
-  updateProfilePicture(link: string) {
-    return this.httpClient.post<string>(
+  uploadImage(formData: FormData) {
+    return this.httpClient.post<string | { message: string; code: number }>(
       `${environment.API}/profileImageLink`,
+      formData,
       {
-        link: link,
-      },
-      {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
-        withCredentials: true
+        withCredentials: true,
       },
     );
   }
@@ -204,18 +201,6 @@ export class AuthService {
         }),
       },
     );
-  }
-
-  async uploadImage(file: File, sender: string) {
-    const storage = getStorage();
-    let downloadUrl: string;
-
-    const storageRef = ref(storage, `profilePicture/${sender}/${file.name}`);
-    await uploadBytes(storageRef, file);
-    let url = await getDownloadURL(storageRef);
-    downloadUrl = url;
-
-    return downloadUrl;
   }
 }
 

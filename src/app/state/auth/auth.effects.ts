@@ -3,26 +3,20 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { AuthService } from '../../services/auth.service';
 import {
   errorAction,
-  FIND_USERS,
-  GET_ALL_USERS_IN_CONTACT,
-  UPDATE_USER_INFO,
-  UPLOAD_PROFILE_PICTURE,
-  GET_CURRENT_LOGGEDIN_USER,
-  retrievedCurrentLoggedInUserAction,
-  GET_USER_BY_OBJECT_ID,
-  retrievedUsersAction,
-  retrievedUserAction,
-  updatedInfosAction,
-  CHECK_TOKEN_IF_VALID,
-  retrievedTokenCheckingAction,
-  GET_PROFILE_PICTURE_LINK,
-  retrievedProfilePictureLinkAction,
-  FIND_BY_EMAIL,
-  retrievedFoundUserByEmailAction,
-  RETRIEVED_PROFILE_PICTURE_LINK,
-  retrievedProfilePictureAction,
-  REQUEST_CSRF_TOKEN,
-  finishedCsrfTokenRequestAction,
+  loadLoggedInUserSuccess,
+  loadUsersInContactSuccess,
+  loadUserSuccess,
+  updateUserInfoSuccess,
+  requestCsrfTokenSuccess,
+  loadLoggedInUser,
+  loadUsersInContact,
+  loadUserById,
+  findUsers,
+  uploadProfilePicAction,
+  updateUserInfo,
+  requestCsrfTokenAction,
+  updatePassword,
+  updatePasswordSuccess,
 } from './auth.actions';
 import {
   catchError,
@@ -32,34 +26,30 @@ import {
   map,
   of,
   switchAll,
-  switchMap,
 } from 'rxjs';
 
 @Injectable()
 export class AuthEffects {
-  getCurrentLoggedInUser$;
+  getLoggedInUser$;
   getUserByObjectId$;
   getAllUsers$;
   findUsers$;
   uploadProfilePicture$;
-  updateProfilePictureLink$;
   updateUserInfo$;
-  tokenValidation$;
-  getProfilePictureLink$;
-  findUserByEmail$;
+  updatePassword$;
   requestCsrfToken$;
 
   constructor(
     private action$: Actions,
     private authService: AuthService,
   ) {
-    this.getCurrentLoggedInUser$ = createEffect(() =>
+    this.getLoggedInUser$ = createEffect(() =>
       this.action$.pipe(
-        ofType(GET_CURRENT_LOGGEDIN_USER),
+        ofType(loadLoggedInUser),
         exhaustMap((value: { objectId: string }) => {
           return this.authService.findUserById(value.objectId).pipe(
             map((data) => {
-              return retrievedCurrentLoggedInUserAction({
+              return loadLoggedInUserSuccess({
                 currentUserLoggedInOrError: data,
               });
             }),
@@ -70,11 +60,11 @@ export class AuthEffects {
 
     this.getUserByObjectId$ = createEffect(() =>
       this.action$.pipe(
-        ofType(GET_USER_BY_OBJECT_ID),
-        map((value: { objectId: string }) =>
-          this.authService.findUserById(value.objectId).pipe(
+        ofType(loadUserById),
+        map((value: { id: string }) =>
+          this.authService.findUserById(value.id).pipe(
             map((data) => {
-              return retrievedUserAction({ user: data });
+              return loadUserSuccess({ user: data });
             }),
           ),
         ),
@@ -84,11 +74,11 @@ export class AuthEffects {
 
     this.getAllUsers$ = createEffect(() =>
       this.action$.pipe(
-        ofType(GET_ALL_USERS_IN_CONTACT),
+        ofType(loadUsersInContact),
         exhaustMap(() =>
           this.authService.getUsersInContact().pipe(
             map((data) => {
-              return retrievedUsersAction({
+              return loadUsersInContactSuccess({
                 users: data,
               });
             }),
@@ -100,19 +90,13 @@ export class AuthEffects {
     this.findUsers$ = createEffect(() =>
       this.action$.pipe(
         debounceTime(500),
-        ofType(FIND_USERS),
+        ofType(findUsers),
         map((value: { name: string }) => {
           return this.authService.findUsersByName(value.name).pipe(
-            map((data) => {
-              if ('error' in data) {
-                return errorAction({
-                  code: data.code,
-                  error: data.error,
-                });
-              } else {
-                return retrievedUsersAction({ users: data });
-              }
-            }),
+            map((data) => loadUsersInContactSuccess({ users: data })),
+            catchError((error) =>
+              of(errorAction({ code: error.status, error: error.message })),
+            ),
           );
         }),
         switchAll(),
@@ -121,54 +105,40 @@ export class AuthEffects {
 
     this.uploadProfilePicture$ = createEffect(() =>
       this.action$.pipe(
-        ofType(UPLOAD_PROFILE_PICTURE),
-        exhaustMap((value: { file: File; userId: string }) =>
-          from(this.authService.uploadImage(value.file, value.userId)).pipe(
+        ofType(uploadProfilePicAction),
+        exhaustMap((value: { formData: FormData }) =>
+          from(this.authService.uploadImage(value.formData)).pipe(
             map((data) => {
-              return retrievedProfilePictureLinkAction({ link: data });
+              if (typeof data != 'string') {
+                return errorAction({
+                  code: data.code,
+                  error: data.message,
+                });
+              } else {
+                return loadLoggedInUser({
+                  objectId: localStorage.getItem('id')!,
+                });
+              }
             }),
           ),
         ),
       ),
     );
 
-    this.updateProfilePictureLink$ = createEffect(() =>
-      this.action$.pipe(
-        ofType(RETRIEVED_PROFILE_PICTURE_LINK),
-        exhaustMap((value: { link: string }) => {
-          return this.authService.updateProfilePicture(value.link).pipe(
-            map((data) => {
-              return retrievedProfilePictureAction({ link: data });
-            }),
-          );
-        }),
-      ),
-    );
-
     this.updateUserInfo$ = createEffect(() =>
       this.action$.pipe(
-        ofType(UPDATE_USER_INFO),
+        ofType(updateUserInfo),
         exhaustMap(
           (value: {
-            objectId: string;
             firstName: string | undefined;
             lastName: string | undefined;
             email: string | undefined;
-            password: string | undefined;
-            provider: string;
           }) => {
             return this.authService
-              .updateInfos(
-                value.objectId,
-                value.firstName,
-                value.lastName,
-                value.email,
-                value.password,
-                value.provider,
-              )
+              .updateInfos(value.firstName, value.lastName, value.email)
               .pipe(
                 map((data) => {
-                  return updatedInfosAction({ result: data });
+                  return updateUserInfoSuccess({ result: data });
                 }),
               );
           },
@@ -176,52 +146,38 @@ export class AuthEffects {
       ),
     );
 
-    this.tokenValidation$ = createEffect(() =>
+    this.updatePassword$ = createEffect(() =>
       this.action$.pipe(
-        ofType(CHECK_TOKEN_IF_VALID),
-        exhaustMap(() =>
-          this.authService.validateToken().pipe(
-            map((data) => {
-              return retrievedTokenCheckingAction({ valid: data });
-            }),
-          ),
-        ),
-      ),
-    );
-
-    this.getProfilePictureLink$ = createEffect(() =>
-      this.action$.pipe(
-        ofType(GET_PROFILE_PICTURE_LINK),
-        exhaustMap((value: { objectId: string }) =>
-          this.authService.getProfilePictureLink(value.objectId).pipe(
-            map((response) => {
-              return retrievedProfilePictureAction({ link: response });
-            }),
-          ),
-        ),
-      ),
-    );
-
-    this.findUserByEmail$ = createEffect(() =>
-      this.action$.pipe(
-        ofType(FIND_BY_EMAIL),
-        exhaustMap((value: { email: string }) =>
-          this.authService
-            .findUserByEmail(value.email)
-            .pipe(
-              map((data) => retrievedFoundUserByEmailAction({ data: data })),
-            ),
+        ofType(updatePassword),
+        exhaustMap(
+          (value: {
+            currentPassword: string;
+            newPassword: string;
+            passwordConfirmation: string;
+          }) => {
+            return this.authService
+              .updatePassword(
+                value.currentPassword,
+                value.newPassword,
+                value.passwordConfirmation,
+              )
+              .pipe(
+                map((data) => {
+                  return updatePasswordSuccess({ result: data });
+                }),
+              );
+          },
         ),
       ),
     );
 
     this.requestCsrfToken$ = createEffect(() =>
       this.action$.pipe(
-        ofType(REQUEST_CSRF_TOKEN),
+        ofType(requestCsrfTokenAction),
         exhaustMap(() => {
           return this.authService.requestCsrfToken().pipe(
             map((data) => {
-              return finishedCsrfTokenRequestAction();
+              return requestCsrfTokenSuccess();
             }),
           );
         }),

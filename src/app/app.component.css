@@ -20,3 +20,7 @@ mat-icon {
   text-align: center;
   font-weight: var(--font-weight-extralight);
 }
+
+mat-sidenav {
+  --mat-sidenav-container-background-color: var(--color-slate-100);
+}

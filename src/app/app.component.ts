@@ -64,11 +64,17 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.breakPointObserver.observe(['(width<40rem)']).subscribe((result) => {
       this.isSmallScreen = result.matches;
+      if(!this.isSmallScreen && this.openSide){
+        this.openSide = false;
+      }
+      
     });
 
     this.store.select(sideNavStateSelector).subscribe((result) => {
       this.openSide = result;
+
     });
+    
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((result) => {

@@ -30,7 +30,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subscription, timestamp } from 'rxjs';
 import { DatePipePipe } from '../../date-pipe.pipe';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BreakpointObserver } from '@angular/cdk/layout';
@@ -140,10 +140,7 @@ export class ChatComponent implements OnInit, OnDestroy {
           this.sending = false;
           this.loading = false;
 
-          setTimeout(() => {
-            this.mainElement()!.nativeElement.scrollTop =
-              this.mainElement()!.nativeElement.scrollHeight;
-          }, 100);
+          this.scrollToBottom();
         }
       });
   }
@@ -157,17 +154,26 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   sendMessage() {
-    console.log('called');
     if (this.file || this.text.length) {
       this.sending = true;
-      let message = new FormData();
-      let channelUUID = crypto.randomUUID();
-      message.append('messageText', this.text ?? '');
-      message.append('senderId', localStorage.getItem('id')!);
-      message.append('receiverId', this.receiverUser!.id);
-      message.append('channel', channelUUID);
+
+      let channelUUID = this.channel ?? crypto.randomUUID();
+      let tempMsgObj: Message = {
+        messageText: this.text ?? '',
+        senderId: localStorage.getItem('id')!,
+        receiverId: this.receiverUser!.id,
+        channel: channelUUID,
+        timestamp: Date.now(),
+        imageUrl: this.file ? URL.createObjectURL(this.file) : '',
+      };
+      let messageFormData = new FormData();
+
+      messageFormData.append('messageText', tempMsgObj.messageText);
+      messageFormData.append('senderId', tempMsgObj.senderId);
+      messageFormData.append('receiverId', tempMsgObj.receiverId);
+      messageFormData.append('channel', tempMsgObj.channel);
       if (this.file) {
-        message.append('image', this.file);
+        messageFormData.append('image', this.file);
       }
 
       if (!this.messages.length) {
@@ -176,10 +182,12 @@ export class ChatComponent implements OnInit, OnDestroy {
 
       this.store.dispatch(
         sendMessageAction({
-          message: message,
+          message: messageFormData,
           firstMessage: this.messages.length === 0 ? true : false,
         }),
       );
+
+      this.messages.push(tempMsgObj);
       this.file = null;
       this.text = '';
     }
@@ -290,5 +298,12 @@ export class ChatComponent implements OnInit, OnDestroy {
 
       return false;
     }
+  }
+
+  scrollToBottom() {
+    setTimeout(() => {
+      this.mainElement()!.nativeElement.scrollTop =
+        this.mainElement()!.nativeElement.scrollHeight;
+    }, 100);
   }
 }

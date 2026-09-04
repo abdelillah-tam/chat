@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import {
   Component,
   ElementRef,
@@ -29,9 +29,8 @@ import {
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Subscription, timestamp } from 'rxjs';
-import { DatePipePipe } from '../../date-pipe.pipe';
+import { Router, RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BreakpointObserver } from '@angular/cdk/layout';
 
@@ -45,7 +44,7 @@ import { BreakpointObserver } from '@angular/cdk/layout';
     MatFormFieldModule,
     MatInputModule,
     RouterLink,
-    DatePipePipe,
+    DatePipe,
     MatProgressSpinnerModule,
   ],
   templateUrl: './chat.component.html',
@@ -163,7 +162,7 @@ export class ChatComponent implements OnInit, OnDestroy {
         senderId: localStorage.getItem('id')!,
         receiverId: this.receiverUser!.id,
         channel: channelUUID,
-        timestamp: Date.now(),
+        timestamp: Date.now() / 1000,
         imageUrl: this.file ? URL.createObjectURL(this.file) : '',
       };
       let messageFormData = new FormData();
@@ -276,7 +275,6 @@ export class ChatComponent implements OnInit, OnDestroy {
     const diffDays = Math.round(
       (now.getTime() - timestampDate.getTime()) / oneDay,
     );
-
     if (diffDays === 0) {
       return 'Today';
     } else if (diffDays === 1) {

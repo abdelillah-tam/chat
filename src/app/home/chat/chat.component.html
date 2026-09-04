@@ -50,8 +50,13 @@
               calculateOneDay(msg.timestamp, messages[$index - 1].timestamp)
             ) {
               <li class="flex justify-center">
+                @let day = whichDay(msg.timestamp);
                 <p class="rounded-2xl bg-white border px-4 py-2 my-2">
-                  {{ whichDay(msg.timestamp) | datePipe }}
+                  @if (day != "Yesterday" && day != "Today") {
+                    {{ day | date: "yyyy-MM-dd" }}
+                  } @else {
+                    {{ day }}
+                  }
                 </p>
               </li>
             }
